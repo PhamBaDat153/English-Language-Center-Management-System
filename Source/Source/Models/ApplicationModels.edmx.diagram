@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="b016e4dfa01d4ba8a07b14ed529f8160" Name="Diagram1">
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.Assessment" Width="1.5" PointX="12" PointY="31.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.AssessmentScore" Width="1.5" PointX="5.25" PointY="19.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.AttendanceRecord" Width="1.5" PointX="8.25" PointY="20" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.Class" Width="1.5" PointX="9.75" PointY="30.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.ClassSchedule" Width="1.5" PointX="15" PointY="31.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.ClassSession" Width="1.5" PointX="12" PointY="27.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.Course" Width="1.5" PointX="7.5" PointY="26.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.Enrollment" Width="1.5" PointX="12" PointY="35.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.Notification" Width="1.5" PointX="5.25" PointY="23.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.Payment" Width="1.5" PointX="8.25" PointY="15.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.Role" Width="1.5" PointX="0.75" PointY="20.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.Room" Width="1.5" PointX="7.5" PointY="35.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.Staff_Profile" Width="1.5" PointX="5.25" PointY="31" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.Student_Profile" Width="1.5" PointX="5.25" PointY="35.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.SyllabusMaterial" Width="1.5" PointX="9.75" PointY="41" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.Teacher_profile" Width="1.5" PointX="7.5" PointY="31.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.Teacher_qualification" Width="1.5" PointX="9.75" PointY="36.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.TimeSlot" Width="1.5" PointX="9.75" PointY="26.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="NewGen_english_center_dbModel.User" Width="1.5" PointX="3" PointY="18.75" IsExpanded="true" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Assessments_Class" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Scores_Assessment" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Scores_Enrollment" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Scores_User" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Attendance_Enrollment" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Attendance_Session" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Attendance_User" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Classes_Course" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Classes_Room" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Classes_Teacher" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Enrollments_Class" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Schedules_Class" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Sessions_Class" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Schedules_TimeSlot" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Sessions_TimeSlot" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Syllabus_Course" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Enrollments_Student" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Payments_Enrollment" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Notifications_User" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Payments_User" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Staff_User" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Teachers_Staff" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Students_User" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.FK_Qualifications_Teacher" ManuallyRouted="false" />
+        <AssociationConnector Association="NewGen_english_center_dbModel.User_Role" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

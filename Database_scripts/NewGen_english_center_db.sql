@@ -1,3 +1,4 @@
+
 USE master;
 GO
 
@@ -15,7 +16,7 @@ GO
 USE NewGen_english_center_db;
 GO
 
-CREATE TABLE dbo.Users (
+CREATE TABLE dbo.[User] (
     user_id uniqueidentifier NOT NULL,
     username varchar(100) NULL,
     hashed_password varchar(255) NULL,
@@ -41,7 +42,7 @@ CREATE TABLE dbo.Users (
 );
 GO
 
-CREATE TABLE dbo.Roles (
+CREATE TABLE dbo.[Role] (
     role_id uniqueidentifier NOT NULL,
     role_name varchar(30) NOT NULL,
     role_description nvarchar(500) NULL,
@@ -53,16 +54,16 @@ CREATE TABLE dbo.Roles (
 );
 GO
 
-CREATE TABLE dbo.User_Roles (
+CREATE TABLE dbo.[User_Role] (
     user_id uniqueidentifier NOT NULL,
     role_id uniqueidentifier NOT NULL,
     CONSTRAINT PK_User_Roles PRIMARY KEY (user_id, role_id),
-    CONSTRAINT FK_UserRoles_User FOREIGN KEY (user_id) REFERENCES dbo.Users(user_id),
-    CONSTRAINT FK_UserRoles_Role FOREIGN KEY (role_id) REFERENCES dbo.Roles(role_id)
+    CONSTRAINT FK_UserRoles_User FOREIGN KEY (user_id) REFERENCES dbo.[User](user_id),
+    CONSTRAINT FK_UserRoles_Role FOREIGN KEY (role_id) REFERENCES dbo.[Role](role_id)
 );
 GO
 
-CREATE TABLE dbo.Staff_Profiles (
+CREATE TABLE dbo.[Staff_Profile] (
     staff_id uniqueidentifier NOT NULL,
     user_id uniqueidentifier NOT NULL,
     staff_code varchar(50) NOT NULL,
@@ -79,14 +80,14 @@ CREATE TABLE dbo.Staff_Profiles (
     CONSTRAINT PK_Staff PRIMARY KEY (staff_id), 
     CONSTRAINT UQ_Staff_User UNIQUE (user_id),
     CONSTRAINT UQ_Staff_Code UNIQUE (staff_code),
-    CONSTRAINT FK_Staff_User FOREIGN KEY (user_id) REFERENCES dbo.Users(user_id),
+    CONSTRAINT FK_Staff_User FOREIGN KEY (user_id) REFERENCES dbo.[User](user_id),
     CONSTRAINT CK_Staff_Type CHECK (employment_type IS NULL OR employment_type IN ('FullTime','PartTime','Contract','Intern')), 
     CONSTRAINT CK_Staff_Status CHECK (employment_status IN ('Active','OnLeave','Resigned','Terminated')),
     CONSTRAINT CK_Staff_Available CHECK (available_status IN ('Available','Unavailable'))
 );
 GO
 
-CREATE TABLE dbo.Student_Profiles (
+CREATE TABLE dbo.[Student_Profile] (
     student_id uniqueidentifier NOT NULL,
     user_id uniqueidentifier NOT NULL,
     student_code varchar(50) NOT NULL,
@@ -100,14 +101,14 @@ CREATE TABLE dbo.Student_Profiles (
     CONSTRAINT PK_Students PRIMARY KEY (student_id),
     CONSTRAINT UQ_Students_User UNIQUE (user_id),
     CONSTRAINT UQ_Students_Code UNIQUE (student_code),
-    CONSTRAINT FK_Students_User FOREIGN KEY (user_id) REFERENCES dbo.Users(user_id), 
+    CONSTRAINT FK_Students_User FOREIGN KEY (user_id) REFERENCES dbo.[User](user_id), 
     CONSTRAINT CK_Students_Status CHECK (student_status IN ('Active','Inactive','Graduated','Suspended')),
     CONSTRAINT CK_Students_Level CHECK (current_level IS NULL OR current_level IN ('Beginner','Elementary','Intermediate','UpperIntermediate','Advanced','IELTS','TOEIC')),  
     CONSTRAINT CK_Students_Available CHECK (available_status IN ('Available','Unavailable'))
 );
 GO
 
-CREATE TABLE dbo.teacher_profiles (
+CREATE TABLE dbo.[Teacher_profile] (
     teacher_id uniqueidentifier NOT NULL,
     staff_id uniqueidentifier NOT NULL,
     professional_title nvarchar(150) NULL,
@@ -119,12 +120,12 @@ CREATE TABLE dbo.teacher_profiles (
     available_status varchar(20) NOT NULL,
     CONSTRAINT PK_Teachers PRIMARY KEY (teacher_id), 
     CONSTRAINT UQ_Teachers_Staff UNIQUE (staff_id),
-    CONSTRAINT FK_Teachers_Staff FOREIGN KEY (staff_id) REFERENCES dbo.Staff_Profiles(staff_id),
+    CONSTRAINT FK_Teachers_Staff FOREIGN KEY (staff_id) REFERENCES dbo.[Staff_Profile](staff_id),
     CONSTRAINT CK_Teachers_Status CHECK (available_status IN ('Available','Unavailable'))
 );
 GO
 
-CREATE TABLE dbo.teacher_qualifications (
+CREATE TABLE dbo.[Teacher_qualification] (
     qualification_id uniqueidentifier NOT NULL,
     teacher_id uniqueidentifier NOT NULL,
     qualification_name nvarchar(200) NOT NULL,
@@ -135,12 +136,12 @@ CREATE TABLE dbo.teacher_qualifications (
     updated_at datetime2(3) NOT NULL,
     available_status varchar(20) NOT NULL,
     CONSTRAINT PK_Qualifications PRIMARY KEY (qualification_id),
-    CONSTRAINT FK_Qualifications_Teacher FOREIGN KEY (teacher_id) REFERENCES dbo.teacher_profiles(teacher_id),
+    CONSTRAINT FK_Qualifications_Teacher FOREIGN KEY (teacher_id) REFERENCES dbo.[Teacher_profile](teacher_id),
     CONSTRAINT CK_Qualifications_Status CHECK (available_status IN ('Available','Unavailable'))
 );
 GO
 
-CREATE TABLE dbo.Courses (
+CREATE TABLE dbo.[Course] (
     course_id uniqueidentifier NOT NULL,
     course_code varchar(50) NOT NULL,
     course_name nvarchar(200) NOT NULL,
@@ -159,7 +160,7 @@ CREATE TABLE dbo.Courses (
 );
 GO
 
-CREATE TABLE dbo.SyllabusMaterials (
+CREATE TABLE dbo.[SyllabusMaterial] (
     syllabus_id uniqueidentifier NOT NULL,
     course_id uniqueidentifier NOT NULL,
     title nvarchar(200) NOT NULL,
@@ -167,12 +168,12 @@ CREATE TABLE dbo.SyllabusMaterials (
     file_url varchar(1000) NULL,
     available_status varchar(20) NOT NULL,
     CONSTRAINT PK_Syllabus PRIMARY KEY (syllabus_id),
-    CONSTRAINT FK_Syllabus_Course FOREIGN KEY (course_id) REFERENCES dbo.Courses(course_id),  
+    CONSTRAINT FK_Syllabus_Course FOREIGN KEY (course_id) REFERENCES dbo.[Course](course_id),  
     CONSTRAINT CK_Syllabus_Status CHECK (available_status IN ('Available','Unavailable'))
 );
 GO
 
-CREATE TABLE dbo.Rooms (
+CREATE TABLE dbo.[Room] (
     room_id uniqueidentifier NOT NULL,
     room_code varchar(50) NOT NULL,
     room_name nvarchar(150) NOT NULL,
@@ -188,7 +189,7 @@ CREATE TABLE dbo.Rooms (
 );
 GO
 
-CREATE TABLE dbo.Classes (
+CREATE TABLE dbo.[Class] (
     class_id uniqueidentifier NOT NULL,
     teacher_id uniqueidentifier NULL,
     course_id uniqueidentifier NOT NULL,
@@ -201,15 +202,15 @@ CREATE TABLE dbo.Classes (
     class_status varchar(20) NOT NULL,
     CONSTRAINT PK_Classes PRIMARY KEY (class_id),
     CONSTRAINT UQ_Classes_Code UNIQUE (class_code),
-    CONSTRAINT FK_Classes_Teacher FOREIGN KEY (teacher_id) REFERENCES dbo.teacher_profiles(teacher_id),
-    CONSTRAINT FK_Classes_Course FOREIGN KEY (course_id) REFERENCES dbo.Courses(course_id),
-    CONSTRAINT FK_Classes_Room FOREIGN KEY (room_id) REFERENCES dbo.Rooms(room_id),
+    CONSTRAINT FK_Classes_Teacher FOREIGN KEY (teacher_id) REFERENCES dbo.[Teacher_profile](teacher_id),
+    CONSTRAINT FK_Classes_Course FOREIGN KEY (course_id) REFERENCES dbo.[Course](course_id),
+    CONSTRAINT FK_Classes_Room FOREIGN KEY (room_id) REFERENCES dbo.[Room](room_id),
     CONSTRAINT CK_Classes_Dates CHECK (end_date >= start_date),
     CONSTRAINT CK_Classes_Status CHECK (class_status IN ('Planned','Open','InProgress','Completed','Cancelled'))
 );
 GO
 
-CREATE TABLE dbo.TimeSlots (
+CREATE TABLE dbo.[TimeSlot] (
     time_slot_id uniqueidentifier NOT NULL,
     slot_name nvarchar(100) NOT NULL,
     start_time time NOT NULL,
@@ -224,7 +225,7 @@ CREATE TABLE dbo.TimeSlots (
 );
 GO
 
-CREATE TABLE dbo.ClassSchedules (
+CREATE TABLE dbo.[ClassSchedule] (
     class_schedule_id uniqueidentifier NOT NULL,
     class_id uniqueidentifier NOT NULL,
     time_slot_id uniqueidentifier NOT NULL,
@@ -233,13 +234,13 @@ CREATE TABLE dbo.ClassSchedules (
     created_at datetime2(3) NOT NULL,
     updated_at datetime2(3) NOT NULL,
     CONSTRAINT PK_ClassSchedules PRIMARY KEY (class_schedule_id),
-    CONSTRAINT FK_Schedules_Class FOREIGN KEY (class_id) REFERENCES dbo.Classes(class_id),
-    CONSTRAINT FK_Schedules_TimeSlot FOREIGN KEY (time_slot_id) REFERENCES dbo.TimeSlots(time_slot_id),
+    CONSTRAINT FK_Schedules_Class FOREIGN KEY (class_id) REFERENCES dbo.[Class](class_id),
+    CONSTRAINT FK_Schedules_TimeSlot FOREIGN KEY (time_slot_id) REFERENCES dbo.[TimeSlot](time_slot_id),
     CONSTRAINT CK_Schedules_Day CHECK (week_day IN ('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'))
 );
 GO
 
-CREATE TABLE dbo.Enrollments (
+CREATE TABLE dbo.[Enrollment] (
     enrollment_id uniqueidentifier NOT NULL,
     class_id uniqueidentifier NOT NULL,
     student_id uniqueidentifier NOT NULL,
@@ -253,27 +254,27 @@ CREATE TABLE dbo.Enrollments (
     enrollment_status varchar(20) NOT NULL,
     CONSTRAINT PK_Enrollments PRIMARY KEY (enrollment_id),
     CONSTRAINT UQ_Enrollments_StudentClass UNIQUE (student_id,class_id),
-    CONSTRAINT FK_Enrollments_Class FOREIGN KEY (class_id) REFERENCES dbo.Classes(class_id),
-    CONSTRAINT FK_Enrollments_Student FOREIGN KEY (student_id) REFERENCES dbo.Student_Profiles(student_id),
+    CONSTRAINT FK_Enrollments_Class FOREIGN KEY (class_id) REFERENCES dbo.[Class](class_id),
+    CONSTRAINT FK_Enrollments_Student FOREIGN KEY (student_id) REFERENCES dbo.[Student_Profile](student_id),
     CONSTRAINT CK_Enrollments_Fee CHECK (tuition_amount >= 0),
     CONSTRAINT CK_Enrollments_Status CHECK (enrollment_status IN ('Pending','Confirmed','Studying','Completed','Withdrawn','Cancelled'))
 );
 GO
 
-CREATE TABLE dbo.ClassSessions (
+CREATE TABLE dbo.[ClassSession] (
     session_id uniqueidentifier NOT NULL,
     class_id uniqueidentifier NOT NULL,
     time_slot_id uniqueidentifier NOT NULL,
     session_date date NOT NULL,
     topic nvarchar(300) NULL,
     CONSTRAINT PK_ClassSessions PRIMARY KEY (session_id),
-    CONSTRAINT FK_Sessions_Class FOREIGN KEY (class_id) REFERENCES dbo.Classes(class_id),
-    CONSTRAINT FK_Sessions_TimeSlot FOREIGN KEY (time_slot_id) REFERENCES dbo.TimeSlots(time_slot_id),
+    CONSTRAINT FK_Sessions_Class FOREIGN KEY (class_id) REFERENCES dbo.[Class](class_id),
+    CONSTRAINT FK_Sessions_TimeSlot FOREIGN KEY (time_slot_id) REFERENCES dbo.[TimeSlot](time_slot_id),
     CONSTRAINT UQ_Sessions_ClassDateSlot UNIQUE (class_id,session_date,time_slot_id)
 );
 GO
 
-CREATE TABLE dbo.AttendanceRecords (
+CREATE TABLE dbo.[AttendanceRecord] (
     attendance_id uniqueidentifier NOT NULL,
     enrollment_id uniqueidentifier NOT NULL,
     session_id uniqueidentifier NOT NULL,
@@ -284,14 +285,14 @@ CREATE TABLE dbo.AttendanceRecords (
     attendance_status varchar(20) NOT NULL,
     CONSTRAINT PK_Attendance PRIMARY KEY (attendance_id),
     CONSTRAINT UQ_Attendance UNIQUE (enrollment_id,session_id),
-    CONSTRAINT FK_Attendance_Enrollment FOREIGN KEY (enrollment_id) REFERENCES dbo.Enrollments(enrollment_id),
-    CONSTRAINT FK_Attendance_Session FOREIGN KEY (session_id) REFERENCES dbo.ClassSessions(session_id),
-    CONSTRAINT FK_Attendance_User FOREIGN KEY (recorded_by) REFERENCES dbo.Users(user_id),
+    CONSTRAINT FK_Attendance_Enrollment FOREIGN KEY (enrollment_id) REFERENCES dbo.[Enrollment](enrollment_id),
+    CONSTRAINT FK_Attendance_Session FOREIGN KEY (session_id) REFERENCES dbo.[ClassSession](session_id),
+    CONSTRAINT FK_Attendance_User FOREIGN KEY (recorded_by) REFERENCES dbo.[User](user_id),
     CONSTRAINT CK_Attendance_Status CHECK (attendance_status IN ('Present','Absent','Excused'))
 );
 GO
 
-CREATE TABLE dbo.Assessments (
+CREATE TABLE dbo.[Assessment] (
     assessment_id uniqueidentifier NOT NULL,
     class_id uniqueidentifier NOT NULL,
     assessment_type varchar(20) NOT NULL,
@@ -302,13 +303,13 @@ CREATE TABLE dbo.Assessments (
     created_at datetime2(3) NOT NULL,
     updated_at datetime2(3) NOT NULL,
     CONSTRAINT PK_Assessments PRIMARY KEY (assessment_id),
-    CONSTRAINT FK_Assessments_Class FOREIGN KEY (class_id) REFERENCES dbo.Classes(class_id),
+    CONSTRAINT FK_Assessments_Class FOREIGN KEY (class_id) REFERENCES dbo.[Class](class_id),
     CONSTRAINT CK_Assessments_Type CHECK (assessment_type IN ('Quiz','Assignment','Midterm','Final','Speaking','Listening','Reading','Writing','Project')),
     CONSTRAINT CK_Assessments_Max CHECK (max_score > 0)
 );
 GO
 
-CREATE TABLE dbo.AssessmentScores (
+CREATE TABLE dbo.[AssessmentScore] (
     assessment_score_id uniqueidentifier NOT NULL,
     entered_by uniqueidentifier NOT NULL,
     assessment_id uniqueidentifier NOT NULL,
@@ -318,14 +319,14 @@ CREATE TABLE dbo.AssessmentScores (
     created_at datetime2(3) NOT NULL,
     CONSTRAINT PK_AssessmentScores PRIMARY KEY (assessment_score_id),
     CONSTRAINT UQ_Scores_AssessmentEnrollment UNIQUE (assessment_id,enrollment_id),
-    CONSTRAINT FK_Scores_User FOREIGN KEY (entered_by) REFERENCES dbo.Users(user_id),
-    CONSTRAINT FK_Scores_Assessment FOREIGN KEY (assessment_id) REFERENCES dbo.Assessments(assessment_id),
-    CONSTRAINT FK_Scores_Enrollment FOREIGN KEY (enrollment_id) REFERENCES dbo.Enrollments(enrollment_id),
+    CONSTRAINT FK_Scores_User FOREIGN KEY (entered_by) REFERENCES dbo.[User](user_id),
+    CONSTRAINT FK_Scores_Assessment FOREIGN KEY (assessment_id) REFERENCES dbo.[Assessment](assessment_id),
+    CONSTRAINT FK_Scores_Enrollment FOREIGN KEY (enrollment_id) REFERENCES dbo.[Enrollment](enrollment_id),
     CONSTRAINT CK_Scores_NonNegative CHECK (score >= 0)
 );
 GO
 
-CREATE TABLE dbo.Payments (
+CREATE TABLE dbo.[Payment] (
     payment_id uniqueidentifier NOT NULL,
     recorded_by uniqueidentifier NOT NULL,
     enrollment_id uniqueidentifier NOT NULL,
@@ -338,15 +339,15 @@ CREATE TABLE dbo.Payments (
     payment_method varchar(20) NOT NULL,
     CONSTRAINT PK_Payments PRIMARY KEY (payment_id),
     CONSTRAINT UQ_Payments_Receipt UNIQUE (receipt_number),
-    CONSTRAINT FK_Payments_User FOREIGN KEY (recorded_by) REFERENCES dbo.Users(user_id),
-    CONSTRAINT FK_Payments_Enrollment FOREIGN KEY (enrollment_id) REFERENCES dbo.Enrollments(enrollment_id),
+    CONSTRAINT FK_Payments_User FOREIGN KEY (recorded_by) REFERENCES dbo.[User](user_id),
+    CONSTRAINT FK_Payments_Enrollment FOREIGN KEY (enrollment_id) REFERENCES dbo.[Enrollment](enrollment_id),
     CONSTRAINT CK_Payments_Amount CHECK (amount > 0),
     CONSTRAINT CK_Payments_Status CHECK (payment_status IN ('Pending','Completed','Failed','Refunded','Cancelled')),
     CONSTRAINT CK_Payments_Method CHECK (payment_method IN ('Cash','BankTransfer','Card'))
 );
 GO
 
-CREATE TABLE dbo.Notifications (
+CREATE TABLE dbo.[Notification] (
     notification_id uniqueidentifier NOT NULL,
     user_id uniqueidentifier NOT NULL,
     title nvarchar(200) NOT NULL,
@@ -356,7 +357,7 @@ CREATE TABLE dbo.Notifications (
     updated_at datetime2(3) NOT NULL,
     read_status varchar(10) NOT NULL,
     CONSTRAINT PK_Notifications PRIMARY KEY (notification_id),
-    CONSTRAINT FK_Notifications_User FOREIGN KEY (user_id) REFERENCES dbo.Users(user_id),
+    CONSTRAINT FK_Notifications_User FOREIGN KEY (user_id) REFERENCES dbo.[User](user_id),
     CONSTRAINT CK_Notifications_Type CHECK (notification_type IN ('ClassReminder','PaymentReminder','ScoreRelease','EnrollmentUpdate','General')),
     CONSTRAINT CK_Notifications_Read CHECK (read_status IN ('Unread','Read'))
 );

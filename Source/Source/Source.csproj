@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\EntityFramework.6.5.2\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.5.2\build\EntityFramework.props')" />
   <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -45,10 +46,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.5.2\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.5.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -124,6 +133,78 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ApplicationModels.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApplicationModels.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationModels.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationModels.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApplicationModels.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Assessment.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AssessmentScore.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AttendanceRecord.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Class.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ClassSchedule.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ClassSession.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Course.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Enrollment.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Notification.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Payment.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Role.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Room.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Staff_Profile.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Student_Profile.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SyllabusMaterial.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Teacher_profile.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Teacher_qualification.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TimeSlot.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\User.cs">
+      <DependentUpon>ApplicationModels.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -146,6 +227,16 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Models\ApplicationModels.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ApplicationModels.edmx</DependentUpon>
+      <LastGenOutput>ApplicationModels.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\ApplicationModels.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ApplicationModels.edmx</DependentUpon>
+      <LastGenOutput>ApplicationModels.cs</LastGenOutput>
+    </Content>
     <Content Include="Resources\adminhmd-1.0.0\.gitattributes" />
     <Content Include="Resources\adminhmd-1.0.0\assets\css\bootstrap.min.css" />
     <Content Include="Resources\adminhmd-1.0.0\assets\css\style.css" />
@@ -405,6 +496,13 @@
     <Content Include="Resources\adminhmd-1.0.0\assets\vendors\bootstrap-icons\fonts\bootstrap-icons.woff" />
     <Content Include="Resources\adminhmd-1.0.0\assets\vendors\bootstrap-icons\fonts\bootstrap-icons.woff2" />
     <Content Include="Resources\adminhmd-1.0.0\README.md" />
+    <EntityDeploy Include="Models\ApplicationModels.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ApplicationModels.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\ApplicationModels.edmx.diagram">
+      <DependentUpon>ApplicationModels.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -433,7 +531,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
@@ -461,6 +558,9 @@
     <Content Include="Scripts\bootstrap.bundle.js.map" />
     <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.7.0.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -501,5 +601,8 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.5.2\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.5.2\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.5.2\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.5.2\build\EntityFramework.targets'))" />
   </Target>
+  <Import Project="..\packages\EntityFramework.6.5.2\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.5.2\build\EntityFramework.targets')" />
 </Project>

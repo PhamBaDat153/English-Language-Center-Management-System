@@ -10,17 +10,18 @@ BEGIN TRY
     DECLARE @Now datetime2(3) = SYSDATETIME();
 
     -- 1) Roles
-    IF NOT EXISTS (SELECT 1 FROM dbo.Roles WHERE role_name = 'Student')
-        INSERT dbo.Roles (role_id, role_name, role_description, available_status)
+    IF NOT EXISTS (SELECT 1 FROM dbo.[Role] WHERE role_name = 'Student')
+        INSERT dbo.[Role] (role_id, role_name, role_description, available_status)
         VALUES (NEWID(), 'Student', N'Học viên của trung tâm', 'Available');
 
-    IF NOT EXISTS (SELECT 1 FROM dbo.Roles WHERE role_name = 'Teacher')
-        INSERT dbo.Roles (role_id, role_name, role_description, available_status)
+    IF NOT EXISTS (SELECT 1 FROM dbo.[Role] WHERE role_name = 'Teacher')
+        INSERT dbo.[Role] (role_id, role_name, role_description, available_status)
         VALUES (NEWID(), 'Teacher', N'Giáo viên tiếng Anh', 'Available');
 
-    IF NOT EXISTS (SELECT 1 FROM dbo.Roles WHERE role_name = 'Administrator')
-        INSERT dbo.Roles (role_id, role_name, role_description, available_status)
+    IF NOT EXISTS (SELECT 1 FROM dbo.[Role] WHERE role_name = 'Administrator')
+        INSERT dbo.[Role] (role_id, role_name, role_description, available_status)
         VALUES (NEWID(), 'Administrator', N'Quản trị viên hệ thống', 'Available');
+
 
     -- 2) Users
     -- The schema only permits Google/Zalo as auth_provider.
@@ -69,7 +70,7 @@ BEGIN TRY
 ('student19', N'$2a$12$IEJJyQmz/nPJs.H1CiGMeu/n7n4SljHz7doCD7lfPBvMCdCx6z3ui','student19@newgen.edu.vn', N'Mai Khả Vy','2005-10-05','0900002019','Female','Vietnamese','0900003019',N'Mai Văn Tùng','Student'),
 ('student20', N'$2a$12$IEJJyQmz/nPJs.H1CiGMeu/n7n4SljHz7doCD7lfPBvMCdCx6z3ui','student20@newgen.edu.vn', N'Nguyễn Đức Anh','1998-02-15','0900002020','Male','Vietnamese','0900003020',N'Nguyễn Thị Kim','Student');
 
-    INSERT dbo.Users (
+    INSERT dbo.[User] (
         user_id, username, hashed_password, email,
         full_name, date_of_birth, phone_number, gender, avatar_url, native_language,
         emergency_contact_number, emergency_contact_name,
@@ -83,21 +84,23 @@ BEGIN TRY
     FROM @UserSeed s
     WHERE NOT EXISTS (
         SELECT 1
-        FROM dbo.Users u
+        FROM dbo.[User] u
         WHERE u.username = s.username OR u.email = s.email
     );
 
+
     -- 3) Assign the requested roles
-    INSERT dbo.User_Roles (user_id, role_id)
+    INSERT dbo.[User_Role] (user_id, role_id)
     SELECT u.user_id, r.role_id
     FROM @UserSeed s
-    INNER JOIN dbo.Users u ON u.username = s.username
-    INNER JOIN dbo.Roles r ON r.role_name = s.role_name
+    INNER JOIN dbo.[User] u ON u.username = s.username
+    INNER JOIN dbo.[Role] r ON r.role_name = s.role_name
     WHERE NOT EXISTS (
         SELECT 1
-        FROM dbo.User_Roles ur
+        FROM dbo.[User_Role] ur
         WHERE ur.user_id = u.user_id AND ur.role_id = r.role_id
     );
+
 
     -- 4) Staff profiles for the administrator + five teachers
     DECLARE @StaffSeed TABLE (
@@ -120,7 +123,7 @@ BEGIN TRY
 ('teacher04','GV-004','English Teacher - Speaking','PartTime','Active','Academic',28000000,'2024-03-04'),
 ('teacher05','GV-005','English Teacher - TOEIC','FullTime','Active','Academic',36000000,'2024-07-15');
 
-    INSERT dbo.Staff_Profiles (
+    INSERT dbo.[Staff_Profile] (
         staff_id, user_id, staff_code, job_title, employment_type,
         employment_status, department, salary, hire_date, termination_date,
         created_at, updated_at, available_status
@@ -130,11 +133,12 @@ BEGIN TRY
         s.employment_status, s.department, s.salary, s.hire_date, NULL,
         @Now, @Now, 'Available'
     FROM @StaffSeed s
-    INNER JOIN dbo.Users u ON u.username = s.username
+    INNER JOIN dbo.[User] u ON u.username = s.username
     WHERE NOT EXISTS (
-        SELECT 1 FROM dbo.Staff_Profiles sp
+        SELECT 1 FROM dbo.[Staff_Profile] sp
         WHERE sp.user_id = u.user_id OR sp.staff_code = s.staff_code
     );
+
 
     -- 5) Teacher profiles
     DECLARE @TeacherSeed TABLE (
@@ -153,7 +157,7 @@ BEGIN TRY
 ('teacher04','Speaking Coach',4,N'Chuyên các lớp phản xạ và giao tiếp thực tế, phù hợp học viên cần tăng sự tự tin khi nói.',N'Speaking, Conversation, Pronunciation'),
 ('teacher05','TOEIC Instructor',6,N'Chuyên luyện TOEIC cho sinh viên và người đi làm, tập trung Listening và Reading.',N'TOEIC, Business English, Listening');
 
-    INSERT dbo.teacher_profiles (
+    INSERT dbo.[Teacher_profile] (
         teacher_id, staff_id, professional_title, years_of_experience,
         teaching_bio, specializations, created_at, updated_at, available_status
     )
@@ -161,12 +165,13 @@ BEGIN TRY
         NEWID(), sp.staff_id, t.professional_title, t.years_of_experience,
         t.teaching_bio, t.specializations, @Now, @Now, 'Available'
     FROM @TeacherSeed t
-    INNER JOIN dbo.Users u ON u.username = t.username
-    INNER JOIN dbo.Staff_Profiles sp ON sp.user_id = u.user_id
+    INNER JOIN dbo.[User] u ON u.username = t.username
+    INNER JOIN dbo.[Staff_Profile] sp ON sp.user_id = u.user_id
     WHERE NOT EXISTS (
-        SELECT 1 FROM dbo.teacher_profiles tp
+        SELECT 1 FROM dbo.[Teacher_profile] tp
         WHERE tp.staff_id = sp.staff_id
     );
+
 
     -- 6) One qualification per teacher for realistic staff seed data
     DECLARE @QualificationSeed TABLE (
@@ -184,7 +189,7 @@ BEGIN TRY
 ('teacher04',N'TEFL Certificate',N'International TEFL Academy','2022-06-18'),
 ('teacher05',N'TOEIC Trainer Certificate',N'IIG Vietnam','2023-04-22');
 
-    INSERT dbo.teacher_qualifications (
+    INSERT dbo.[Teacher_qualification] (
         qualification_id, teacher_id, qualification_name, institution,
         issued_date, expiry_date, created_at, updated_at, available_status
     )
@@ -192,15 +197,16 @@ BEGIN TRY
         NEWID(), tp.teacher_id, q.qualification_name, q.institution,
         q.issued_date, NULL, @Now, @Now, 'Available'
     FROM @QualificationSeed q
-    INNER JOIN dbo.Users u ON u.username = q.username
-    INNER JOIN dbo.Staff_Profiles sp ON sp.user_id = u.user_id
-    INNER JOIN dbo.teacher_profiles tp ON tp.staff_id = sp.staff_id
+    INNER JOIN dbo.[User] u ON u.username = q.username
+    INNER JOIN dbo.[Staff_Profile] sp ON sp.user_id = u.user_id
+    INNER JOIN dbo.[Teacher_profile] tp ON tp.staff_id = sp.staff_id
     WHERE NOT EXISTS (
         SELECT 1
-        FROM dbo.teacher_qualifications tq
+        FROM dbo.[Teacher_qualification] tq
         WHERE tq.teacher_id = tp.teacher_id
           AND tq.qualification_name = q.qualification_name
     );
+
 
     -- 7) Student profiles
     DECLARE @StudentSeed TABLE (
@@ -235,7 +241,7 @@ BEGIN TRY
 ('student19','STU-019','Active','2026-01-10','Beginner',N'Tạo nền tảng tiếng Anh để giao tiếp và du lịch.'),
 ('student20','STU-020','Active','2026-02-13','UpperIntermediate',N'Nâng cao kỹ năng nói và viết để làm việc với đối tác nước ngoài.');
 
-    INSERT dbo.Student_Profiles (
+    INSERT dbo.[Student_Profile] (
         student_id, user_id, student_code, student_status, enrollment_date,
         current_level, learning_goal, created_at, updated_at, available_status
     )
@@ -243,11 +249,12 @@ BEGIN TRY
         NEWID(), u.user_id, s.student_code, s.student_status, s.enrollment_date,
         s.current_level, s.learning_goal, @Now, @Now, 'Available'
     FROM @StudentSeed s
-    INNER JOIN dbo.Users u ON u.username = s.username
+    INNER JOIN dbo.[User] u ON u.username = s.username
     WHERE NOT EXISTS (
-        SELECT 1 FROM dbo.Student_Profiles sp
+        SELECT 1 FROM dbo.[Student_Profile] sp
         WHERE sp.user_id = u.user_id OR sp.student_code = s.student_code
     );
+
 
     -- 8) Eight English courses.
     -- The supplied CHECK constraint allows seven distinct level values,
@@ -272,7 +279,7 @@ BEGIN TRY
 ('IELTS-INT-01',N'IELTS Intensive - Target 6.5+','IELTS',N'Luyện chuyên sâu Listening, Reading, Writing và Speaking theo định hướng mục tiêu 6.5+.',10,5200000),
 ('TOEIC-650-01',N'TOEIC Preparation - 650+','TOEIC',N'Luyện TOEIC Listening và Reading, bổ sung từ vựng và kỹ thuật làm bài cho mục tiêu 650+.',10,4500000);
 
-    INSERT dbo.Courses (
+    INSERT dbo.[Course] (
         course_id, course_code, course_name, level, description,
         duration_weeks, tuition_fee, created_at, updated_at, available_status
     )
@@ -281,29 +288,33 @@ BEGIN TRY
         c.duration_weeks, c.tuition_fee, @Now, @Now, 'Available'
     FROM @CourseSeed c
     WHERE NOT EXISTS (
-        SELECT 1 FROM dbo.Courses co
+        SELECT 1 FROM dbo.[Course] co
         WHERE co.course_code = c.course_code
     );
 
+
     COMMIT;
+
 
     -- Seed verification
     SELECT r.role_name, COUNT(*) AS account_count
-    FROM dbo.User_Roles ur
-    INNER JOIN dbo.Roles r ON r.role_id = ur.role_id
-    INNER JOIN dbo.Users u ON u.user_id = ur.user_id
+    FROM dbo.[User_Role] ur
+    INNER JOIN dbo.[Role] r ON r.role_id = ur.role_id
+    INNER JOIN dbo.[User] u ON u.user_id = ur.user_id
     WHERE u.username IN (SELECT username FROM @UserSeed)
     GROUP BY r.role_name
     ORDER BY r.role_name;
 
     SELECT level, COUNT(*) AS course_count
-    FROM dbo.Courses
+    FROM dbo.[Course]
     WHERE course_code IN (SELECT course_code FROM @CourseSeed)
     GROUP BY level
     ORDER BY level;
+
 
 END TRY
 BEGIN CATCH
     IF @@TRANCOUNT > 0 ROLLBACK;
     THROW;
 END CATCH;
+

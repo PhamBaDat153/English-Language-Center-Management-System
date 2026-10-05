@@ -1,7 +1,16 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Source\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\models\\applicationmodels.edmx||{C99AEA30-8E36-4515-B76F-496F5A48A6AA}|",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\models\\applicationmodels.edmx||{C99AEA30-8E36-4515-B76F-496F5A48A6AA}|"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +18,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -30,6 +39,31 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ApplicationModels.edmx [Diagram1]",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Source\\Source\\Models\\ApplicationModels.edmx",
+              "RelativeDocumentMoniker": "Source\\Models\\ApplicationModels.edmx",
+              "ToolTip": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Source\\Source\\Models\\ApplicationModels.edmx [Diagram1]",
+              "RelativeToolTip": "Source\\Models\\ApplicationModels.edmx [Diagram1]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001116|",
+              "WhenOpened": "2026-10-05T01:38:48.09Z",
+              "EditorCaption": " [Diagram1]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Web.config",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Source\\Source\\Web.config",
+              "RelativeDocumentMoniker": "Source\\Web.config",
+              "ToolTip": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Source\\Source\\Web.config",
+              "RelativeToolTip": "Source\\Web.config",
+              "ViewState": "AgIAADkAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
+              "WhenOpened": "2026-10-05T00:54:07.259Z",
+              "EditorCaption": ""
             }
           ]
         }
