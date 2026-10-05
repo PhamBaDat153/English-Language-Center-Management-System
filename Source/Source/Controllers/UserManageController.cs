@@ -6,9 +6,9 @@ using System.Web.Mvc;
 
 namespace Source.Controllers
 {
-    public class DashboardController : Controller
+    public class UserManageController : Controller
     {
-        // GET: Dashboard
+        // GET: UserManage
         public ActionResult Index()
         {
             return View();
