@@ -1,3 +1,15 @@
+USE master;
+GO
+
+IF DB_ID(N'NewGen_english_center_db') IS NOT NULL
+BEGIN
+    ALTER DATABASE NewGen_english_center_db
+    SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+
+    DROP DATABASE NewGen_english_center_db;
+END;
+GO
+
 IF DB_ID(N'NewGen_english_center_db') IS NULL CREATE DATABASE NewGen_english_center_db;
 GO
 USE NewGen_english_center_db;
@@ -8,8 +20,8 @@ CREATE TABLE dbo.Users (
     username varchar(100) NULL,
     hashed_password varchar(255) NULL,
     email varchar(255) NULL,
-    auth_provider varchar(20) NOT NULL,
-    auth_provider_key varchar(255) NOT NULL,
+    auth_provider varchar(20) NULL,
+    auth_provider_key varchar(255) NULL,
     full_name nvarchar(200) NOT NULL,
     date_of_birth date NULL,
     phone_number varchar(30) NULL,
@@ -23,7 +35,6 @@ CREATE TABLE dbo.Users (
     active_status varchar(20) NOT NULL,
     CONSTRAINT PK_Users PRIMARY KEY (user_id),
     CONSTRAINT UQ_Users_Email UNIQUE (email),
-    CONSTRAINT UQ_Users_Provider UNIQUE (auth_provider, auth_provider_key),
     CONSTRAINT CK_Users_Provider CHECK (auth_provider IN ('Google','Zalo')),
     CONSTRAINT CK_Users_Gender CHECK (gender IS NULL OR gender IN ('Male','Female','Other','PreferNotToSay')),
     CONSTRAINT CK_Users_Status CHECK (active_status IN ('Active','Inactive'))
