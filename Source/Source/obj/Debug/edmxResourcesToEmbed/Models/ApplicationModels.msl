@@ -1,0 +1,295 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="NewGen_english_center_dbModelStoreContainer" CdmEntityContainer="NewGen_english_center_dbEntities">
+    <EntitySetMapping Name="Assessments">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.Assessment">
+        <MappingFragment StoreEntitySet="Assessment">
+          <ScalarProperty Name="assessment_id" ColumnName="assessment_id" />
+          <ScalarProperty Name="class_id" ColumnName="class_id" />
+          <ScalarProperty Name="assessment_type" ColumnName="assessment_type" />
+          <ScalarProperty Name="assessment_name" ColumnName="assessment_name" />
+          <ScalarProperty Name="max_score" ColumnName="max_score" />
+          <ScalarProperty Name="assessment_date" ColumnName="assessment_date" />
+          <ScalarProperty Name="description" ColumnName="description" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="AssessmentScores">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.AssessmentScore">
+        <MappingFragment StoreEntitySet="AssessmentScore">
+          <ScalarProperty Name="assessment_score_id" ColumnName="assessment_score_id" />
+          <ScalarProperty Name="entered_by" ColumnName="entered_by" />
+          <ScalarProperty Name="assessment_id" ColumnName="assessment_id" />
+          <ScalarProperty Name="enrollment_id" ColumnName="enrollment_id" />
+          <ScalarProperty Name="score" ColumnName="score" />
+          <ScalarProperty Name="feedback" ColumnName="feedback" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="AttendanceRecords">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.AttendanceRecord">
+        <MappingFragment StoreEntitySet="AttendanceRecord">
+          <ScalarProperty Name="attendance_id" ColumnName="attendance_id" />
+          <ScalarProperty Name="enrollment_id" ColumnName="enrollment_id" />
+          <ScalarProperty Name="session_id" ColumnName="session_id" />
+          <ScalarProperty Name="recorded_by" ColumnName="recorded_by" />
+          <ScalarProperty Name="remarks" ColumnName="remarks" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+          <ScalarProperty Name="attendance_status" ColumnName="attendance_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Classes">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.Class">
+        <MappingFragment StoreEntitySet="Class">
+          <ScalarProperty Name="class_id" ColumnName="class_id" />
+          <ScalarProperty Name="teacher_id" ColumnName="teacher_id" />
+          <ScalarProperty Name="course_id" ColumnName="course_id" />
+          <ScalarProperty Name="room_id" ColumnName="room_id" />
+          <ScalarProperty Name="class_code" ColumnName="class_code" />
+          <ScalarProperty Name="start_date" ColumnName="start_date" />
+          <ScalarProperty Name="end_date" ColumnName="end_date" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+          <ScalarProperty Name="class_status" ColumnName="class_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ClassSchedules">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.ClassSchedule">
+        <MappingFragment StoreEntitySet="ClassSchedule">
+          <ScalarProperty Name="class_schedule_id" ColumnName="class_schedule_id" />
+          <ScalarProperty Name="class_id" ColumnName="class_id" />
+          <ScalarProperty Name="time_slot_id" ColumnName="time_slot_id" />
+          <ScalarProperty Name="room_name" ColumnName="room_name" />
+          <ScalarProperty Name="week_day" ColumnName="week_day" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ClassSessions">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.ClassSession">
+        <MappingFragment StoreEntitySet="ClassSession">
+          <ScalarProperty Name="session_id" ColumnName="session_id" />
+          <ScalarProperty Name="class_id" ColumnName="class_id" />
+          <ScalarProperty Name="time_slot_id" ColumnName="time_slot_id" />
+          <ScalarProperty Name="session_date" ColumnName="session_date" />
+          <ScalarProperty Name="topic" ColumnName="topic" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Courses">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.Course">
+        <MappingFragment StoreEntitySet="Course">
+          <ScalarProperty Name="course_id" ColumnName="course_id" />
+          <ScalarProperty Name="course_code" ColumnName="course_code" />
+          <ScalarProperty Name="course_name" ColumnName="course_name" />
+          <ScalarProperty Name="level" ColumnName="level" />
+          <ScalarProperty Name="description" ColumnName="description" />
+          <ScalarProperty Name="duration_weeks" ColumnName="duration_weeks" />
+          <ScalarProperty Name="tuition_fee" ColumnName="tuition_fee" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+          <ScalarProperty Name="available_status" ColumnName="available_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Enrollments">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.Enrollment">
+        <MappingFragment StoreEntitySet="Enrollment">
+          <ScalarProperty Name="enrollment_id" ColumnName="enrollment_id" />
+          <ScalarProperty Name="class_id" ColumnName="class_id" />
+          <ScalarProperty Name="student_id" ColumnName="student_id" />
+          <ScalarProperty Name="enrollment_date" ColumnName="enrollment_date" />
+          <ScalarProperty Name="notes" ColumnName="notes" />
+          <ScalarProperty Name="tuition_amount" ColumnName="tuition_amount" />
+          <ScalarProperty Name="confirmed_at" ColumnName="confirmed_at" />
+          <ScalarProperty Name="withdrawn_at" ColumnName="withdrawn_at" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+          <ScalarProperty Name="enrollment_status" ColumnName="enrollment_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Notifications">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.Notification">
+        <MappingFragment StoreEntitySet="Notification">
+          <ScalarProperty Name="notification_id" ColumnName="notification_id" />
+          <ScalarProperty Name="user_id" ColumnName="user_id" />
+          <ScalarProperty Name="title" ColumnName="title" />
+          <ScalarProperty Name="message" ColumnName="message" />
+          <ScalarProperty Name="notification_type" ColumnName="notification_type" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+          <ScalarProperty Name="read_status" ColumnName="read_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Payments">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.Payment">
+        <MappingFragment StoreEntitySet="Payment">
+          <ScalarProperty Name="payment_id" ColumnName="payment_id" />
+          <ScalarProperty Name="recorded_by" ColumnName="recorded_by" />
+          <ScalarProperty Name="enrollment_id" ColumnName="enrollment_id" />
+          <ScalarProperty Name="amount" ColumnName="amount" />
+          <ScalarProperty Name="payment_date" ColumnName="payment_date" />
+          <ScalarProperty Name="receipt_number" ColumnName="receipt_number" />
+          <ScalarProperty Name="notes" ColumnName="notes" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="payment_status" ColumnName="payment_status" />
+          <ScalarProperty Name="payment_method" ColumnName="payment_method" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Roles">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.Role">
+        <MappingFragment StoreEntitySet="Role">
+          <ScalarProperty Name="role_id" ColumnName="role_id" />
+          <ScalarProperty Name="role_name" ColumnName="role_name" />
+          <ScalarProperty Name="role_description" ColumnName="role_description" />
+          <ScalarProperty Name="available_status" ColumnName="available_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Rooms">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.Room">
+        <MappingFragment StoreEntitySet="Room">
+          <ScalarProperty Name="room_id" ColumnName="room_id" />
+          <ScalarProperty Name="room_code" ColumnName="room_code" />
+          <ScalarProperty Name="room_name" ColumnName="room_name" />
+          <ScalarProperty Name="max_capacity" ColumnName="max_capacity" />
+          <ScalarProperty Name="location" ColumnName="location" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+          <ScalarProperty Name="available_status" ColumnName="available_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Staff_Profile">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.Staff_Profile">
+        <MappingFragment StoreEntitySet="Staff_Profile">
+          <ScalarProperty Name="staff_id" ColumnName="staff_id" />
+          <ScalarProperty Name="user_id" ColumnName="user_id" />
+          <ScalarProperty Name="staff_code" ColumnName="staff_code" />
+          <ScalarProperty Name="job_title" ColumnName="job_title" />
+          <ScalarProperty Name="employment_type" ColumnName="employment_type" />
+          <ScalarProperty Name="employment_status" ColumnName="employment_status" />
+          <ScalarProperty Name="department" ColumnName="department" />
+          <ScalarProperty Name="salary" ColumnName="salary" />
+          <ScalarProperty Name="hire_date" ColumnName="hire_date" />
+          <ScalarProperty Name="termination_date" ColumnName="termination_date" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+          <ScalarProperty Name="available_status" ColumnName="available_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Student_Profile">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.Student_Profile">
+        <MappingFragment StoreEntitySet="Student_Profile">
+          <ScalarProperty Name="student_id" ColumnName="student_id" />
+          <ScalarProperty Name="user_id" ColumnName="user_id" />
+          <ScalarProperty Name="student_code" ColumnName="student_code" />
+          <ScalarProperty Name="student_status" ColumnName="student_status" />
+          <ScalarProperty Name="enrollment_date" ColumnName="enrollment_date" />
+          <ScalarProperty Name="current_level" ColumnName="current_level" />
+          <ScalarProperty Name="learning_goal" ColumnName="learning_goal" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+          <ScalarProperty Name="available_status" ColumnName="available_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SyllabusMaterials">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.SyllabusMaterial">
+        <MappingFragment StoreEntitySet="SyllabusMaterial">
+          <ScalarProperty Name="syllabus_id" ColumnName="syllabus_id" />
+          <ScalarProperty Name="course_id" ColumnName="course_id" />
+          <ScalarProperty Name="title" ColumnName="title" />
+          <ScalarProperty Name="description" ColumnName="description" />
+          <ScalarProperty Name="file_url" ColumnName="file_url" />
+          <ScalarProperty Name="available_status" ColumnName="available_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Teacher_profile">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.Teacher_profile">
+        <MappingFragment StoreEntitySet="Teacher_profile">
+          <ScalarProperty Name="teacher_id" ColumnName="teacher_id" />
+          <ScalarProperty Name="staff_id" ColumnName="staff_id" />
+          <ScalarProperty Name="professional_title" ColumnName="professional_title" />
+          <ScalarProperty Name="years_of_experience" ColumnName="years_of_experience" />
+          <ScalarProperty Name="teaching_bio" ColumnName="teaching_bio" />
+          <ScalarProperty Name="specializations" ColumnName="specializations" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+          <ScalarProperty Name="available_status" ColumnName="available_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Teacher_qualification">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.Teacher_qualification">
+        <MappingFragment StoreEntitySet="Teacher_qualification">
+          <ScalarProperty Name="qualification_id" ColumnName="qualification_id" />
+          <ScalarProperty Name="teacher_id" ColumnName="teacher_id" />
+          <ScalarProperty Name="qualification_name" ColumnName="qualification_name" />
+          <ScalarProperty Name="institution" ColumnName="institution" />
+          <ScalarProperty Name="issued_date" ColumnName="issued_date" />
+          <ScalarProperty Name="expiry_date" ColumnName="expiry_date" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+          <ScalarProperty Name="available_status" ColumnName="available_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TimeSlots">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.TimeSlot">
+        <MappingFragment StoreEntitySet="TimeSlot">
+          <ScalarProperty Name="time_slot_id" ColumnName="time_slot_id" />
+          <ScalarProperty Name="slot_name" ColumnName="slot_name" />
+          <ScalarProperty Name="start_time" ColumnName="start_time" />
+          <ScalarProperty Name="end_time" ColumnName="end_time" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+          <ScalarProperty Name="available_status" ColumnName="available_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Users">
+      <EntityTypeMapping TypeName="NewGen_english_center_dbModel.User">
+        <MappingFragment StoreEntitySet="User">
+          <ScalarProperty Name="user_id" ColumnName="user_id" />
+          <ScalarProperty Name="username" ColumnName="username" />
+          <ScalarProperty Name="hashed_password" ColumnName="hashed_password" />
+          <ScalarProperty Name="email" ColumnName="email" />
+          <ScalarProperty Name="auth_provider" ColumnName="auth_provider" />
+          <ScalarProperty Name="auth_provider_key" ColumnName="auth_provider_key" />
+          <ScalarProperty Name="full_name" ColumnName="full_name" />
+          <ScalarProperty Name="date_of_birth" ColumnName="date_of_birth" />
+          <ScalarProperty Name="phone_number" ColumnName="phone_number" />
+          <ScalarProperty Name="gender" ColumnName="gender" />
+          <ScalarProperty Name="avatar_url" ColumnName="avatar_url" />
+          <ScalarProperty Name="native_language" ColumnName="native_language" />
+          <ScalarProperty Name="emergency_contact_number" ColumnName="emergency_contact_number" />
+          <ScalarProperty Name="emergency_contact_name" ColumnName="emergency_contact_name" />
+          <ScalarProperty Name="created_at" ColumnName="created_at" />
+          <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+          <ScalarProperty Name="active_status" ColumnName="active_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="User_Role" TypeName="NewGen_english_center_dbModel.User_Role" StoreEntitySet="User_Role">
+      <EndProperty Name="Role">
+        <ScalarProperty Name="role_id" ColumnName="role_id" />
+      </EndProperty>
+      <EndProperty Name="User">
+        <ScalarProperty Name="user_id" ColumnName="user_id" />
+      </EndProperty>
+    </AssociationSetMapping>
+  </EntityContainerMapping>
+</Mapping>

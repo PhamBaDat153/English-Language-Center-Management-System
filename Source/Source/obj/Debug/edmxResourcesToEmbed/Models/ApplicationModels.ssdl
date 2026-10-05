@@ -1,0 +1,712 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="NewGen_english_center_dbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Assessment">
+    <Key>
+      <PropertyRef Name="assessment_id" />
+    </Key>
+    <Property Name="assessment_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="class_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="assessment_type" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="assessment_name" Type="nvarchar" MaxLength="200" Nullable="false" />
+    <Property Name="max_score" Type="decimal" Precision="8" Scale="2" Nullable="false" />
+    <Property Name="assessment_date" Type="date" />
+    <Property Name="description" Type="nvarchar" MaxLength="1000" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+  </EntityType>
+  <EntityType Name="AssessmentScore">
+    <Key>
+      <PropertyRef Name="assessment_score_id" />
+    </Key>
+    <Property Name="assessment_score_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="entered_by" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="assessment_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="enrollment_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="score" Type="decimal" Precision="8" Scale="2" Nullable="false" />
+    <Property Name="feedback" Type="nvarchar" MaxLength="2000" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+  </EntityType>
+  <EntityType Name="AttendanceRecord">
+    <Key>
+      <PropertyRef Name="attendance_id" />
+    </Key>
+    <Property Name="attendance_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="enrollment_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="session_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="recorded_by" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="remarks" Type="nvarchar" MaxLength="1000" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="attendance_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Class">
+    <Key>
+      <PropertyRef Name="class_id" />
+    </Key>
+    <Property Name="class_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="teacher_id" Type="uniqueidentifier" />
+    <Property Name="course_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="room_id" Type="uniqueidentifier" />
+    <Property Name="class_code" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="start_date" Type="date" Nullable="false" />
+    <Property Name="end_date" Type="date" Nullable="false" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="class_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="ClassSchedule">
+    <Key>
+      <PropertyRef Name="class_schedule_id" />
+    </Key>
+    <Property Name="class_schedule_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="class_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="time_slot_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="room_name" Type="nvarchar" MaxLength="150" />
+    <Property Name="week_day" Type="varchar" MaxLength="10" Nullable="false" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+  </EntityType>
+  <EntityType Name="ClassSession">
+    <Key>
+      <PropertyRef Name="session_id" />
+    </Key>
+    <Property Name="session_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="class_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="time_slot_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="session_date" Type="date" Nullable="false" />
+    <Property Name="topic" Type="nvarchar" MaxLength="300" />
+  </EntityType>
+  <EntityType Name="Course">
+    <Key>
+      <PropertyRef Name="course_id" />
+    </Key>
+    <Property Name="course_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="course_code" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="course_name" Type="nvarchar" MaxLength="200" Nullable="false" />
+    <Property Name="level" Type="varchar" MaxLength="30" Nullable="false" />
+    <Property Name="description" Type="nvarchar" MaxLength="1000" />
+    <Property Name="duration_weeks" Type="int" Nullable="false" />
+    <Property Name="tuition_fee" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="available_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Enrollment">
+    <Key>
+      <PropertyRef Name="enrollment_id" />
+    </Key>
+    <Property Name="enrollment_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="class_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="student_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="enrollment_date" Type="date" Nullable="false" />
+    <Property Name="notes" Type="nvarchar" MaxLength="1000" />
+    <Property Name="tuition_amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="confirmed_at" Type="datetime2" Precision="3" />
+    <Property Name="withdrawn_at" Type="datetime2" Precision="3" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="enrollment_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Notification">
+    <Key>
+      <PropertyRef Name="notification_id" />
+    </Key>
+    <Property Name="notification_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="user_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="title" Type="nvarchar" MaxLength="200" Nullable="false" />
+    <Property Name="message" Type="nvarchar" MaxLength="2000" Nullable="false" />
+    <Property Name="notification_type" Type="varchar" MaxLength="30" Nullable="false" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="read_status" Type="varchar" MaxLength="10" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Payment">
+    <Key>
+      <PropertyRef Name="payment_id" />
+    </Key>
+    <Property Name="payment_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="recorded_by" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="enrollment_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="payment_date" Type="date" Nullable="false" />
+    <Property Name="receipt_number" Type="varchar" MaxLength="100" />
+    <Property Name="notes" Type="nvarchar" MaxLength="1000" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="payment_status" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="payment_method" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Role">
+    <Key>
+      <PropertyRef Name="role_id" />
+    </Key>
+    <Property Name="role_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="role_name" Type="varchar" MaxLength="30" Nullable="false" />
+    <Property Name="role_description" Type="nvarchar" MaxLength="500" />
+    <Property Name="available_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Room">
+    <Key>
+      <PropertyRef Name="room_id" />
+    </Key>
+    <Property Name="room_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="room_code" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="room_name" Type="nvarchar" MaxLength="150" Nullable="false" />
+    <Property Name="max_capacity" Type="int" Nullable="false" />
+    <Property Name="location" Type="nvarchar" MaxLength="300" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="available_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Staff_Profile">
+    <Key>
+      <PropertyRef Name="staff_id" />
+    </Key>
+    <Property Name="staff_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="user_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="staff_code" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="job_title" Type="nvarchar" MaxLength="150" />
+    <Property Name="employment_type" Type="varchar" MaxLength="20" />
+    <Property Name="employment_status" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="department" Type="nvarchar" MaxLength="150" />
+    <Property Name="salary" Type="decimal" Precision="18" Scale="2" />
+    <Property Name="hire_date" Type="date" />
+    <Property Name="termination_date" Type="date" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="available_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Student_Profile">
+    <Key>
+      <PropertyRef Name="student_id" />
+    </Key>
+    <Property Name="student_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="user_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="student_code" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="student_status" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="enrollment_date" Type="date" />
+    <Property Name="current_level" Type="varchar" MaxLength="30" />
+    <Property Name="learning_goal" Type="nvarchar" MaxLength="500" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="available_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="SyllabusMaterial">
+    <Key>
+      <PropertyRef Name="syllabus_id" />
+    </Key>
+    <Property Name="syllabus_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="course_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="title" Type="nvarchar" MaxLength="200" Nullable="false" />
+    <Property Name="description" Type="nvarchar" MaxLength="1000" />
+    <Property Name="file_url" Type="varchar" MaxLength="1000" />
+    <Property Name="available_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Teacher_profile">
+    <Key>
+      <PropertyRef Name="teacher_id" />
+    </Key>
+    <Property Name="teacher_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="staff_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="professional_title" Type="nvarchar" MaxLength="150" />
+    <Property Name="years_of_experience" Type="int" />
+    <Property Name="teaching_bio" Type="nvarchar(max)" />
+    <Property Name="specializations" Type="nvarchar" MaxLength="500" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="available_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Teacher_qualification">
+    <Key>
+      <PropertyRef Name="qualification_id" />
+    </Key>
+    <Property Name="qualification_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="teacher_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="qualification_name" Type="nvarchar" MaxLength="200" Nullable="false" />
+    <Property Name="institution" Type="nvarchar" MaxLength="200" />
+    <Property Name="issued_date" Type="date" />
+    <Property Name="expiry_date" Type="date" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="available_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="TimeSlot">
+    <Key>
+      <PropertyRef Name="time_slot_id" />
+    </Key>
+    <Property Name="time_slot_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="slot_name" Type="nvarchar" MaxLength="100" Nullable="false" />
+    <Property Name="start_time" Type="time" Precision="7" Nullable="false" />
+    <Property Name="end_time" Type="time" Precision="7" Nullable="false" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="available_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="user_id" />
+    </Key>
+    <Property Name="user_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="username" Type="varchar" MaxLength="100" />
+    <Property Name="hashed_password" Type="varchar" MaxLength="255" />
+    <Property Name="email" Type="varchar" MaxLength="255" />
+    <Property Name="auth_provider" Type="varchar" MaxLength="20" />
+    <Property Name="auth_provider_key" Type="varchar" MaxLength="255" />
+    <Property Name="full_name" Type="nvarchar" MaxLength="200" Nullable="false" />
+    <Property Name="date_of_birth" Type="date" />
+    <Property Name="phone_number" Type="varchar" MaxLength="30" />
+    <Property Name="gender" Type="varchar" MaxLength="20" />
+    <Property Name="avatar_url" Type="varchar" MaxLength="500" />
+    <Property Name="native_language" Type="nvarchar" MaxLength="100" />
+    <Property Name="emergency_contact_number" Type="varchar" MaxLength="30" />
+    <Property Name="emergency_contact_name" Type="nvarchar" MaxLength="200" />
+    <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
+    <Property Name="active_status" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="User_Role">
+    <Key>
+      <PropertyRef Name="user_id" />
+      <PropertyRef Name="role_id" />
+    </Key>
+    <Property Name="user_id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="role_id" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <Association Name="FK_Assessments_Class">
+    <End Role="Class" Type="Self.Class" Multiplicity="1" />
+    <End Role="Assessment" Type="Self.Assessment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Class">
+        <PropertyRef Name="class_id" />
+      </Principal>
+      <Dependent Role="Assessment">
+        <PropertyRef Name="class_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Attendance_Enrollment">
+    <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="1" />
+    <End Role="AttendanceRecord" Type="Self.AttendanceRecord" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Enrollment">
+        <PropertyRef Name="enrollment_id" />
+      </Principal>
+      <Dependent Role="AttendanceRecord">
+        <PropertyRef Name="enrollment_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Attendance_Session">
+    <End Role="ClassSession" Type="Self.ClassSession" Multiplicity="1" />
+    <End Role="AttendanceRecord" Type="Self.AttendanceRecord" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ClassSession">
+        <PropertyRef Name="session_id" />
+      </Principal>
+      <Dependent Role="AttendanceRecord">
+        <PropertyRef Name="session_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Attendance_User">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="AttendanceRecord" Type="Self.AttendanceRecord" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="user_id" />
+      </Principal>
+      <Dependent Role="AttendanceRecord">
+        <PropertyRef Name="recorded_by" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Classes_Course">
+    <End Role="Course" Type="Self.Course" Multiplicity="1" />
+    <End Role="Class" Type="Self.Class" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Course">
+        <PropertyRef Name="course_id" />
+      </Principal>
+      <Dependent Role="Class">
+        <PropertyRef Name="course_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Classes_Room">
+    <End Role="Room" Type="Self.Room" Multiplicity="0..1" />
+    <End Role="Class" Type="Self.Class" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Room">
+        <PropertyRef Name="room_id" />
+      </Principal>
+      <Dependent Role="Class">
+        <PropertyRef Name="room_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Classes_Teacher">
+    <End Role="Teacher_profile" Type="Self.Teacher_profile" Multiplicity="0..1" />
+    <End Role="Class" Type="Self.Class" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Teacher_profile">
+        <PropertyRef Name="teacher_id" />
+      </Principal>
+      <Dependent Role="Class">
+        <PropertyRef Name="teacher_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Enrollments_Class">
+    <End Role="Class" Type="Self.Class" Multiplicity="1" />
+    <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Class">
+        <PropertyRef Name="class_id" />
+      </Principal>
+      <Dependent Role="Enrollment">
+        <PropertyRef Name="class_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Enrollments_Student">
+    <End Role="Student_Profile" Type="Self.Student_Profile" Multiplicity="1" />
+    <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Student_Profile">
+        <PropertyRef Name="student_id" />
+      </Principal>
+      <Dependent Role="Enrollment">
+        <PropertyRef Name="student_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Notifications_User">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="Notification" Type="Self.Notification" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="user_id" />
+      </Principal>
+      <Dependent Role="Notification">
+        <PropertyRef Name="user_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Payments_Enrollment">
+    <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="1" />
+    <End Role="Payment" Type="Self.Payment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Enrollment">
+        <PropertyRef Name="enrollment_id" />
+      </Principal>
+      <Dependent Role="Payment">
+        <PropertyRef Name="enrollment_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Payments_User">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="Payment" Type="Self.Payment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="user_id" />
+      </Principal>
+      <Dependent Role="Payment">
+        <PropertyRef Name="recorded_by" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Qualifications_Teacher">
+    <End Role="Teacher_profile" Type="Self.Teacher_profile" Multiplicity="1" />
+    <End Role="Teacher_qualification" Type="Self.Teacher_qualification" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Teacher_profile">
+        <PropertyRef Name="teacher_id" />
+      </Principal>
+      <Dependent Role="Teacher_qualification">
+        <PropertyRef Name="teacher_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Schedules_Class">
+    <End Role="Class" Type="Self.Class" Multiplicity="1" />
+    <End Role="ClassSchedule" Type="Self.ClassSchedule" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Class">
+        <PropertyRef Name="class_id" />
+      </Principal>
+      <Dependent Role="ClassSchedule">
+        <PropertyRef Name="class_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Schedules_TimeSlot">
+    <End Role="TimeSlot" Type="Self.TimeSlot" Multiplicity="1" />
+    <End Role="ClassSchedule" Type="Self.ClassSchedule" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TimeSlot">
+        <PropertyRef Name="time_slot_id" />
+      </Principal>
+      <Dependent Role="ClassSchedule">
+        <PropertyRef Name="time_slot_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Scores_Assessment">
+    <End Role="Assessment" Type="Self.Assessment" Multiplicity="1" />
+    <End Role="AssessmentScore" Type="Self.AssessmentScore" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Assessment">
+        <PropertyRef Name="assessment_id" />
+      </Principal>
+      <Dependent Role="AssessmentScore">
+        <PropertyRef Name="assessment_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Scores_Enrollment">
+    <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="1" />
+    <End Role="AssessmentScore" Type="Self.AssessmentScore" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Enrollment">
+        <PropertyRef Name="enrollment_id" />
+      </Principal>
+      <Dependent Role="AssessmentScore">
+        <PropertyRef Name="enrollment_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Scores_User">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="AssessmentScore" Type="Self.AssessmentScore" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="user_id" />
+      </Principal>
+      <Dependent Role="AssessmentScore">
+        <PropertyRef Name="entered_by" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Sessions_Class">
+    <End Role="Class" Type="Self.Class" Multiplicity="1" />
+    <End Role="ClassSession" Type="Self.ClassSession" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Class">
+        <PropertyRef Name="class_id" />
+      </Principal>
+      <Dependent Role="ClassSession">
+        <PropertyRef Name="class_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Sessions_TimeSlot">
+    <End Role="TimeSlot" Type="Self.TimeSlot" Multiplicity="1" />
+    <End Role="ClassSession" Type="Self.ClassSession" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TimeSlot">
+        <PropertyRef Name="time_slot_id" />
+      </Principal>
+      <Dependent Role="ClassSession">
+        <PropertyRef Name="time_slot_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Staff_User">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="Staff_Profile" Type="Self.Staff_Profile" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="user_id" />
+      </Principal>
+      <Dependent Role="Staff_Profile">
+        <PropertyRef Name="user_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Students_User">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="Student_Profile" Type="Self.Student_Profile" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="user_id" />
+      </Principal>
+      <Dependent Role="Student_Profile">
+        <PropertyRef Name="user_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Syllabus_Course">
+    <End Role="Course" Type="Self.Course" Multiplicity="1" />
+    <End Role="SyllabusMaterial" Type="Self.SyllabusMaterial" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Course">
+        <PropertyRef Name="course_id" />
+      </Principal>
+      <Dependent Role="SyllabusMaterial">
+        <PropertyRef Name="course_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Teachers_Staff">
+    <End Role="Staff_Profile" Type="Self.Staff_Profile" Multiplicity="1" />
+    <End Role="Teacher_profile" Type="Self.Teacher_profile" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Staff_Profile">
+        <PropertyRef Name="staff_id" />
+      </Principal>
+      <Dependent Role="Teacher_profile">
+        <PropertyRef Name="staff_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_UserRoles_Role">
+    <End Role="Role" Type="Self.Role" Multiplicity="1" />
+    <End Role="User_Role" Type="Self.User_Role" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Role">
+        <PropertyRef Name="role_id" />
+      </Principal>
+      <Dependent Role="User_Role">
+        <PropertyRef Name="role_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_UserRoles_User">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="User_Role" Type="Self.User_Role" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="user_id" />
+      </Principal>
+      <Dependent Role="User_Role">
+        <PropertyRef Name="user_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="NewGen_english_center_dbModelStoreContainer">
+    <EntitySet Name="Assessment" EntityType="Self.Assessment" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="AssessmentScore" EntityType="Self.AssessmentScore" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="AttendanceRecord" EntityType="Self.AttendanceRecord" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Class" EntityType="Self.Class" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="ClassSchedule" EntityType="Self.ClassSchedule" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="ClassSession" EntityType="Self.ClassSession" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Course" EntityType="Self.Course" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Enrollment" EntityType="Self.Enrollment" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Notification" EntityType="Self.Notification" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Payment" EntityType="Self.Payment" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Role" EntityType="Self.Role" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Room" EntityType="Self.Room" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Staff_Profile" EntityType="Self.Staff_Profile" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Student_Profile" EntityType="Self.Student_Profile" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="SyllabusMaterial" EntityType="Self.SyllabusMaterial" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Teacher_profile" EntityType="Self.Teacher_profile" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Teacher_qualification" EntityType="Self.Teacher_qualification" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TimeSlot" EntityType="Self.TimeSlot" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="User_Role" EntityType="Self.User_Role" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_Assessments_Class" Association="Self.FK_Assessments_Class">
+      <End Role="Class" EntitySet="Class" />
+      <End Role="Assessment" EntitySet="Assessment" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Attendance_Enrollment" Association="Self.FK_Attendance_Enrollment">
+      <End Role="Enrollment" EntitySet="Enrollment" />
+      <End Role="AttendanceRecord" EntitySet="AttendanceRecord" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Attendance_Session" Association="Self.FK_Attendance_Session">
+      <End Role="ClassSession" EntitySet="ClassSession" />
+      <End Role="AttendanceRecord" EntitySet="AttendanceRecord" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Attendance_User" Association="Self.FK_Attendance_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="AttendanceRecord" EntitySet="AttendanceRecord" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Classes_Course" Association="Self.FK_Classes_Course">
+      <End Role="Course" EntitySet="Course" />
+      <End Role="Class" EntitySet="Class" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Classes_Room" Association="Self.FK_Classes_Room">
+      <End Role="Room" EntitySet="Room" />
+      <End Role="Class" EntitySet="Class" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Classes_Teacher" Association="Self.FK_Classes_Teacher">
+      <End Role="Teacher_profile" EntitySet="Teacher_profile" />
+      <End Role="Class" EntitySet="Class" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Enrollments_Class" Association="Self.FK_Enrollments_Class">
+      <End Role="Class" EntitySet="Class" />
+      <End Role="Enrollment" EntitySet="Enrollment" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Enrollments_Student" Association="Self.FK_Enrollments_Student">
+      <End Role="Student_Profile" EntitySet="Student_Profile" />
+      <End Role="Enrollment" EntitySet="Enrollment" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Notifications_User" Association="Self.FK_Notifications_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Notification" EntitySet="Notification" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Payments_Enrollment" Association="Self.FK_Payments_Enrollment">
+      <End Role="Enrollment" EntitySet="Enrollment" />
+      <End Role="Payment" EntitySet="Payment" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Payments_User" Association="Self.FK_Payments_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Payment" EntitySet="Payment" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Qualifications_Teacher" Association="Self.FK_Qualifications_Teacher">
+      <End Role="Teacher_profile" EntitySet="Teacher_profile" />
+      <End Role="Teacher_qualification" EntitySet="Teacher_qualification" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Schedules_Class" Association="Self.FK_Schedules_Class">
+      <End Role="Class" EntitySet="Class" />
+      <End Role="ClassSchedule" EntitySet="ClassSchedule" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Schedules_TimeSlot" Association="Self.FK_Schedules_TimeSlot">
+      <End Role="TimeSlot" EntitySet="TimeSlot" />
+      <End Role="ClassSchedule" EntitySet="ClassSchedule" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Scores_Assessment" Association="Self.FK_Scores_Assessment">
+      <End Role="Assessment" EntitySet="Assessment" />
+      <End Role="AssessmentScore" EntitySet="AssessmentScore" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Scores_Enrollment" Association="Self.FK_Scores_Enrollment">
+      <End Role="Enrollment" EntitySet="Enrollment" />
+      <End Role="AssessmentScore" EntitySet="AssessmentScore" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Scores_User" Association="Self.FK_Scores_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="AssessmentScore" EntitySet="AssessmentScore" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Sessions_Class" Association="Self.FK_Sessions_Class">
+      <End Role="Class" EntitySet="Class" />
+      <End Role="ClassSession" EntitySet="ClassSession" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Sessions_TimeSlot" Association="Self.FK_Sessions_TimeSlot">
+      <End Role="TimeSlot" EntitySet="TimeSlot" />
+      <End Role="ClassSession" EntitySet="ClassSession" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Staff_User" Association="Self.FK_Staff_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Staff_Profile" EntitySet="Staff_Profile" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Students_User" Association="Self.FK_Students_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Student_Profile" EntitySet="Student_Profile" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Syllabus_Course" Association="Self.FK_Syllabus_Course">
+      <End Role="Course" EntitySet="Course" />
+      <End Role="SyllabusMaterial" EntitySet="SyllabusMaterial" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Teachers_Staff" Association="Self.FK_Teachers_Staff">
+      <End Role="Staff_Profile" EntitySet="Staff_Profile" />
+      <End Role="Teacher_profile" EntitySet="Teacher_profile" />
+    </AssociationSet>
+    <AssociationSet Name="FK_UserRoles_Role" Association="Self.FK_UserRoles_Role">
+      <End Role="Role" EntitySet="Role" />
+      <End Role="User_Role" EntitySet="User_Role" />
+    </AssociationSet>
+    <AssociationSet Name="FK_UserRoles_User" Association="Self.FK_UserRoles_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="User_Role" EntitySet="User_Role" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

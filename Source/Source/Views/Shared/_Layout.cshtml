@@ -1,39 +1,75 @@
 ﻿<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
-</head>
-<body>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
-        <div class="container">
-            @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
-    </div>
+<html lang="en">
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
+<head>
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="Eduleb - Education HTML Template">
+    <meta name="keywords" content="agency, business, corporate, creative, html5, modern, multipurpose, One Page, parallax, startup">
+    <!-- SITE TITLE -->
+    <title>Eduleb - Education HTML Template</title>
+    <!-- Latest Bootstrap min CSS -->
+    <link rel="stylesheet" href="/Resources/eduleb/eduleb/assets/bootstrap/css/bootstrap.min.css">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/Resources/eduleb/eduleb/assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="/Resources/eduleb/eduleb/assets/fonts/themify-icons.css">
+    <!--- owl carousel Css-->
+    <link rel="stylesheet" href="/Resources/eduleb/eduleb/assets/owlcarousel/css/owl.carousel.css">
+    <link rel="stylesheet" href="/Resources/eduleb/eduleb/assets/owlcarousel/css/owl.theme.css">
+    <!--jquery-simple-mobilemenu Css-->
+    <link rel="stylesheet" href="/Resources/eduleb/eduleb/assets/css/jquery-simple-mobilemenu.css">
+    <!-- MAGNIFIC CSS -->
+    <link rel="stylesheet" href="/Resources/eduleb/eduleb/assets/css/magnific-popup.css">
+    <!-- animate CSS -->
+    <link rel="stylesheet" href="/Resources/eduleb/eduleb/assets/css/animate.css">
+    <!-- Style CSS -->
+    <link rel="stylesheet" href="/Resources/eduleb/eduleb/assets/css/style.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body data-spy="scroll" data-offset="80">
+
+    <!-- START PRELOADER -->
+    <div class="preloaders">
+        <span class="loader"></span>
+    </div>
+    <!-- END PRELOADER -->
+    @Html.Partial("_Header")
+   
+    @RenderBody()
+
+    @Html.Partial("_Footer")
+    <!-- Latest jQuery -->
+    <script src="/Resources/eduleb/eduleb/assets/js/jquery-1.12.4.min.js"></script>
+    <!-- Latest compiled and minified Bootstrap -->
+    <script src="/Resources/eduleb/eduleb/assets/bootstrap/js/bootstrap.min.js"></script>
+    <!-- modernizer JS -->
+    <script src="/Resources/eduleb/eduleb/assets/js/modernizr-2.8.3.min.js"></script>
+    <!-- jquery-simple-mobilemenu.min -->
+    <script src="/Resources/eduleb/eduleb/assets/js/jquery-simple-mobilemenu.js"></script>
+    <!-- owl-carousel min js  -->
+    <script src="/Resources/eduleb/eduleb/assets/owlcarousel/js/owl.carousel.min.js"></script>
+    <!-- magnific-popup js -->
+    <script src="/Resources/eduleb/eduleb/assets/js/jquery.magnific-popup.min.js"></script>
+    <!-- countTo js -->
+    <script src="/Resources/eduleb/eduleb/assets/js/jquery.inview.min.js"></script>
+    <!-- scrolltopcontrol js -->
+    <script src="/Resources/eduleb/eduleb/assets/js/scrolltopcontrol.js"></script>
+    <!-- WOW - Reveal Animations When You Scroll -->
+    <script src="/Resources/eduleb/eduleb/assets/js/wow.min.js"></script>
+    <!-- scripts js -->
+    <script src="/Resources/eduleb/eduleb/assets/js/scripts.js"></script>
 </body>
 </html>
