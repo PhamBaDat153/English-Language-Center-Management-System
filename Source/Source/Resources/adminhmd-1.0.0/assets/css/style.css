@@ -578,6 +578,36 @@ html[data-theme="dark"] .profile-button .avatar-sm {
   font-size: 0.92rem;
 }
 
+.user-filter-scroll {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.user-filter-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.65rem;
+  min-width: 1010px;
+}
+
+.user-filter-field {
+  flex: 0 0 auto;
+}
+
+.user-filter-username { width: 155px; }
+.user-filter-email { width: 205px; }
+.user-filter-phone { width: 155px; }
+.user-filter-role { width: 165px; }
+.user-filter-status { width: 185px; }
+
+.user-filter-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+  padding-bottom: 0.02rem;
+  white-space: nowrap;
+}
+
 .chart-bars {
   height: 292px;
   display: grid;
