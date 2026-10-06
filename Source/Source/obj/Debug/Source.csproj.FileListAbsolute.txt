@@ -81,3 +81,12 @@ D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Sourc
 D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\obj\Debug\Source.csproj.Up2Date
 D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\obj\Debug\Source.dll
 D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\obj\Debug\Source.pdb
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\BCrypt-Net-Next.dll
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\System.Buffers.dll
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\System.Memory.dll
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\System.Numerics.Vectors.dll
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\System.Runtime.CompilerServices.Unsafe.dll
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\System.Buffers.xml
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\System.Memory.xml
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\System.Numerics.Vectors.xml
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\System.Runtime.CompilerServices.Unsafe.xml

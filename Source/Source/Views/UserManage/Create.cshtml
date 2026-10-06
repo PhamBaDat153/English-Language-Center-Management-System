@@ -1,0 +1,82 @@
+@model Source.Models.User
+
+@{
+    ViewBag.Title = "Thêm người dùng";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon"><i class="bi bi-person-plus" aria-hidden="true"></i></span>
+                <div>
+                    <p class="eyebrow mb-1">Quản lý</p>
+                    <h1 class="h3 mb-1">Thêm người dùng</h1>
+                    <p class="text-muted mb-0">Tạo tài khoản người dùng mới và cập nhật thông tin cá nhân.</p>
+                </div>
+            </div>
+            <div class="heading-actions">
+                <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Index", "UserManage")">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i> Quay lại danh sách
+                </a>
+            </div>
+        </div>
+
+        <section class="row g-3">
+            <div class="col-12 col-xl-8">
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="h5 mb-1 section-title"><i class="bi bi-person-plus" aria-hidden="true"></i><span>Thông tin người dùng</span></h2>
+                                <p class="text-muted mb-0">Nhập đầy đủ thông tin tài khoản và liên hệ.</p>
+                            </div>
+                        </div>
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="username">Tên tài khoản</label>
+                                @Html.EditorFor(model => model.username, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                                @Html.ValidationMessageFor(model => model.username, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="hashed_password">Mật khẩu</label>
+                                @Html.PasswordFor(model => model.hashed_password, new { @class = "form-control", required = "required" })
+                                @Html.ValidationMessageFor(model => model.hashed_password, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="email">Email</label>
+                                @Html.EditorFor(model => model.email, new { htmlAttributes = new { @class = "form-control", type = "email", required = "required" } })
+                                @Html.ValidationMessageFor(model => model.email, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="role_id">Vai trò</label>
+                                @Html.DropDownList("role_id", (SelectList)ViewBag.Roles, "Chọn vai trò", new { @class = "form-select" })
+                                @Html.ValidationMessage("role_id", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap justify-content-end gap-2 mt-4">
+                            <a class="btn btn-outline-secondary" href="@Url.Action("Index", "UserManage")">Hủy</a>
+                            <button class="btn btn-primary" type="submit"><i class="bi bi-person-check" aria-hidden="true"></i> Tạo người dùng</button>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="col-12 col-xl-4">
+                <div class="panel h-100">
+                    <h2 class="h5 mb-3 section-title"><i class="bi bi-list-check" aria-hidden="true"></i><span>Hãy đảm bảo</span></h2>
+                    <div class="activity-list">
+                        <div class="activity-item"><span class="activity-dot bg-warning"></span><div><p class="mb-1 fw-semibold">Kiểm tra thông tin đăng nhập</p><p class="text-muted small mb-0">Sử dụng tên tài khoản và mật khẩu bảo mật.</p></div></div>
+                        <div class="activity-item"><span class="activity-dot bg-warning"></span><div><p class="mb-1 fw-semibold">Không được để trống</p><p class="text-muted small mb-0">Đảm bảo không được để trống bất kỳ thông tin gì.</p></div></div>
+                        <div class="activity-item"><span class="activity-dot bg-warning"></span><div><p class="mb-1 fw-semibold">Không gán Roles bừa bãi</p><p class="text-muted small mb-0">Không được lạm quyền.</p></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
