@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\Seed_data.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Seed_data.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\NewGen_english_center_db.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NewGen_english_center_db.sql||{B5A506EB-11BE-4782-9A18-21265C2CA0B4}"
     }
@@ -35,14 +39,26 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "NewGen_english_center_db.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (72))",
+              "Title": "Seed_data.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (69))",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\Seed_data.sql",
+              "RelativeDocumentMoniker": "Seed_data.sql",
+              "ToolTip": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\Seed_data.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (69))",
+              "RelativeToolTip": "Seed_data.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (69))",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2026-10-07T08:03:54.45Z",
+              "EditorCaption": " - LILITH\\SQLEXPRESS.master (LILITH\\phamb (69))"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "NewGen_english_center_db.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (83))",
               "DocumentMoniker": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\NewGen_english_center_db.sql",
               "RelativeDocumentMoniker": "NewGen_english_center_db.sql",
-              "ToolTip": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\NewGen_english_center_db.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (72))",
-              "RelativeToolTip": "NewGen_english_center_db.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (72))",
+              "ToolTip": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\NewGen_english_center_db.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (83))",
+              "RelativeToolTip": "NewGen_english_center_db.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (83))",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
               "WhenOpened": "2026-10-06T07:07:37.437Z",
-              "EditorCaption": " - LILITH\\SQLEXPRESS.master (LILITH\\phamb (72))"
+              "EditorCaption": " - LILITH\\SQLEXPRESS.master (LILITH\\phamb (83))"
             }
           ]
         }

@@ -1,0 +1,1238 @@
+@model Source.ViewModels.UserDetailsViewModel
+@using System.Web.Mvc
+
+<style>
+    .profile-card .info-list .col-md-6 {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+        padding: .85rem;
+    }
+
+        .profile-card .info-list .col-md-6 > div:first-child {
+            margin-bottom: .4rem;
+        }
+
+        .profile-card .info-list .col-md-6 label {
+            display: block;
+            color: var(--admin-muted);
+            font-size: .84rem;
+            font-weight: 600;
+        }
+
+        .profile-card .info-list .col-md-6 .form-control,
+        .profile-card .info-list .col-md-6 .form-select {
+            width: 100%;
+            min-height: 38px;
+        }
+
+    .profile-card .info-list .account-save {
+        padding: 0;
+        border: 0;
+        background: transparent;
+    }
+
+    .profile-card .profile-hero {
+        padding-top: 1.25rem;
+    }
+
+    .profile-card .profile-photo {
+        margin-top: 0;
+    }
+</style>
+
+@{
+    ViewBag.Title = "Chi tiết người dùng";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">Quản lý</p>
+                    <h1 class="h3 mb-1">Chi tiết người dùng</h1>
+                    <p class="text-muted mb-0">
+                        Chỉnh sửa thông tin tài khoản và hồ sơ liên quan.
+                    </p>
+                </div>
+            </div>
+
+            <a class="btn btn-outline-secondary btn-sm"
+               href="@Url.Action("Index")">
+                <i class="bi bi-arrow-left"></i>
+                Quay lại danh sách
+            </a>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @using (Html.BeginForm(
+            "Details",
+            "UserManage",
+            FormMethod.Post,
+            new { @class = "row g-3" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.UserId)
+
+            <div class="col-12 col-xl-4">
+                <div class="panel profile-card h-100">
+
+                 
+
+                    <div class="profile-hero text-center">
+                        <label for="avatar-upload"
+                               class="d-inline-block position-relative"
+                               style="cursor:pointer"
+                               title="Đổi ảnh đại diện">
+
+                            <img id="avatar-preview"
+                                 class="avatar-img avatar-xl profile-photo"
+                                 src="@(string.IsNullOrWhiteSpace(Model.AvatarUrl)
+                                     ? "/Resources/adminhmd-1.0.0/assets/images/avatar/avatar-1.jpg"
+                                     : Model.AvatarUrl)"
+                                 alt="@Model.FullName">
+
+                            <span class="badge bg-primary position-absolute bottom-0 end-0">
+                                <i class="bi bi-camera"></i>
+                            </span>
+                        </label>
+
+                        <input id="avatar-upload"
+                               type="file"
+                               accept="image/jpeg,image/png,image/webp"
+                               class="d-none">
+
+                        <div id="avatar-message" class="small text-muted mt-2">
+                            Bấm vào ảnh để thay đổi
+                        </div>
+
+                        <h2 class="h5 mb-1">
+                            @Model.FullName
+                        </h2>
+
+                        <p class="text-muted mb-3">
+                            @Model.Roles
+                        </p>
+
+                        <span class="badge text-bg-@(Model.ActiveStatus == "Active"
+                            ? "success"
+                            : "secondary")">
+                            @(Model.ActiveStatus == "Active"
+                                ? "Đang hoạt động"
+                                : "Không hoạt động")
+                        </span>
+                    </div>
+
+                    <div class="info-list mt-4">
+
+                        @Field(
+                            Html.LabelFor(m => m.Username, "Tên đăng nhập"),
+                            Html.TextBoxFor(
+                                m => m.Username,
+                                new { @class = "form-control" }
+                            ),
+                            Html.ValidationMessageFor(
+                                m => m.Username,
+                                null,
+                                new { @class = "text-danger small" }
+                            )
+                        )
+
+                        @Field(
+                            Html.LabelFor(m => m.SelectedRole, "Vai trò"),
+                            Html.DropDownListFor(
+                                m => m.SelectedRole,
+                                Options(
+                                    new[] { "Student", "Teacher", "Administrator" },
+                                    new[] { "Học viên", "Giáo viên", "Quản trị viên" },
+                                    Model.SelectedRole
+                                ),
+                                new { @class = "form-select" }
+                            ),
+                            Html.ValidationMessageFor(
+                                m => m.SelectedRole,
+                                null,
+                                new { @class = "text-danger small" }
+                            )
+                        )
+
+                        @Field(
+                            Html.LabelFor(m => m.NewPassword, "Mật khẩu mới"),
+                            Html.PasswordFor(
+                                m => m.NewPassword,
+                                new
+                                {
+                                    @class = "form-control",
+                                    autocomplete = "new-password"
+                                }
+                            ),
+                            Html.ValidationMessageFor(
+                                m => m.NewPassword,
+                                null,
+                                new { @class = "text-danger small" }
+                            )
+                        )
+
+                        @Field(
+                            Html.LabelFor(m => m.ActiveStatus, "Trạng thái tài khoản"),
+                            Html.DropDownListFor(
+                                m => m.ActiveStatus,
+                                Options(
+                                    new[] { "Active", "Inactive" },
+                                    new[] { "Đang hoạt động", "Không hoạt động" },
+                                    Model.ActiveStatus
+                                ),
+                                new { @class = "form-select" }
+                            )
+                        )
+                        <div>
+                            <span>Ngày tạo</span>
+                            <strong>@Model.CreatedAt</strong>
+                        </div>
+
+                        <div>
+                            <span>Cập nhật</span>
+                            <strong>@Model.UpdatedAt</strong>
+                        </div>
+                        <div class="account-save">
+                            <button class="btn btn-primary w-100" type="submit">
+                                <i class="bi bi-check2"></i>
+                                Lưu thông tin tài khoản
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-8">
+
+                <div class="panel mb-3">
+                    @SectionTitle("Thông tin tài khoản", "bi-person-lines-fill")
+
+                    <div class="row g-3">
+
+                        @Field(
+                            Html.LabelFor(m => m.Email, "Email"),
+                            Html.TextBoxFor(
+                                m => m.Email,
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "email"
+                                }
+                            ),
+                            Html.ValidationMessageFor(
+                                m => m.Email,
+                                null,
+                                new { @class = "text-danger small" }
+                            )
+                        )
+
+                        @Field(
+                            Html.LabelFor(m => m.FullName, "Họ và tên"),
+                            Html.TextBoxFor(
+                                m => m.FullName,
+                                new { @class = "form-control" }
+                            )
+                        )
+
+                        @Field(
+                            Html.LabelFor(m => m.DateOfBirth, "Ngày sinh"),
+                            Html.TextBoxFor(
+                                m => m.DateOfBirth,
+                                "{0:yyyy-MM-dd}",
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "date"
+                                }
+                            )
+                        )
+
+                        @Field(
+                            Html.LabelFor(m => m.PhoneNumber, "Số điện thoại"),
+                            Html.TextBoxFor(
+                                m => m.PhoneNumber,
+                                new { @class = "form-control" }
+                            )
+                        )
+
+                        @Field(
+                            Html.LabelFor(m => m.Gender, "Giới tính"),
+                            Html.DropDownListFor(
+                                m => m.Gender,
+                                Options(
+                                    new[] { "Male", "Female", "Other", "PreferNotToSay" },
+                                    new[] { "Nam", "Nữ", "Khác", "Không muốn tiết lộ" }
+                                ),
+                                "-- Chọn giới tính --",
+                                new { @class = "form-select" }
+                            )
+                        )
+
+                        @Field(
+                            Html.LabelFor(m => m.NativeLanguage, "Ngôn ngữ bản địa"),
+                            Html.TextBoxFor(
+                                m => m.NativeLanguage,
+                                new { @class = "form-control" }
+                            )
+                        )
+
+                        @Field(
+                            Html.LabelFor(m => m.EmergencyContactName, "Tên liên hệ khẩn cấp"),
+                            Html.TextBoxFor(
+                                m => m.EmergencyContactName,
+                                new { @class = "form-control" }
+                            )
+                        )
+
+                        @Field(
+                            Html.LabelFor(m => m.EmergencyContactNumber, "Số điện thoại khẩn cấp"),
+                            Html.TextBoxFor(
+                                m => m.EmergencyContactNumber,
+                                new { @class = "form-control" }
+                            )
+                        )
+
+                    </div>
+                </div>
+
+                @for (var i = 0; i < Model.StudentProfiles.Count; i++)
+                {
+                    <div class="panel mb-3">
+                        @SectionTitle("Hồ sơ học viên", "bi-mortarboard")
+
+                        @Html.HiddenFor(m => m.StudentProfiles[i].StudentId)
+                        @Html.HiddenFor(m => m.StudentProfiles[i].UserId)
+
+                        <div class="row g-3">
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StudentProfiles[i].StudentCode,
+                                    "Mã học viên"
+                                ),
+                                Html.TextBoxFor(
+                                    m => m.StudentProfiles[i].StudentCode,
+                                    new { @class = "form-control" }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StudentProfiles[i].StudentStatus,
+                                    "Trạng thái học viên"
+                                ),
+                                Html.DropDownListFor(
+                                    m => m.StudentProfiles[i].StudentStatus,
+                                    Options(
+                                        new[] { "Active", "Inactive", "Graduated", "Suspended" },
+                                        new[] {
+                                            "Đang học",
+                                            "Không hoạt động",
+                                            "Đã tốt nghiệp",
+                                            "Tạm dừng"
+                                        },
+                                        Model.StudentProfiles[i].StudentStatus
+                                    ),
+                                    new { @class = "form-select" }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StudentProfiles[i].EnrollmentDate,
+                                    "Ngày nhập học"
+                                ),
+                                Html.TextBoxFor(
+                                    m => m.StudentProfiles[i].EnrollmentDate,
+                                    "{0:yyyy-MM-dd}",
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        type = "date"
+                                    }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StudentProfiles[i].CurrentLevel,
+                                    "Trình độ"
+                                ),
+                                Html.DropDownListFor(
+                                    m => m.StudentProfiles[i].CurrentLevel,
+                                    Options(
+                                        new[] {
+                                            "Beginner",
+                                            "Elementary",
+                                            "Intermediate",
+                                            "UpperIntermediate",
+                                            "Advanced",
+                                            "IELTS",
+                                            "TOEIC"
+                                        },
+                                        new[] {
+                                            "Beginner",
+                                            "Elementary",
+                                            "Intermediate",
+                                            "Upper Intermediate",
+                                            "Advanced",
+                                            "IELTS",
+                                            "TOEIC"
+                                        },
+                                        Model.StudentProfiles[i].CurrentLevel
+                                    ),
+                                    "-- Chọn trình độ --",
+                                    new { @class = "form-select" }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StudentProfiles[i].LearningGoal,
+                                    "Mục tiêu học tập"
+                                ),
+                                Html.TextAreaFor(
+                                    m => m.StudentProfiles[i].LearningGoal,
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        rows = 2
+                                    }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StudentProfiles[i].AvailableStatus,
+                                    "Trạng thái sử dụng"
+                                ),
+                                Html.DropDownListFor(
+                                    m => m.StudentProfiles[i].AvailableStatus,
+                                    Options(
+                                        new[] { "Available", "Unavailable" },
+                                        new[] { "Đang sử dụng", "Ngừng sử dụng" },
+                                        Model.StudentProfiles[i].AvailableStatus
+                                    ),
+                                    new { @class = "form-select" }
+                                )
+                            )
+
+                        </div>
+                    </div>
+                }
+
+                @for (var i = 0; i < Model.StaffProfiles.Count; i++)
+                {
+                    <div class="panel mb-3">
+                        @SectionTitle("Hồ sơ nhân viên", "bi-person-badge")
+
+                        @Html.HiddenFor(m => m.StaffProfiles[i].StaffId)
+                        @Html.HiddenFor(m => m.StaffProfiles[i].UserId)
+
+                        <div class="row g-3">
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StaffProfiles[i].StaffCode,
+                                    "Mã nhân viên"
+                                ),
+                                Html.TextBoxFor(
+                                    m => m.StaffProfiles[i].StaffCode,
+                                    new { @class = "form-control" }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StaffProfiles[i].JobTitle,
+                                    "Chức danh"
+                                ),
+                                Html.TextBoxFor(
+                                    m => m.StaffProfiles[i].JobTitle,
+                                    new { @class = "form-control" }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StaffProfiles[i].EmploymentType,
+                                    "Loại hình làm việc"
+                                ),
+                                Html.DropDownListFor(
+                                    m => m.StaffProfiles[i].EmploymentType,
+                                    Options(
+                                        new[] {
+                                            "FullTime",
+                                            "PartTime",
+                                            "Contract",
+                                            "Intern"
+                                        },
+                                        new[] {
+                                            "Toàn thời gian",
+                                            "Bán thời gian",
+                                            "Hợp đồng",
+                                            "Thực tập"
+                                        },
+                                        Model.StaffProfiles[i].EmploymentType
+                                    ),
+                                    "-- Chọn loại hình --",
+                                    new { @class = "form-select" }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StaffProfiles[i].EmploymentStatus,
+                                    "Trạng thái làm việc"
+                                ),
+                                Html.DropDownListFor(
+                                    m => m.StaffProfiles[i].EmploymentStatus,
+                                    Options(
+                                        new[] {
+                                            "Active",
+                                            "OnLeave",
+                                            "Resigned",
+                                            "Terminated"
+                                        },
+                                        new[] {
+                                            "Đang làm việc",
+                                            "Nghỉ phép",
+                                            "Đã nghỉ việc",
+                                            "Đã chấm dứt"
+                                        },
+                                        Model.StaffProfiles[i].EmploymentStatus
+                                    ),
+                                    new { @class = "form-select" }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StaffProfiles[i].Department,
+                                    "Phòng ban"
+                                ),
+                                Html.TextBoxFor(
+                                    m => m.StaffProfiles[i].Department,
+                                    new { @class = "form-control" }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StaffProfiles[i].Salary,
+                                    "Mức lương"
+                                ),
+                                Html.TextBoxFor(
+                                    m => m.StaffProfiles[i].Salary,
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        type = "number",
+                                        step = "0.01"
+                                    }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StaffProfiles[i].HireDate,
+                                    "Ngày tuyển dụng"
+                                ),
+                                Html.TextBoxFor(
+                                    m => m.StaffProfiles[i].HireDate,
+                                    "{0:yyyy-MM-dd}",
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        type = "date"
+                                    }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StaffProfiles[i].TerminationDate,
+                                    "Ngày nghỉ việc"
+                                ),
+                                Html.TextBoxFor(
+                                    m => m.StaffProfiles[i].TerminationDate,
+                                    "{0:yyyy-MM-dd}",
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        type = "date"
+                                    }
+                                )
+                            )
+
+                            @Field(
+                                Html.LabelFor(
+                                    m => m.StaffProfiles[i].AvailableStatus,
+                                    "Trạng thái sử dụng"
+                                ),
+                                Html.DropDownListFor(
+                                    m => m.StaffProfiles[i].AvailableStatus,
+                                    Options(
+                                        new[] { "Available", "Unavailable" },
+                                        new[] { "Đang sử dụng", "Ngừng sử dụng" },
+                                        Model.StaffProfiles[i].AvailableStatus
+                                    ),
+                                    new { @class = "form-select" }
+                                )
+                            )
+
+                        </div>
+                    </div>
+
+                    for (var j = 0; j < Model.StaffProfiles[i].Teachers.Count; j++)
+                    {
+                        <div class="panel mb-3">
+                            @SectionTitle("Hồ sơ giáo viên", "bi-person-video3")
+
+                            @Html.HiddenFor(
+                                m => m.StaffProfiles[i].Teachers[j].TeacherId
+                            )
+
+                            @Html.HiddenFor(
+                                m => m.StaffProfiles[i].Teachers[j].StaffId
+                            )
+
+                            <div class="row g-3">
+
+                                @Field(
+                                    Html.LabelFor(
+                                        m => m.StaffProfiles[i].Teachers[j].ProfessionalTitle,
+                                        "Chức danh chuyên môn"
+                                    ),
+                                    Html.TextBoxFor(
+                                        m => m.StaffProfiles[i].Teachers[j].ProfessionalTitle,
+                                        new { @class = "form-control" }
+                                    )
+                                )
+
+                                @Field(
+                                    Html.LabelFor(
+                                        m => m.StaffProfiles[i].Teachers[j].YearsOfExperience,
+                                        "Số năm kinh nghiệm"
+                                    ),
+                                    Html.TextBoxFor(
+                                        m => m.StaffProfiles[i].Teachers[j].YearsOfExperience,
+                                        new
+                                        {
+                                            @class = "form-control",
+                                            type = "number"
+                                        }
+                                    )
+                                )
+
+                                @Field(
+                                    Html.LabelFor(
+                                        m => m.StaffProfiles[i].Teachers[j].Specializations,
+                                        "Chuyên môn"
+                                    ),
+                                    Html.TextBoxFor(
+                                        m => m.StaffProfiles[i].Teachers[j].Specializations,
+                                        new { @class = "form-control" }
+                                    )
+                                )
+
+                                @Field(
+                                    Html.LabelFor(
+                                        m => m.StaffProfiles[i].Teachers[j].TeachingBio,
+                                        "Giới thiệu giảng dạy"
+                                    ),
+                                    Html.TextAreaFor(
+                                        m => m.StaffProfiles[i].Teachers[j].TeachingBio,
+                                        new
+                                        {
+                                            @class = "form-control",
+                                            rows = 3
+                                        }
+                                    )
+                                )
+
+                                @Field(
+                                    Html.LabelFor(
+                                        m => m.StaffProfiles[i].Teachers[j].AvailableStatus,
+                                        "Trạng thái sử dụng"
+                                    ),
+                                    Html.DropDownListFor(
+                                        m => m.StaffProfiles[i].Teachers[j].AvailableStatus,
+                                        Options(
+                                            new[] { "Available", "Unavailable" },
+                                            new[] {
+                                                "Đang sử dụng",
+                                                "Ngừng sử dụng"
+                                            },
+                                            Model.StaffProfiles[i].Teachers[j].AvailableStatus
+                                        ),
+                                        new { @class = "form-select" }
+                                    )
+                                )
+
+                            </div>
+                        </div>
+
+                        <div class="panel mb-3">
+                            @SectionTitle(
+                                "Danh sách bằng cấp và chứng chỉ",
+                                "bi-award"
+                            )
+
+                            <button type="button"
+                                    class="btn btn-outline-primary btn-sm mb-3"
+                                    data-add-qualification="@i-@j">
+                                <i class="bi bi-plus-lg"></i>
+                                Thêm chứng chỉ
+                            </button>
+
+                            @if (!Model.StaffProfiles[i].Teachers[j].Qualifications.Any())
+                            {
+                                <p class="text-muted mb-0">
+                                    Chưa có bằng cấp hoặc chứng chỉ.
+                                </p>
+                            }
+
+                            @for (
+                                var k = 0;
+                                k < Model.StaffProfiles[i].Teachers[j].Qualifications.Count;
+                                k++
+                            )
+                            {
+                                <div class="border rounded p-3 mb-3 qualification-item">
+
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <strong>
+                                            Bằng cấp @(k + 1)
+                                        </strong>
+
+                                        <div class="d-flex gap-2">
+                                            <button type="button"
+                                                    class="btn btn-outline-danger btn-sm"
+                                                    data-remove-qualification
+                                                    data-id="@Model.StaffProfiles[i].Teachers[j].Qualifications[k].QualificationId">
+                                                Ẩn chứng chỉ
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-danger btn-sm"
+                                                    data-delete-qualification
+                                                    data-id="@Model.StaffProfiles[i].Teachers[j].Qualifications[k].QualificationId">
+                                                Xóa luôn
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    @Html.HiddenFor(
+                                        m => m.StaffProfiles[i]
+                                            .Teachers[j]
+                                            .Qualifications[k]
+                                            .QualificationId
+                                    )
+
+                                    @Html.HiddenFor(
+                                        m => m.StaffProfiles[i]
+                                            .Teachers[j]
+                                            .Qualifications[k]
+                                            .TeacherId
+                                    )
+
+                                    @Html.HiddenFor(
+                                        m => m.StaffProfiles[i]
+                                            .Teachers[j]
+                                            .Qualifications[k]
+                                            .IsDeleted,
+                                        new { @class = "qualification-deleted" }
+                                    )
+
+                                    @Html.HiddenFor(
+                                        m => m.StaffProfiles[i]
+                                            .Teachers[j]
+                                            .Qualifications[k]
+                                            .PermanentDelete,
+                                        new { @class = "qualification-permanent-delete" }
+                                    )
+
+                                    <div class="row g-3">
+
+                                        @Field(
+                                            Html.LabelFor(
+                                                m => m.StaffProfiles[i]
+                                                    .Teachers[j]
+                                                    .Qualifications[k]
+                                                    .QualificationName,
+                                                "Tên bằng cấp/chứng chỉ"
+                                            ),
+                                            Html.TextBoxFor(
+                                                m => m.StaffProfiles[i]
+                                                    .Teachers[j]
+                                                    .Qualifications[k]
+                                                    .QualificationName,
+                                                new { @class = "form-control" }
+                                            )
+                                        )
+
+                                        @Field(
+                                            Html.LabelFor(
+                                                m => m.StaffProfiles[i]
+                                                    .Teachers[j]
+                                                    .Qualifications[k]
+                                                    .Institution,
+                                                "Đơn vị cấp"
+                                            ),
+                                            Html.TextBoxFor(
+                                                m => m.StaffProfiles[i]
+                                                    .Teachers[j]
+                                                    .Qualifications[k]
+                                                    .Institution,
+                                                new { @class = "form-control" }
+                                            )
+                                        )
+
+                                        @Field(
+                                            Html.LabelFor(
+                                                m => m.StaffProfiles[i]
+                                                    .Teachers[j]
+                                                    .Qualifications[k]
+                                                    .IssuedDate,
+                                                "Ngày cấp"
+                                            ),
+                                            Html.TextBoxFor(
+                                                m => m.StaffProfiles[i]
+                                                    .Teachers[j]
+                                                    .Qualifications[k]
+                                                    .IssuedDate,
+                                                "{0:yyyy-MM-dd}",
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    type = "date"
+                                                }
+                                            )
+                                        )
+
+                                        @Field(
+                                            Html.LabelFor(
+                                                m => m.StaffProfiles[i]
+                                                    .Teachers[j]
+                                                    .Qualifications[k]
+                                                    .ExpiryDate,
+                                                "Ngày hết hạn"
+                                            ),
+                                            Html.TextBoxFor(
+                                                m => m.StaffProfiles[i]
+                                                    .Teachers[j]
+                                                    .Qualifications[k]
+                                                    .ExpiryDate,
+                                                "{0:yyyy-MM-dd}",
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    type = "date"
+                                                }
+                                            )
+                                        )
+
+                                        @Field(
+                                            Html.LabelFor(
+                                                m => m.StaffProfiles[i]
+                                                    .Teachers[j]
+                                                    .Qualifications[k]
+                                                    .AvailableStatus,
+                                                "Trạng thái sử dụng"
+                                            ),
+                                            Html.DropDownListFor(
+                                                m => m.StaffProfiles[i]
+                                                    .Teachers[j]
+                                                    .Qualifications[k]
+                                                    .AvailableStatus,
+                                                Options(
+                                                    new[] {
+                                                        "Available",
+                                                        "Unavailable"
+                                                    },
+                                                    new[] {
+                                                        "Đang sử dụng",
+                                                        "Ngừng sử dụng"
+                                                    },
+                                                    Model.StaffProfiles[i]
+                                                        .Teachers[j]
+                                                        .Qualifications[k]
+                                                        .AvailableStatus
+                                                ),
+                                                new
+                                                {
+                                                    @class = "form-select qualification-status"
+                                                }
+                                            )
+                                        )
+
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+        }
+    </div>
+</main>
+
+@helper Field(object label, object input, object validation = null)
+{
+    <div class="col-md-6">
+        <div class="mb-1">
+            @label
+        </div>
+
+        @input
+
+        @if (validation != null)
+        {
+            @validation
+        }
+    </div>
+}
+
+@helper SectionTitle(string text, string icon)
+{
+    <div class="panel-header">
+        <h2 class="h5 mb-0 section-title">
+            <i class="bi @icon"></i>
+            <span>@text</span>
+        </h2>
+    </div>
+}
+
+@functions
+{
+    public IEnumerable<SelectListItem> Options(
+        string[] values,
+        string[] labels,
+        string selectedValue = null)
+    {
+        for (var i = 0; i < values.Length; i++)
+        {
+            yield return new SelectListItem
+            {
+                Value = values[i],
+                Text = labels[i],
+                Selected = values[i] == selectedValue
+            };
+        }
+    }
+}
+
+<script>
+    (function () {
+        var input = document.getElementById('avatar-upload');
+        var preview = document.getElementById('avatar-preview');
+        var message = document.getElementById('avatar-message');
+
+        if (!input) {
+            return;
+        }
+
+        input.addEventListener('change', function () {
+            if (!input.files.length) {
+                return;
+            }
+
+            var data = new FormData();
+
+            data.append('avatar', input.files[0]);
+            data.append('userId', '@Model.UserId');
+            data.append(
+                '__RequestVerificationToken',
+                document.querySelector(
+                    'input[name="__RequestVerificationToken"]'
+                ).value
+            );
+
+            message.textContent = 'Đang tải ảnh...';
+
+            fetch(
+                '@Url.Action("UploadAvatar", "UserManage")',
+                {
+                    method: 'POST',
+                    body: data
+                }
+            )
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (result) {
+                    message.textContent =
+                        result.message ||
+                        (
+                            result.success
+                                ? 'Đã cập nhật ảnh.'
+                                : 'Tải ảnh thất bại.'
+                        );
+
+                    if (result.success) {
+                        preview.src = result.url;
+                    }
+                })
+                .catch(function () {
+                    message.textContent =
+                        'Không thể kết nối đến máy chủ.';
+                });
+        });
+    })();
+
+    document.addEventListener('click', function (event) {
+        var remove = event.target.closest(
+            '[data-remove-qualification]'
+        );
+
+        if (remove) {
+            var card = remove.closest('.border.rounded');
+            var id = remove.getAttribute('data-id');
+
+            if (
+                id &&
+                id !== '00000000-0000-0000-0000-000000000000'
+            ) {
+                qualificationRequest(
+                    id,
+                    false,
+                    card,
+                    remove
+                );
+
+                return;
+            }
+
+            card.querySelector(
+                '.qualification-deleted'
+            ).value = 'true';
+
+            var status = card.querySelector(
+                '.qualification-status'
+            );
+
+            if (status) {
+                status.value = 'Unavailable';
+            }
+
+            card.classList.add('d-none');
+        }
+
+        var permanent = event.target.closest(
+            '[data-delete-qualification]'
+        );
+
+        if (
+            permanent &&
+            confirm('Xóa vĩnh viễn chứng chỉ này?')
+        ) {
+            var card = permanent.closest(
+                '.qualification-item'
+            );
+
+            var id = permanent.getAttribute('data-id');
+
+            if (
+                id &&
+                id !== '00000000-0000-0000-0000-000000000000'
+            ) {
+                qualificationRequest(
+                    id,
+                    true,
+                    card,
+                    permanent
+                );
+
+                return;
+            }
+
+            card.querySelector(
+                '.qualification-deleted'
+            ).value = 'true';
+
+            card.querySelector(
+                '.qualification-permanent-delete'
+            ).value = 'true';
+
+            card.classList.add('d-none');
+        }
+
+        var add = event.target.closest(
+            '[data-add-qualification]'
+        );
+
+        if (add) {
+            var parts = add
+                .getAttribute('data-add-qualification')
+                .split('-');
+
+            var staffIndex = parts[0];
+            var teacherIndex = parts[1];
+
+            var panel = add.closest('.panel');
+
+            var index = panel.querySelectorAll(
+                '.qualification-item'
+            ).length;
+
+            var teacherId = add
+                .closest('form')
+                .querySelector(
+                    '[name="StaffProfiles[' +
+                    staffIndex +
+                    '].Teachers[' +
+                    teacherIndex +
+                    '].TeacherId"]'
+                )
+                .value;
+
+            var prefix =
+                'StaffProfiles[' +
+                staffIndex +
+                '].Teachers[' +
+                teacherIndex +
+                '].Qualifications[' +
+                index +
+                ']';
+
+            var item = document.createElement('div');
+
+            item.className =
+                'border rounded p-3 mb-3 qualification-item';
+
+            item.innerHTML =
+                '<div class="d-flex justify-content-between align-items-center mb-3">' +
+                    '<strong>Chứng chỉ mới</strong>' +
+                    '<button type="button" class="btn btn-outline-danger btn-sm" data-remove-qualification>' +
+                        'Ẩn chứng chỉ' +
+                    '</button>' +
+                '</div>' +
+
+                '<input type="hidden" name="' +
+                    prefix +
+                    '.QualificationId" value="00000000-0000-0000-0000-000000000000">' +
+
+                '<input type="hidden" name="' +
+                    prefix +
+                    '.TeacherId" value="' +
+                    teacherId +
+                    '">' +
+
+                '<input type="hidden" class="qualification-deleted" name="' +
+                    prefix +
+                    '.IsDeleted" value="false">' +
+
+                '<div class="row g-3">' +
+
+                    '<div class="col-md-6">' +
+                        '<label>Tên bằng cấp/chứng chỉ</label>' +
+                        '<input class="form-control" name="' +
+                            prefix +
+                            '.QualificationName">' +
+                    '</div>' +
+
+                    '<div class="col-md-6">' +
+                        '<label>Đơn vị cấp</label>' +
+                        '<input class="form-control" name="' +
+                            prefix +
+                            '.Institution">' +
+                    '</div>' +
+
+                    '<div class="col-md-6">' +
+                        '<label>Ngày cấp</label>' +
+                        '<input class="form-control" type="date" name="' +
+                            prefix +
+                            '.IssuedDate">' +
+                    '</div>' +
+
+                    '<div class="col-md-6">' +
+                        '<label>Ngày hết hạn</label>' +
+                        '<input class="form-control" type="date" name="' +
+                            prefix +
+                            '.ExpiryDate">' +
+                    '</div>' +
+
+                    '<div class="col-md-6">' +
+                        '<label>Trạng thái sử dụng</label>' +
+                        '<select class="form-select qualification-status" name="' +
+                            prefix +
+                            '.AvailableStatus">' +
+                            '<option value="Available">Đang sử dụng</option>' +
+                            '<option value="Unavailable">Ngừng sử dụng</option>' +
+                        '</select>' +
+                    '</div>' +
+
+                '</div>';
+
+            panel.appendChild(item);
+        }
+    });
+
+    function qualificationRequest(
+        id,
+        permanent,
+        card,
+        button
+    ) {
+        var data = new FormData();
+
+        data.append('qualificationId', id);
+        data.append(
+            'permanent',
+            permanent ? 'true' : 'false'
+        );
+
+        data.append(
+            '__RequestVerificationToken',
+            document.querySelector(
+                'input[name="__RequestVerificationToken"]'
+            ).value
+        );
+
+        button.disabled = true;
+
+        fetch(
+            '@Url.Action("DeleteQualification", "UserManage")',
+            {
+                method: 'POST',
+                body: data
+            }
+        )
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (result) {
+                if (!result.success) {
+                    throw new Error(result.message);
+                }
+
+                card.remove();
+            })
+            .catch(function (error) {
+                button.disabled = false;
+
+                alert(
+                    error.message ||
+                    'Không thể cập nhật chứng chỉ.'
+                );
+            });
+    }
+</script>
