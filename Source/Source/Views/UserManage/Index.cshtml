@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Source.Models.User>
+﻿
+@model IEnumerable<Source.Models.User>
 
 @{
     ViewBag.Title = "Quản lý người dùng";
@@ -7,27 +8,40 @@
 
 <main class="dashboard-content">
     <div class="container-fluid px-3 px-lg-4 py-4">
+
         <div class="page-heading">
             <div class="page-heading-copy">
-                <span class="page-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+                <span class="page-icon">
+                    <i class="bi bi-people" aria-hidden="true"></i>
+                </span>
+
                 <div>
                     <p class="eyebrow mb-1">Trang quản lý</p>
                     <h1 class="h3 mb-1">Người dùng</h1>
-                    <p class="text-muted mb-0">Xem tài khoản, vai trò, trạng thái tài khoản.</p>
+                    <p class="text-muted mb-0">
+                        Xem tài khoản, vai trò, trạng thái tài khoản.
+                    </p>
                 </div>
             </div>
+
             <div class="heading-actions">
-            <a class="btn btn-primary btn-sm" href="@Url.Action("Create", "UserManage")">
-                <i class="bi bi-person-plus" aria-hidden="true">
-                    </i>Thêm tài khoản mới</a>
+                <a class="btn btn-primary btn-sm"
+                   href="@Url.Action("Create", "UserManage")">
+                    <i class="bi bi-person-plus" aria-hidden="true"></i>
+                    Thêm tài khoản mới
+                </a>
             </div>
         </div>
 
         <section class="row g-3 mt-1" aria-label="User summary">
+
             <div class="col-12 col-sm-6 col-xl-3">
                 <article class="metric-card metric-primary">
                     <div class="metric-top">
-                        <span class="metric-label">Tổng người dùng</span>
+                        <span class="metric-label">
+                            Tổng người dùng
+                        </span>
+
                         <span class="metric-icon">
                             <i class="bi bi-people" aria-hidden="true"></i>
                         </span>
@@ -42,7 +56,10 @@
             <div class="col-12 col-sm-6 col-xl-3">
                 <article class="metric-card metric-warning">
                     <div class="metric-top">
-                        <span class="metric-label">Tổng số học viên</span>
+                        <span class="metric-label">
+                            Tổng số học viên
+                        </span>
+
                         <span class="metric-icon">
                             <i class="bi bi-people-fill" aria-hidden="true"></i>
                         </span>
@@ -57,137 +74,280 @@
             <div class="col-12 col-sm-6 col-xl-3">
                 <article class="metric-card metric-success">
                     <div class="metric-top">
-                        <span class="metric-label">Tài khoản đang hoạt động</span>
-                        <span class="metric-icon"><i class="bi bi-check2-circle" aria-hidden="true"></i></span>
+                        <span class="metric-label">
+                            Tài khoản đang hoạt động
+                        </span>
+
+                        <span class="metric-icon">
+                            <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                        </span>
                     </div>
+
                     <div class="metric-value">
                         @(ViewBag.TotalActiveUsers ?? 0)
                     </div>
                 </article>
             </div>
+
             <div class="col-12 col-sm-6 col-xl-3">
                 <article class="metric-card metric-danger">
                     <div class="metric-top">
-                        <span class="metric-label">Tài khoản không hoạt động</span>
-                        <span class="metric-icon"><i class="bi bi-slash-circle" aria-hidden="true"></i></span>
+                        <span class="metric-label">
+                            Tài khoản không hoạt động
+                        </span>
+
+                        <span class="metric-icon">
+                            <i class="bi bi-slash-circle" aria-hidden="true"></i>
+                        </span>
                     </div>
+
                     <div class="metric-value">
                         @(ViewBag.TotalInactiveUsers ?? 0)
                     </div>
                 </article>
             </div>
+
         </section>
-       
+
         <section class="panel mt-3">
+
             <h3>Tìm kiếm người dùng</h3>
-            <form class="user-filter-scroll mb-4" method="get" action="@Url.Action("Index", "UserManage")" aria-label="Lọc người dùng">
+
+            <form class="user-filter-scroll mb-4"
+                  method="get"
+                  action="@Url.Action("Index", "UserManage")"
+                  aria-label="Lọc người dùng">
+
                 <div class="user-filter-row">
+
                     <div class="user-filter-field user-filter-username">
-                        <label class="form-label small fw-semibold mb-1" for="username">Tên đăng nhập</label>
-                        <input class="form-control form-control-sm" id="username" name="username" type="search" value="@ViewBag.Username" placeholder="Nhập tên đăng nhập">
+                        <label class="form-label small fw-semibold mb-1"
+                               for="username">
+                            Tên đăng nhập
+                        </label>
+
+                        <input class="form-control form-control-sm"
+                               id="username"
+                               name="username"
+                               type="search"
+                               value="@ViewBag.Username"
+                               placeholder="Nhập tên đăng nhập">
                     </div>
+
                     <div class="user-filter-field user-filter-email">
-                        <label class="form-label small fw-semibold mb-1" for="email">Email</label>
-                        <input class="form-control form-control-sm" id="email" name="email" type="search" value="@ViewBag.Email" placeholder="Nhập email">
+                        <label class="form-label small fw-semibold mb-1"
+                               for="email">
+                            Email
+                        </label>
+
+                        <input class="form-control form-control-sm"
+                               id="email"
+                               name="email"
+                               type="search"
+                               value="@ViewBag.Email"
+                               placeholder="Nhập email">
                     </div>
+
                     <div class="user-filter-field user-filter-phone">
-                        <label class="form-label small fw-semibold mb-1" for="phone">Số điện thoại</label>
-                        <input class="form-control form-control-sm" id="phone" name="phone" type="search" value="@ViewBag.Phone" placeholder="Nhập số điện thoại">
+                        <label class="form-label small fw-semibold mb-1"
+                               for="phone">
+                            Số điện thoại
+                        </label>
+
+                        <input class="form-control form-control-sm"
+                               id="phone"
+                               name="phone"
+                               type="search"
+                               value="@ViewBag.Phone"
+                               placeholder="Nhập số điện thoại">
                     </div>
+
                     <div class="user-filter-field user-filter-role">
-                        <label class="form-label small fw-semibold mb-1" for="role">Vai trò</label>
-                        <select class="form-select form-select-sm" id="role" name="role">
-                            <option value="">Tất cả vai trò</option>
-                            <option value="Administrator" @(ViewBag.Role == "Administrator" ? "selected" : "")>Quản trị viên</option>
-                            <option value="Teacher" @(ViewBag.Role == "Teacher" ? "selected" : "")>Giáo viên</option>
-                            <option value="Student" @(ViewBag.Role == "Student" ? "selected" : "")>Học viên</option>
+                        <label class="form-label small fw-semibold mb-1"
+                               for="role">
+                            Vai trò
+                        </label>
+
+                        <select class="form-select form-select-sm"
+                                id="role"
+                                name="role">
+                            <option value="">
+                                Tất cả vai trò
+                            </option>
+
+                            <option value="Administrator"
+                                    @(ViewBag.Role == "Administrator" ? "selected" : "")>
+                                Quản trị viên
+                            </option>
+
+                            <option value="Teacher"
+                                    @(ViewBag.Role == "Teacher" ? "selected" : "")>
+                                Giáo viên
+                            </option>
+
+                            <option value="Student"
+                                    @(ViewBag.Role == "Student" ? "selected" : "")>
+                                Học viên
+                            </option>
                         </select>
                     </div>
+
                     <div class="user-filter-field user-filter-status">
-                        <label class="form-label small fw-semibold mb-1" for="status">Trạng thái</label>
-                        <select class="form-select form-select-sm" id="status" name="status">
-                            <option value="">Tất cả trạng thái</option>
-                            <option value="Active" @(ViewBag.Status == "Active" ? "selected" : "")>Đang hoạt động</option>
-                            <option value="Inactive" @(ViewBag.Status == "Inactive" ? "selected" : "")>Không hoạt động</option>
+                        <label class="form-label small fw-semibold mb-1"
+                               for="status">
+                            Trạng thái
+                        </label>
+
+                        <select class="form-select form-select-sm"
+                                id="status"
+                                name="status">
+                            <option value="">
+                                Tất cả trạng thái
+                            </option>
+
+                            <option value="Active"
+                                    @(ViewBag.Status == "Active" ? "selected" : "")>
+                                Đang hoạt động
+                            </option>
+
+                            <option value="Inactive"
+                                    @(ViewBag.Status == "Inactive" ? "selected" : "")>
+                                Không hoạt động
+                            </option>
                         </select>
                     </div>
+
                     <div class="user-filter-actions">
-                        <button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-search" aria-hidden="true"></i> Tìm kiếm</button>
-                        <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Index", "UserManage")"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Xóa bộ lọc</a>
+                        <button class="btn btn-primary btn-sm"
+                                type="submit">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                            Tìm kiếm
+                        </button>
+
+                        <a class="btn btn-outline-secondary btn-sm"
+                           href="@Url.Action("Index", "UserManage")">
+                            <i class="bi bi-arrow-counterclockwise"
+                               aria-hidden="true"></i>
+                            Xóa bộ lọc
+                        </a>
                     </div>
+
                 </div>
             </form>
+
             <div class="panel-header">
                 <div>
-                    <h2 class="h5 mb-1 section-title"><i class="bi bi-table" aria-hidden="true"></i><span>Danh sách tài khoản</span></h2>
+                    <h2 class="h5 mb-1 section-title">
+                        <i class="bi bi-table" aria-hidden="true"></i>
+                        <span>Danh sách tài khoản</span>
+                    </h2>
                 </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table align-middle mb-0" id="usersTable" data-searchable-table>
+            <div class="table-responsive users-table-wrap">
+                <table class="table users-table align-middle mb-0"
+                       id="usersTable"
+                       data-searchable-table>
+
                     <thead>
                         <tr>
-                            <th>
-                                Tên đăng nhập
-                            </th>
-                            <th>
-                                Email người dùng
-                            </th>
-                            <th>
-                                Số điện thoại
-                            </th>
-                            <th>
-                                Giới tính
-                            </th>
-                            <th>
-                                Chức vụ tài khoản
-                            </th>
-                            <th>
-                                Đã liên kết Google
-                            </th>
-                            <th>
-                                Trạng thái tài khoản
-                            </th>
-                            <th></th>
+                            <th>Tài khoản</th>
+                            <th>Liên hệ</th>
+                            <th class="text-center">Giới tính</th>
+                            <th>Vai trò</th>
+                            <th class="text-center">Google</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-end">Thao tác</th>
                         </tr>
                     </thead>
+
                     <tbody>
 
                         @if (Model == null || !Model.Any())
                         {
                             <tr>
-                                <td class="text-center text-muted py-4" colspan="8">Không tìm thấy người dùng phù hợp với bộ lọc.</td>
+                                <td class="text-center text-muted py-5"
+                                    colspan="7">
+
+                                    <i class="bi bi-person-x d-block fs-2 mb-2"
+                                       aria-hidden="true"></i>
+
+                                    Không tìm thấy người dùng phù hợp
+                                    với bộ lọc.
+                                </td>
                             </tr>
                         }
-                        @foreach (var item in Model ?? Enumerable.Empty<Source.Models.User>())
+
+                        @foreach (var item in Model
+                            ?? Enumerable.Empty<Source.Models.User>())
                         {
                             <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.username)
+
+                                <td class="user-account-cell">
+                                    <div class="table-media">
+
+                                        <span class="user-avatar">
+                                            <i class="bi bi-person"
+                                               aria-hidden="true"></i>
+                                        </span>
+
+                                        <div>
+                                            <strong class="d-block">
+                                                @item.username
+                                            </strong>
+                                        </div>
+
+                                    </div>
                                 </td>
+
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.email)
+                                    <span class="d-block">
+                                        @(item.email ?? "Chưa cập nhật")
+                                    </span>
+
+                                    <small class="text-muted">
+                                        @(string.IsNullOrWhiteSpace(
+                                            item.phone_number)
+                                            ? "Chưa có số điện thoại"
+                                            : item.phone_number)
+                                    </small>
                                 </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.phone_number)
-                                </td>
-                                <td>
+
+                                <td class="text-center">
                                     @if (item.gender == "Male")
                                     {
-                                        <span style="color: blue;"><strong>Nam</strong></span>
+                                        <span class="user-gender gender-male">
+                                            <i class="bi bi-gender-male"
+                                               aria-hidden="true"></i>
+                                            Nam
+                                        </span>
                                     }
                                     else if (item.gender == "Female")
                                     {
-                                        <span style="color: hotpink;"><strong>Nữ</strong></span>
+                                        <span class="user-gender gender-female">
+                                            <i class="bi bi-gender-female"
+                                               aria-hidden="true"></i>
+                                            Nữ
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span style="color: grey;"><strong>Khác</strong></span>
+                                        <span class="user-gender gender-other">
+                                            <i class="bi bi-gender-ambiguous"
+                                               aria-hidden="true"></i>
+                                            Khác
+                                        </span>
                                     }
                                 </td>
+
                                 <td>
                                     @{
-                                        var rolePriority = new[] { "Administrator", "Teacher", "Student" };
+                                        var rolePriority = new[]
+                                        {
+                                            "Administrator",
+                                            "Teacher",
+                                            "Student"
+                                        };
 
                                         var highestRole = rolePriority
                                             .FirstOrDefault(priority =>
@@ -195,92 +355,225 @@
                                                     string.Equals(
                                                         role.role_name,
                                                         priority,
-                                                        StringComparison.OrdinalIgnoreCase
+                                                        StringComparison
+                                                            .OrdinalIgnoreCase
                                                     )
-                                                ));
+                                                )
+                                            );
                                     }
 
                                     @if (highestRole == "Administrator")
                                     {
-                                        <span style="color:red"><strong>Quản trị viên</strong></span>
+                                        <span class="badge user-role role-admin">
+                                            <i class="bi bi-shield-check"
+                                               aria-hidden="true"></i>
+                                            Quản trị viên
+                                        </span>
                                     }
                                     else if (highestRole == "Teacher")
                                     {
-                                        <span style="color:yellow"><strong>Giáo viên</strong></span>
+                                        <span class="badge user-role role-teacher">
+                                            <i class="bi bi-person-workspace"
+                                               aria-hidden="true"></i>
+                                            Giáo viên
+                                        </span>
                                     }
                                     else if (highestRole == "Student")
                                     {
-                                        <span style="color:cadetblue"><strong>Học viên</strong></span>
-                                    }
-                                </td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(item.auth_provider_key))
-                                    {
-                                        <span>Đã liên kết</span>
+                                        <span class="badge user-role role-student">
+                                            <i class="bi bi-mortarboard"
+                                               aria-hidden="true"></i>
+                                            Học viên
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span>Không liên kết</span>
+                                        <span class="badge user-role role-other">
+                                            Chưa phân quyền
+                                        </span>
                                     }
                                 </td>
-                                <td>
+
+                                <td class="text-center">
+                                    @if (!string.IsNullOrEmpty(
+                                        item.auth_provider_key))
+                                    {
+                                        <span class="user-link-status linked">
+                                            <i class="bi bi-google"
+                                               aria-hidden="true"></i>
+                                            Đã liên kết
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="user-link-status">
+                                            Chưa liên kết
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="text-center">
                                     @if (item.active_status == "Active")
                                     {
-                                        <span class="badge text-bg-success">Đang hoạt động</span>
+                                        <span class="badge user-status status-active">
+                                            <i class="bi bi-check-circle"
+                                               aria-hidden="true"></i>
+                                            Đang hoạt động
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="badge text-bg-danger">Không hoạt động</span>
+                                        <span class="badge user-status status-inactive">
+                                            <i class="bi bi-slash-circle"
+                                               aria-hidden="true"></i>
+                                            Không hoạt động
+                                        </span>
                                     }
                                 </td>
-                                <td>
-         
-                                    @Html.ActionLink("Details", "Details", new { userId = item.user_id }) |
-                                     @Html.ActionLink(
-                                         "Delete",
-                                         "Delete",
-                                         new { id = item.user_id },
-                                         new
-                                         {
-                                             onclick = "return confirm('Bạn có chắc chắn muốn xóa tài khoản này không? Tất cả dữ liệu liên quan cũng sẽ bị xóa.');"
-                                         })
+
+                                <td class="text-end text-nowrap">
+                                    <div class="table-actions">
+
+                                        <a class="btn btn-sm btn-action btn-view"
+                                           href="@Url.Action(
+                                               "Details",
+                                               new { userId = item.user_id }
+                                           )"
+                                           title="Xem chi tiết"
+                                           aria-label="Xem chi tiết tài khoản @item.username">
+                                            <i class="bi bi-eye"
+                                               aria-hidden="true"></i>
+                                        </a>
+
+                                        <a class="btn btn-sm btn-action btn-delete"
+                                           href="@Url.Action(
+                                               "Delete",
+                                               new { id = item.user_id }
+                                           )"
+                                           title="Xóa tài khoản"
+                                           aria-label="Xóa tài khoản @item.username"
+                                           onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này không? Tất cả dữ liệu liên quan cũng sẽ bị xóa.');">
+                                            <i class="bi bi-trash3"
+                                               aria-hidden="true"></i>
+                                        </a>
+
+                                    </div>
                                 </td>
+
                             </tr>
                         }
+
                     </tbody>
                 </table>
             </div>
+
             @{
                 int currentPage = ViewBag.CurrentPage ?? 1;
                 int totalPages = ViewBag.TotalPages ?? 0;
                 int totalUsers = ViewBag.FilteredUserCount ?? 0;
                 int pageSize = ViewBag.PageSize ?? 15;
-                int firstUser = totalUsers == 0 ? 0 : ((currentPage - 1) * pageSize) + 1;
-                int lastUser = Math.Min(currentPage * pageSize, totalUsers);
+
+                int firstUser = totalUsers == 0
+                    ? 0
+                    : ((currentPage - 1) * pageSize) + 1;
+
+                int lastUser = Math.Min(
+                    currentPage * pageSize,
+                    totalUsers
+                );
             }
-            <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mt-3">
-                <p class="text-muted small mb-0">Hiển thị @firstUser - @lastUser trong tổng số @totalUsers người dùng</p>
+
+            <div class="d-flex flex-column flex-sm-row
+                        align-items-sm-center
+                        justify-content-between
+                        gap-3 mt-3">
+
+                <p class="text-muted small mb-0">
+                    Hiển thị @firstUser - @lastUser
+                    trong tổng số @totalUsers người dùng
+                </p>
+
                 @if (totalPages > 1)
                 {
                     <nav aria-label="Users pagination">
                         <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                                <a class="page-link" href="@Url.Action("Index", new { page = currentPage - 1, username = ViewBag.Username, email = ViewBag.Email, phone = ViewBag.Phone, role = ViewBag.Role, status = ViewBag.Status })">Trước</a>
+
+                            <li class="page-item
+                                @(currentPage == 1 ? "disabled" : "")">
+
+                                <a class="page-link"
+                                   href="@Url.Action(
+                                       "Index",
+                                       new
+                                       {
+                                           page = currentPage - 1,
+                                           username = ViewBag.Username,
+                                           email = ViewBag.Email,
+                                           phone = ViewBag.Phone,
+                                           role = ViewBag.Role,
+                                           status = ViewBag.Status
+                                       }
+                                   )">
+                                    Trước
+                                </a>
                             </li>
-                            @for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
+
+                            @for (
+                                int pageNumber = 1;
+                                pageNumber <= totalPages;
+                                pageNumber++
+                            )
                             {
-                                <li class="page-item @(pageNumber == currentPage ? "active" : "")">
-                                    <a class="page-link" href="@Url.Action("Index", new { page = pageNumber, username = ViewBag.Username, email = ViewBag.Email, phone = ViewBag.Phone, role = ViewBag.Role, status = ViewBag.Status })">@pageNumber</a>
+                                <li class="page-item
+                                    @(pageNumber == currentPage
+                                        ? "active"
+                                        : "")">
+
+                                    <a class="page-link"
+                                       href="@Url.Action(
+                                           "Index",
+                                           new
+                                           {
+                                               page = pageNumber,
+                                               username = ViewBag.Username,
+                                               email = ViewBag.Email,
+                                               phone = ViewBag.Phone,
+                                               role = ViewBag.Role,
+                                               status = ViewBag.Status
+                                           }
+                                       )">
+                                        @pageNumber
+                                    </a>
                                 </li>
                             }
-                            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                                <a class="page-link" href="@Url.Action("Index", new { page = currentPage + 1, username = ViewBag.Username, email = ViewBag.Email, phone = ViewBag.Phone, role = ViewBag.Role, status = ViewBag.Status })">Sau</a>
+
+                            <li class="page-item
+                                @(currentPage == totalPages
+                                    ? "disabled"
+                                    : "")">
+
+                                <a class="page-link"
+                                   href="@Url.Action(
+                                       "Index",
+                                       new
+                                       {
+                                           page = currentPage + 1,
+                                           username = ViewBag.Username,
+                                           email = ViewBag.Email,
+                                           phone = ViewBag.Phone,
+                                           role = ViewBag.Role,
+                                           status = ViewBag.Status
+                                       }
+                                   )">
+                                    Sau
+                                </a>
                             </li>
+
                         </ul>
                     </nav>
                 }
             </div>
+
         </section>
     </div>
 </main>
-
