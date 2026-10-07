@@ -236,7 +236,14 @@
                                 <td>
          
                                     @Html.ActionLink("Details", "Details", new { userId = item.user_id }) |
-                                    @Html.ActionLink("Delete", "Delete", new { id = item.user_id })
+                                     @Html.ActionLink(
+                                         "Delete",
+                                         "Delete",
+                                         new { id = item.user_id },
+                                         new
+                                         {
+                                             onclick = "return confirm('Bạn có chắc chắn muốn xóa tài khoản này không? Tất cả dữ liệu liên quan cũng sẽ bị xóa.');"
+                                         })
                                 </td>
                             </tr>
                         }

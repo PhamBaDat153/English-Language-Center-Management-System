@@ -496,6 +496,74 @@ namespace Source.Controllers
             }
         }
 
+        [HttpGet]
+        public ActionResult Delete(Guid id)
+        {
+            var user = db.Users
+                .Include("Student_Profile.Enrollments.AssessmentScores")
+                .Include("Student_Profile.Enrollments.AttendanceRecords")
+                .Include("Student_Profile.Enrollments.Payments")
+                .Include("Staff_Profile.Teacher_profile.Teacher_qualification")
+                .Include("Roles")
+                .SingleOrDefault(u => u.user_id == id);
+
+            if (user == null)
+                return HttpNotFound();
+
+            using (var transaction = db.Database.BeginTransaction())
+            {
+                try
+                {
+                    var studentIds = user.Student_Profile.Select(s => s.student_id).ToList();
+                    var enrollmentIds = db.Enrollments
+                        .Where(e => studentIds.Contains(e.student_id))
+                        .Select(e => e.enrollment_id)
+                        .ToList();
+
+                    db.AssessmentScores.RemoveRange(db.AssessmentScores
+                        .Where(x => enrollmentIds.Contains(x.enrollment_id) || x.entered_by == id));
+                    db.AttendanceRecords.RemoveRange(db.AttendanceRecords
+                        .Where(x => enrollmentIds.Contains(x.enrollment_id) || x.recorded_by == id));
+                    db.Payments.RemoveRange(db.Payments
+                        .Where(x => enrollmentIds.Contains(x.enrollment_id) || x.recorded_by == id));
+                    db.Enrollments.RemoveRange(db.Enrollments
+                        .Where(x => enrollmentIds.Contains(x.enrollment_id)));
+                    db.Student_Profile.RemoveRange(user.Student_Profile);
+
+                    var teacherIds = user.Staff_Profile
+                        .SelectMany(s => s.Teacher_profile)
+                        .Select(t => t.teacher_id)
+                        .ToList();
+                    var teacherProfiles = user.Staff_Profile
+                        .SelectMany(s => s.Teacher_profile)
+                        .ToList();
+
+                    db.Classes
+                        .Where(c => c.teacher_id.HasValue && teacherIds.Contains(c.teacher_id.Value))
+                        .ToList()
+                        .ForEach(c => c.teacher_id = null);
+                    db.Teacher_qualification.RemoveRange(db.Teacher_qualification
+                        .Where(q => teacherIds.Contains(q.teacher_id)));
+                    db.Teacher_profile.RemoveRange(teacherProfiles);
+                    db.Staff_Profile.RemoveRange(user.Staff_Profile);
+
+                    db.Notifications.RemoveRange(db.Notifications.Where(x => x.user_id == id));
+                    user.Roles.Clear();
+                    db.Users.Remove(user);
+                    db.SaveChanges();
+                    transaction.Commit();
+
+                    TempData["SuccessMessage"] = "Đã xóa tài khoản và các dữ liệu liên quan.";
+                    return RedirectToAction("Index");
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult UploadAvatar(Guid userId)
