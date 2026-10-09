@@ -1,0 +1,352 @@
+﻿
+@model IEnumerable<Source.Models.Course>
+
+@{
+    ViewBag.Title = "Quản lý khóa học";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 0;
+    int totalCourses = ViewBag.TotalCourses ?? 0;
+    int totalActiveCourses = ViewBag.TotalActiveCourses ?? 0;
+    int totalInactiveCourses = ViewBag.TotalInactiveCourses ?? 0;
+    int filteredCourseCount = ViewBag.FilteredCourseCount ?? 0;
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <!-- Tiêu đề trang -->
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-book" aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">Trang quản lý</p>
+                    <h1 class="h3 mb-1">Quản lý khóa học</h1>
+                    <p class="text-muted mb-0">
+                        Theo dõi, tìm kiếm và quản lý các khóa học.
+                    </p>
+                </div>
+            </div>
+
+            <div class="heading-actions">
+                <a class="btn btn-primary btn-sm"
+                   href="@Url.Action("Create", "CourseManage")">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                    Thêm khóa học
+                </a>
+            </div>
+        </div>
+
+        <!-- Thông báo -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mt-3"
+                 role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Thống kê -->
+        <div class="row g-3 mt-2">
+            <div class="col-12 col-md-4">
+                <div class="panel p-3 h-100">
+                    <p class="text-muted mb-2">Tổng số khóa học</p>
+                    <h3 class="mb-0">@totalCourses</h3>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="panel p-3 h-100">
+                    <p class="text-muted mb-2">Đang hoạt động</p>
+                    <h3 class="mb-0">@totalActiveCourses</h3>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="panel p-3 h-100">
+                    <p class="text-muted mb-2">Ngừng hoạt động</p>
+                    <h3 class="mb-0">@totalInactiveCourses</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bộ lọc và tìm kiếm -->
+        <section class="panel mt-4">
+            <div class="panel-header p-3">
+                <h2 class="h5 mb-0 section-title">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    Tìm kiếm khóa học
+                </h2>
+            </div>
+
+            <div class="p-3">
+                @using (Html.BeginForm("Index", "CourseManage", FormMethod.Get))
+                {
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="courseCode" class="form-label">
+                                Mã khóa học
+                            </label>
+                            <input type="text"
+                                   id="courseCode"
+                                   name="courseCode"
+                                   class="form-control"
+                                   value="@ViewBag.CourseCode"
+                                   placeholder="Nhập mã khóa học..." />
+                        </div>
+
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="courseName" class="form-label">
+                                Tên khóa học
+                            </label>
+                            <input type="text"
+                                   id="courseName"
+                                   name="courseName"
+                                   class="form-control"
+                                   value="@ViewBag.CourseName"
+                                   placeholder="Nhập tên khóa học..." />
+                        </div>
+
+                        <div class="col-12 col-md-6 col-lg-2">
+                            <label for="level" class="form-label">
+                                Trình độ
+                            </label>
+                            <select id="level" name="level" class="form-select">
+                                <option value="">Tất cả trình độ</option>
+                                <option value="Beginner"
+                                        @(ViewBag.Level as string == "Beginner" ? "selected" : "")>
+                                    Beginner
+                                </option>
+                                <option value="Intermediate"
+                                        @(ViewBag.Level as string == "Intermediate" ? "selected" : "")>
+                                    Intermediate
+                                </option>
+                                <option value="Advanced"
+                                        @(ViewBag.Level as string == "Advanced" ? "selected" : "")>
+                                    Advanced
+                                </option>
+                                <option value="Advanced"
+                                        @(ViewBag.Level as string == "Elementary" ? "selected" : "")>
+                                    Elementary
+                                </option>
+                                <option value="Advanced"
+                                        @(ViewBag.Level as string == "UpperIntermediate" ? "selected" : "")>
+                                    UpperIntermediate
+                                </option>
+                                <option value="Advanced"
+                                        @(ViewBag.Level as string == "TOEIC" ? "selected" : "")>
+                                    TOEIC
+                                </option>
+                                <option value="Advanced"
+                                        @(ViewBag.Level as string == "IELTS" ? "selected" : "")>
+                                    IELTS
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-lg-2">
+                            <label for="status" class="form-label">
+                                Trạng thái
+                            </label>
+                            <select id="status" name="status" class="form-select">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="Available"
+                                        @(ViewBag.Status as string == "Available" ? "selected" : "")>
+                                    Khả dụng
+                                </option>
+                                <option value="Unavailable"
+                                        @(ViewBag.Status as string == "Unavailable" ? "selected" : "")>
+                                    Không khả dụng
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-lg-2 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search" aria-hidden="true"></i>
+                                Tìm kiếm
+                            </button>
+
+                            <a href="@Url.Action("Index", "CourseManage")"
+                               class="btn btn-outline-secondary">
+                                Xóa lọc
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <!-- Bảng khóa học -->
+        <section class="panel mt-4">
+            <div class="panel-header p-3">
+                <h2 class="h5 mb-1 section-title">
+                    <i class="bi bi-table" aria-hidden="true"></i>
+                    Danh sách khóa học
+                </h2>
+                <p class="text-muted mb-0 mt-2">
+                    Tìm thấy @filteredCourseCount khóa học phù hợp.
+                </p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Mã khóa học</th>
+                            <th>Tên khóa học</th>
+                            <th>Trình độ</th>
+                            <th class="text-center">Thời lượng</th>
+                            <th class="text-end">Học phí</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model == null || !Model.Any())
+                        {
+                            <tr>
+                                <td colspan="7"
+                                    class="text-center text-muted py-5">
+                                    Không tìm thấy khóa học nào.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.course_code</td>
+                                    <td>
+                                        <strong>@item.course_name</strong>
+                                    </td>
+                                    <td>@item.level</td>
+                                    <td class="text-center">
+                                        @item.duration_weeks tuần
+                                    </td>
+                                    <td class="text-end">
+                                        @item.tuition_fee.ToString("N0")
+                                    </td>
+                                    <td class="text-center">
+                                        @if (item.available_status == "Available")
+                                        {
+                                            <span class="badge bg-success">Đang hoạt động</span>
+                                        }
+                                        else if (item.available_status == "Unavailable")
+                                        {
+                                            <span class="badge bg-secondary">Ngừng hoạt động</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@item.available_status</span>
+                                        }
+                                    </td>
+
+                                    <!-- Hai nút nằm ngang -->
+                                    <td class="text-center text-nowrap">
+                                        <div class="d-inline-flex align-items-center gap-2">
+
+                                            <!-- Xem chi tiết -->
+                                            <a class="btn btn-sm btn-action btn-view"
+                                               href="@Url.Action("Details", "CourseManage", new { id = item.course_id })"
+                                               title="Xem chi tiết">
+                                                <i class="bi bi-eye"
+                                                   aria-hidden="true"></i>
+                                            </a>
+
+                                            <!-- Xóa khóa học -->
+                                            @using (Html.BeginForm(
+                                                "DeleteConfirmed",
+                                                "CourseManage",
+                                                new { id = item.course_id },
+                                                FormMethod.Post,
+                                                null))
+                                            {
+                                                @Html.AntiForgeryToken()
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        title="Xóa khóa học"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa khóa học này không?');">
+                                                    <i class="bi bi-trash"
+                                                       aria-hidden="true"></i>
+                                                </button>
+                                            }
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Phân trang -->
+            @if (totalPages > 1)
+            {
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 p-3">
+                    <span class="text-muted">
+                        Trang @currentPage / @totalPages
+                    </span>
+
+                    <nav aria-label="Phân trang khóa học">
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", new {
+                                       courseCode = ViewBag.CourseCode,
+                                       courseName = ViewBag.CourseName,
+                                       level = ViewBag.Level,
+                                       status = ViewBag.Status,
+                                       page = currentPage - 1
+                                   })">
+                                    Trước
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= totalPages; i++)
+                            {
+                                <li class="page-item @(i == currentPage ? "active" : "")">
+                                    <a class="page-link"
+                                       href="@Url.Action("Index", new {
+                                           courseCode = ViewBag.CourseCode,
+                                           courseName = ViewBag.CourseName,
+                                           level = ViewBag.Level,
+                                           status = ViewBag.Status,
+                                           page = i
+                                       })">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", new {
+                                       courseCode = ViewBag.CourseCode,
+                                       courseName = ViewBag.CourseName,
+                                       level = ViewBag.Level,
+                                       status = ViewBag.Status,
+                                       page = currentPage + 1
+                                   })">
+                                    Sau
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </section>
+
+    </div>
+</main>

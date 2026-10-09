@@ -1,0 +1,310 @@
+﻿
+@model Source.Models.Course
+
+@{
+    ViewBag.Title = "Thêm khóa học";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-journal-plus" aria-hidden="true"></i>
+                </span>
+                <div>
+                    <p class="eyebrow mb-1">Quản lý</p>
+                    <h1 class="h3 mb-1">Thêm khóa học</h1>
+                    <p class="text-muted mb-0">
+                        Nhập thông tin khóa học và tải lên giáo trình PDF.
+                    </p>
+                </div>
+            </div>
+
+            <div class="heading-actions">
+                <a class="btn btn-outline-secondary btn-sm"
+                   href="@Url.Action("Index", "CourseManage")">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </div>
+
+        @using (Html.BeginForm(
+            "Create",
+            "CourseManage",
+            FormMethod.Post,
+            new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(
+                true, "", new { @class = "text-danger mb-3" })
+
+            <div class="row g-3">
+
+                <div class="col-12 col-xl-8">
+                    <div class="panel">
+
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="h5 mb-1 section-title">
+                                    <i class="bi bi-journal-text"></i>
+                                    <span>Thông tin khóa học</span>
+                                </h2>
+                                <p class="text-muted mb-0">
+                                    Điền thông tin cơ bản của khóa học.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="course_code">
+                                    Mã khóa học
+                                </label>
+                                @Html.TextBoxFor(
+                                    m => m.course_code,
+                                    new
+                                         {
+                                        @class = "form-control",
+                                        required = "required"
+                                    })
+                                @Html.ValidationMessageFor(
+                                    m => m.course_code,
+                                    "",
+                                    new { @class = "text-danger" })
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="course_name">
+                                    Tên khóa học
+                                </label>
+                                @Html.TextBoxFor(
+                                    m => m.course_name,
+                                    new
+                                         {
+                                        @class = "form-control",
+                                        required = "required"
+                                    })
+                                @Html.ValidationMessageFor(
+                                    m => m.course_name,
+                                    "",
+                                    new { @class = "text-danger" })
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="level">
+                                    Trình độ
+                                </label>
+                                @Html.DropDownListFor(
+                                    m => m.level,
+                                    new SelectList(new[] {
+                                        "Beginner",
+                                        "Elementary",
+                                        "Intermediate",
+                                        "Upper-Intermediate",
+                                        "Advanced",
+                                        "TOEIC",
+                                        "IELTS"
+                                    }),
+                                    "Chọn trình độ",
+                                    new
+                                         {
+                                        @class = "form-select",
+                                        required = "required"
+                                    })
+                                @Html.ValidationMessageFor(
+                                    m => m.level,
+                                    "",
+                                    new { @class = "text-danger" })
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label"
+                                       for="duration_weeks">
+                                    Thời lượng (tuần)
+                                </label>
+                                @Html.TextBoxFor(
+                                    m => m.duration_weeks,
+                                    new
+                                         {
+                                        @class = "form-control",
+                                        type = "number",
+                                        min = "1",
+                                        required = "required"
+                                    })
+                                @Html.ValidationMessageFor(
+                                    m => m.duration_weeks,
+                                    "",
+                                    new { @class = "text-danger" })
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label" for="tuition_fee">
+                                    Học phí
+                                </label>
+                                @Html.TextBoxFor(
+                                    m => m.tuition_fee,
+                                    new
+                                         {
+                                        @class = "form-control",
+                                        type = "number",
+                                        min = "0",
+                                        step = "0.01",
+                                        required = "required"
+                                    })
+                                @Html.ValidationMessageFor(
+                                    m => m.tuition_fee,
+                                    "",
+                                    new { @class = "text-danger" })
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label" for="description">
+                                    Mô tả khóa học
+                                </label>
+                                @Html.TextAreaFor(
+                                    m => m.description,
+                                    new
+                                         {
+                                        @class = "form-control",
+                                        rows = "4"
+                                    })
+                                @Html.ValidationMessageFor(
+                                    m => m.description,
+                                    "",
+                                    new { @class = "text-danger" })
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="panel mt-3">
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="h5 mb-1 section-title">
+                                    <i class="bi bi-file-earmark-pdf"></i>
+                                    <span>Giáo trình PDF</span>
+                                </h2>
+                                <p class="text-muted mb-0">
+                                    Có thể chọn nhiều file PDF cho khóa học.
+                                </p>
+                            </div>
+                        </div>
+
+                        <label class="form-label" for="pdfFiles">
+                            Chọn tài liệu
+                        </label>
+
+                        <input type="file"
+                               id="pdfFiles"
+                               name="pdfFiles"
+                               class="form-control"
+                               accept=".pdf,application/pdf"
+                               multiple />
+
+                        <div class="form-text">
+                            File sẽ được tải lên Cloudinary.
+                            Database chỉ lưu đường dẫn tài liệu.
+                        </div>
+
+                        <ul id="pdfFileList"
+                            class="list-group mt-3"></ul>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <a class="btn btn-outline-secondary"
+                           href="@Url.Action("Index", "CourseManage")">
+                            Hủy
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i>
+                            Tạo khóa học
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-12 col-xl-4">
+                    <div class="panel h-100">
+                        <h2 class="h5 mb-3 section-title">
+                            <i class="bi bi-list-check"></i>
+                            <span>Lưu ý</span>
+                        </h2>
+
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <span class="activity-dot bg-warning"></span>
+                                <div>
+                                    <p class="mb-1 fw-semibold">
+                                        Thông tin đầy đủ
+                                    </p>
+                                    <p class="text-muted small mb-0">
+                                        Kiểm tra mã, tên và học phí trước khi lưu.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <span class="activity-dot bg-warning"></span>
+                                <div>
+                                    <p class="mb-1 fw-semibold">
+                                        Chỉ chọn PDF
+                                    </p>
+                                    <p class="text-muted small mb-0">
+                                        Không chọn tài liệu có định dạng khác.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <span class="activity-dot bg-warning"></span>
+                                <div>
+                                    <p class="mb-1 fw-semibold">
+                                        Lưu trữ trực tuyến
+                                    </p>
+                                    <p class="text-muted small mb-0">
+                                        Tài liệu được lưu trên Cloudinary,
+                                        không lưu file trong SQL Server.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+
+    </div>
+</main>
+
+<script>
+    (function () {
+        var input = document.getElementById("pdfFiles");
+        var list = document.getElementById("pdfFileList");
+
+        input.addEventListener("change", function () {
+            list.innerHTML = "";
+
+            Array.prototype.forEach.call(input.files, function (file) {
+                var item = document.createElement("li");
+                item.className =
+                    "list-group-item d-flex align-items-center gap-2";
+
+                var icon = document.createElement("i");
+                icon.className = "bi bi-file-earmark-pdf text-danger";
+
+                var name = document.createElement("span");
+                name.textContent = file.name;
+
+                item.appendChild(icon);
+                item.appendChild(name);
+                list.appendChild(item);
+            });
+        });
+    })();
+</script>

@@ -1,0 +1,436 @@
+﻿
+@model Source.Models.Course
+@using Source.Models
+@using System.Linq
+@using System.Collections.Generic
+
+@{
+    ViewBag.Title = "Chi tiết khóa học";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    var materials = ViewBag.SyllabusMaterials as IEnumerable<SyllabusMaterial>;
+}
+
+@* Thông báo cập nhật khóa học *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        <i class="bi bi-check-circle"></i>
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@* Thông báo thêm hoặc xóa PDF *@
+@if (TempData["PdfSuccess"] != null)
+{
+    <div class="alert alert-success">
+        <i class="bi bi-check-circle"></i>
+        @TempData["PdfSuccess"]
+    </div>
+}
+
+@if (TempData["PdfError"] != null)
+{
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle"></i>
+        @TempData["PdfError"]
+    </div>
+}
+
+@* Thông báo lỗi nhập liệu *@
+@if (!ViewData.ModelState.IsValid)
+{
+    @Html.ValidationSummary(
+        false,
+        "",
+        new { @class = "alert alert-danger" }
+    )
+}
+
+@* =========================================
+    PHẦN 1: CHỈNH SỬA THÔNG TIN KHÓA HỌC
+    ========================================= *@
+
+<div class="panel mb-4">
+    <div class="panel-header">
+        <h2 class="h5 mb-0 section-title">
+            <i class="bi bi-pencil-square"></i>
+            Chỉnh sửa thông tin khóa học
+        </h2>
+    </div>
+
+    <div class="p-3">
+        @using (Html.BeginForm(
+            "Details",
+            "CourseManage",
+            FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.course_id)
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    @Html.LabelFor(
+                        m => m.course_code,
+                        "Mã khóa học",
+                        new { @class = "form-label" }
+                    )
+
+                    @Html.TextBoxFor(
+                        m => m.course_code,
+                        new
+                        {
+                            @class = "form-control",
+                            required = "required"
+                        }
+                    )
+
+                    @Html.ValidationMessageFor(
+                        m => m.course_code,
+                        "",
+                        new { @class = "text-danger small" }
+                    )
+                </div>
+
+                <div class="col-md-6">
+                    @Html.LabelFor(
+                        m => m.course_name,
+                        "Tên khóa học",
+                        new { @class = "form-label" }
+                    )
+
+                    @Html.TextBoxFor(
+                        m => m.course_name,
+                        new
+                        {
+                            @class = "form-control",
+                            required = "required"
+                        }
+                    )
+
+                    @Html.ValidationMessageFor(
+                        m => m.course_name,
+                        "",
+                        new { @class = "text-danger small" }
+                    )
+                </div>
+
+                <div class="col-md-6">
+                    @Html.LabelFor(
+                        m => m.level,
+                        "Trình độ",
+                        new { @class = "form-label" }
+                    )
+
+                    @Html.DropDownListFor(
+                        m => m.level,
+                        new SelectList(
+                            new[]
+                            {
+                                "Beginner",
+                                "Elementary",
+                                "Intermediate",
+                                "Upper-Intermediate",
+                                "Advanced",
+                                "IELTS",
+                                "TOEIC"
+                            },
+                            Model.level
+                        ),
+                        "-- Chọn trình độ --",
+                        new
+                        {
+                            @class = "form-select",
+                            required = "required"
+                        }
+                    )
+                </div>
+
+                <div class="col-md-6">
+                    @Html.LabelFor(
+                        m => m.duration_weeks,
+                        "Thời lượng (tuần)",
+                        new { @class = "form-label" }
+                    )
+
+                    @Html.TextBoxFor(
+                        m => m.duration_weeks,
+                        new
+                        {
+                            @class = "form-control",
+                            type = "number",
+                            min = "1",
+                            required = "required"
+                        }
+                    )
+
+                    @Html.ValidationMessageFor(
+                        m => m.duration_weeks,
+                        "",
+                        new { @class = "text-danger small" }
+                    )
+                </div>
+
+                <div class="col-md-6">
+                    @Html.LabelFor(
+                        m => m.tuition_fee,
+                        "Học phí (VNĐ)",
+                        new { @class = "form-label" }
+                    )
+
+                    @Html.TextBoxFor(
+                        m => m.tuition_fee,
+                        new
+                        {
+                            @class = "form-control",
+                            type = "number",
+                            min = "0",
+                            step = "1000",
+                            required = "required"
+                        }
+                    )
+
+                    @Html.ValidationMessageFor(
+                        m => m.tuition_fee,
+                        "",
+                        new { @class = "text-danger small" }
+                    )
+                </div>
+
+                <div class="col-md-6">
+                    @Html.LabelFor(
+                        m => m.available_status,
+                        "Trạng thái",
+                        new { @class = "form-label" }
+                    )
+
+                    @Html.DropDownListFor(
+                        m => m.available_status,
+                        new SelectList(
+                            new[]
+                            {
+                                new SelectListItem
+                                {
+                                    Value = "Available",
+                                    Text = "Đang mở"
+                                },
+                                new SelectListItem
+                                {
+                                    Value = "Unavailable",
+                                    Text = "Ngừng mở"
+                                }
+                            },
+                            "Value",
+                            "Text",
+                            Model.available_status
+                        ),
+                        new { @class = "form-select" }
+                    )
+                </div>
+
+                <div class="col-12">
+                    @Html.LabelFor(
+                        m => m.description,
+                        "Mô tả khóa học",
+                        new { @class = "form-label" }
+                    )
+
+                    @Html.TextAreaFor(
+                        m => m.description,
+                        new
+                        {
+                            @class = "form-control",
+                            rows = "4",
+                            placeholder = "Nhập mô tả khóa học..."
+                        }
+                    )
+
+                    @Html.ValidationMessageFor(
+                        m => m.description,
+                        "",
+                        new { @class = "text-danger small" }
+                    )
+                </div>
+
+                <div class="col-12 d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check2"></i>
+                        Lưu thay đổi
+                    </button>
+
+                    <a href="@Url.Action("Index", "CourseManage")"
+                       class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                        Quay lại
+                    </a>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+
+@* =========================================
+    PHẦN 2: THÊM VÀ QUẢN LÝ TÀI LIỆU PDF
+    ========================================= *@
+
+<div class="panel mb-4">
+    <div class="panel-header">
+        <h2 class="h5 mb-0 section-title">
+            <i class="bi bi-file-earmark-pdf"></i>
+            Quản lý tài liệu PDF
+        </h2>
+    </div>
+
+    <div class="p-3">
+
+        @* FORM TẢI LÊN PDF MỚI *@
+        <div class="border rounded p-3 mb-4">
+            <h3 class="h6 mb-3">
+                <i class="bi bi-cloud-arrow-up"></i>
+                Thêm tài liệu mới
+            </h3>
+
+            @using (Html.BeginForm(
+                "UploadMaterials",
+                "CourseManage",
+                FormMethod.Post,
+                new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("courseId", Model.course_id)
+
+                <div class="mb-3">
+                    <label for="pdfFiles" class="form-label">
+                        Chọn file PDF
+                    </label>
+
+                    <input type="file"
+                           id="pdfFiles"
+                           name="pdfFiles"
+                           class="form-control"
+                           accept=".pdf,application/pdf"
+                           multiple
+                           required />
+
+                    <div class="form-text">
+                        Có thể chọn nhiều file PDF cùng lúc.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-upload"></i>
+                    Tải PDF lên
+                </button>
+            }
+        </div>
+
+
+        @* DANH SÁCH PDF ĐÃ LƯU *@
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="h6 mb-0">
+                Tài liệu hiện có
+            </h3>
+
+            <span class="badge bg-secondary">
+                @(materials == null ? 0 : materials.Count()) tài liệu
+            </span>
+        </div>
+
+        @if (materials != null && materials.Any())
+        {
+            foreach (var material in materials)
+            {
+                <div class="border rounded p-3 mb-3">
+
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-file-earmark-pdf text-danger fs-4"></i>
+
+                            <div>
+                                <div class="fw-bold">
+                                    @material.title
+                                </div>
+
+                                <small class="text-muted">
+                                    Trạng thái: @material.available_status
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            @if (!string.IsNullOrWhiteSpace(material.file_url))
+                            {
+                                <a href="@material.file_url"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                    Mở PDF
+                                </a>
+                            }
+
+                            @using (Html.BeginForm(
+                                "DeleteMaterial",
+                                "CourseManage",
+                                new { id = material.syllabus_id },
+                                FormMethod.Post,
+                                null))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit"
+                                        class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash"></i>
+                                    Xóa
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    @* KHUNG XEM PDF *@
+                    @if (!string.IsNullOrWhiteSpace(material.file_url))
+                    {
+                        <div class="mt-3">
+
+                            <iframe src="@(material.file_url + "#page=1&toolbar=0&navpanes=0&view=FitH")"
+                                    width="100%"
+                                    height="350"
+                                    style="border: 1px solid #dee2e6; border-radius: 8px;"
+                                    loading="lazy"
+                                    title="@material.title">
+                            </iframe>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mt-3 mb-0">
+                            Tài liệu này chưa có đường dẫn PDF.
+                        </div>
+                    }
+
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center py-5 border rounded">
+                <i class="bi bi-file-earmark-pdf text-muted"
+                   style="font-size: 3rem;"></i>
+
+                <h3 class="h6 mt-3">
+                    Chưa có tài liệu PDF
+                </h3>
+
+                <p class="text-muted mb-0">
+                    Hãy chọn file PDF ở phía trên để thêm tài liệu cho khóa học.
+                </p>
+            </div>
+        }
+
+    </div>
+</div>
