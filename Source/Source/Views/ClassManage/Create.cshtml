@@ -1,0 +1,125 @@
+
+@model Source.Models.Class
+
+@{
+    ViewBag.Title = "Thêm lớp học";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-plus-circle" aria-hidden="true"></i>
+                </span>
+                <div>
+                    <p class="eyebrow mb-1">Quản lý lớp học</p>
+                    <h1 class="h3 mb-1">Thêm lớp học mới</h1>
+                    <p class="text-muted mb-0">Nhập thông tin lớp học bên dưới.</p>
+                </div>
+            </div>
+            <div class="heading-actions">
+                <a class="btn btn-outline-secondary btn-sm"
+                   href="@Url.Action("Index", "ClassManage")">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                    Quay lại
+                </a>
+            </div>
+        </div>
+
+        <section class="panel mt-3">
+            @using (Html.BeginForm("Create", "ClassManage", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        @Html.LabelFor(m => m.class_code, "Mã lớp",
+                            new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.class_code,
+                            new { @class = "form-control", placeholder = "Ví dụ: ENG-A01" })
+                        @Html.ValidationMessageFor(m => m.class_code, "",
+                            new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        @Html.LabelFor(m => m.course_id, "Khóa học",
+                            new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.course_id,
+                            (SelectList)ViewBag.Courses,
+                            "-- Chọn khóa học --",
+                            new { @class = "form-select" })
+                        @Html.ValidationMessageFor(m => m.course_id, "",
+                            new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        @Html.LabelFor(m => m.teacher_id, "Giáo viên",
+                            new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.teacher_id,
+                            (SelectList)ViewBag.Teachers,
+                            "-- Chưa phân công --",
+                            new { @class = "form-select" })
+                        @Html.ValidationMessageFor(m => m.teacher_id, "",
+                            new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        @Html.LabelFor(m => m.room_id, "Phòng học",
+                            new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.room_id,
+                            (SelectList)ViewBag.Rooms,
+                            "-- Chưa xếp phòng --",
+                            new { @class = "form-select" })
+                        @Html.ValidationMessageFor(m => m.room_id, "",
+                            new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        @Html.LabelFor(m => m.start_date, "Ngày bắt đầu",
+                            new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.start_date, "{0:yyyy-MM-dd}",
+                            new { @class = "form-control", type = "date" })
+                        @Html.ValidationMessageFor(m => m.start_date, "",
+                            new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        @Html.LabelFor(m => m.end_date, "Ngày kết thúc",
+                            new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.end_date, "{0:yyyy-MM-dd}",
+                            new { @class = "form-control", type = "date" })
+                        @Html.ValidationMessageFor(m => m.end_date, "",
+                            new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        @Html.LabelFor(m => m.class_status, "Trạng thái",
+                            new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.class_status,
+                            (SelectList)ViewBag.ClassStatuses,
+                            new { @class = "form-select" })
+                        @Html.ValidationMessageFor(m => m.class_status, "",
+                            new { @class = "text-danger small" })
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle" aria-hidden="true"></i>
+                        Lưu lớp học
+                    </button>
+                    <a class="btn btn-outline-secondary"
+                       href="@Url.Action("Index", "ClassManage")">
+                        Hủy
+                    </a>
+                </div>
+            }
+        </section>
+    </div>
+</main>

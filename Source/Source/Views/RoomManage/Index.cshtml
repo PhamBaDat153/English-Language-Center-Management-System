@@ -1,0 +1,421 @@
+﻿@model IEnumerable<Source.Models.Room>
+
+@{
+    ViewBag.Title = "Quản lý phòng học";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 0;
+    int totalRooms = ViewBag.FilteredRoomCount ?? ViewBag.TotalItems ?? 0;
+    int pageSize = ViewBag.PageSize ?? 15;
+
+    int firstRoom = totalRooms == 0
+        ? 0
+        : ((currentPage - 1) * pageSize) + 1;
+
+    int lastRoom = Math.Min(currentPage * pageSize, totalRooms);
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <!-- Tiêu đề trang -->
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-door-open" aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">Trang quản lý</p>
+                    <h1 class="h3 mb-1">Phòng học</h1>
+                    <p class="text-muted mb-0">
+                        Quản lý mã phòng, sức chứa, vị trí và tình trạng phòng học.
+                    </p>
+                </div>
+            </div>
+
+            <div class="heading-actions">
+                <a class="btn btn-primary btn-sm"
+                   href="@Url.Action("Create", "RoomManage")">
+                    <i class="bi bi-plus-circle" aria-hidden="true"></i>
+                    Thêm phòng mới
+                </a>
+            </div>
+        </div>
+
+        <!-- Thông báo -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mt-3"
+                 role="alert">
+                <i class="bi bi-check-circle me-2" aria-hidden="true"></i>
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert" aria-label="Đóng"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mt-3"
+                 role="alert">
+                <i class="bi bi-exclamation-circle me-2" aria-hidden="true"></i>
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert" aria-label="Đóng"></button>
+            </div>
+        }
+
+        <!-- Thẻ thống kê -->
+        <section class="row g-3 mt-1" aria-label="Room summary">
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="metric-card metric-primary">
+                    <div class="metric-top">
+                        <span class="metric-label">Tổng phòng tìm thấy</span>
+                        <span class="metric-icon">
+                            <i class="bi bi-door-open" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <div class="metric-value">
+                        @(ViewBag.TotalItems ?? 0)
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="metric-card metric-success">
+                    <div class="metric-top">
+                        <span class="metric-label">Phòng có sẵn</span>
+                        <span class="metric-icon">
+                            <i class="bi bi-check-circle" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <div class="metric-value">
+                        @(ViewBag.TotalAvailableRooms ?? 0)
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="metric-card metric-danger">
+                    <div class="metric-top">
+                        <span class="metric-label">Phòng không khả dụng</span>
+                        <span class="metric-icon">
+                            <i class="bi bi-slash-circle" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <div class="metric-value">
+                        @(ViewBag.TotalUnavailableRooms ?? 0)
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <article class="metric-card metric-warning">
+                    <div class="metric-top">
+                        <span class="metric-label">Sức chứa mỗi trang</span>
+                        <span class="metric-icon">
+                            <i class="bi bi-list-ol" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <div class="metric-value">
+                        @pageSize
+                    </div>
+                </article>
+            </div>
+
+        </section>
+
+        <!-- Tìm kiếm phòng -->
+        <section class="panel mt-3">
+            <h3>Tìm kiếm phòng học</h3>
+
+            <form class="user-filter-scroll mb-4"
+                  method="get"
+                  action="@Url.Action("Index", "RoomManage")"
+                  aria-label="Lọc phòng học">
+
+                <div class="user-filter-row">
+
+                    <div class="user-filter-field user-filter-username">
+                        <label class="form-label small fw-semibold mb-1"
+                               for="roomCode">
+                            Mã phòng
+                        </label>
+                        <input class="form-control form-control-sm"
+                               id="roomCode"
+                               name="roomCode"
+                               type="search"
+                               value="@ViewBag.RoomCode"
+                               placeholder="Nhập mã phòng">
+                    </div>
+
+                    <div class="user-filter-field user-filter-email">
+                        <label class="form-label small fw-semibold mb-1"
+                               for="roomName">
+                            Tên phòng
+                        </label>
+                        <input class="form-control form-control-sm"
+                               id="roomName"
+                               name="roomName"
+                               type="search"
+                               value="@ViewBag.RoomName"
+                               placeholder="Nhập tên phòng">
+                    </div>
+
+                    <div class="user-filter-field user-filter-status">
+                        <label class="form-label small fw-semibold mb-1"
+                               for="status">
+                            Trạng thái
+                        </label>
+
+                        <select class="form-select form-select-sm"
+                                id="status"
+                                name="status">
+                            <option value="">Tất cả trạng thái</option>
+
+                            <option value="Available"
+                                    @(ViewBag.Status as string == "Available" ? "selected" : "")>
+                                Có sẵn
+                            </option>
+
+                            <option value="Unavailable"
+                                    @(ViewBag.Status as string == "Unavailable" ? "selected" : "")>
+                                Không khả dụng
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="user-filter-actions">
+                        <button class="btn btn-primary btn-sm" type="submit">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                            Tìm kiếm
+                        </button>
+
+                        <a class="btn btn-outline-secondary btn-sm"
+                           href="@Url.Action("Index", "RoomManage")">
+                            <i class="bi bi-arrow-counterclockwise"
+                               aria-hidden="true"></i>
+                            Xóa bộ lọc
+                        </a>
+                    </div>
+
+                </div>
+            </form>
+
+            <!-- Tiêu đề danh sách -->
+            <div class="panel-header">
+                <div>
+                    <h2 class="h5 mb-1 section-title">
+                        <i class="bi bi-table" aria-hidden="true"></i>
+                        <span>Danh sách phòng học</span>
+                    </h2>
+                </div>
+            </div>
+
+            <!-- Bảng phòng học -->
+            <div class="table-responsive users-table-wrap">
+                <table class="table users-table align-middle mb-0"
+                       id="roomsTable"
+                       data-searchable-table>
+
+                    <thead>
+                        <tr>
+                            <th>Phòng học</th>
+                            <th class="text-center">Sức chứa</th>
+                            <th>Vị trí</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-end">Thao tác</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model == null || !Model.Any())
+                        {
+                            <tr>
+                                <td class="text-center text-muted py-5"
+                                    colspan="5">
+                                    <i class="bi bi-door-closed d-block fs-2 mb-2"
+                                       aria-hidden="true"></i>
+                                    Không tìm thấy phòng học phù hợp với bộ lọc.
+                                </td>
+                            </tr>
+                        }
+
+                        @foreach (var item in Model
+                            ?? Enumerable.Empty<Source.Models.Room>())
+                        {
+                            <tr>
+                                <!-- Mã và tên phòng -->
+                                <td>
+                                    <div class="table-media">
+                                        <span class="user-avatar">
+                                            <i class="bi bi-door-closed"
+                                               aria-hidden="true"></i>
+                                        </span>
+
+                                        <div>
+                                            <strong class="d-block">
+                                                @item.room_name
+                                            </strong>
+                                            <small class="text-muted">
+                                                @item.room_code
+                                            </small>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Sức chứa -->
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-people me-1"
+                                           aria-hidden="true"></i>
+                                        @item.max_capacity người
+                                    </span>
+                                </td>
+
+                                <!-- Vị trí -->
+                                <td>
+                                    @if (string.IsNullOrWhiteSpace(item.location))
+                                    {
+                                        <span class="text-muted">Chưa cập nhật</span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <i class="bi bi-geo-alt me-1"
+                                               aria-hidden="true"></i>
+                                            @item.location
+                                        </span>
+                                    }
+                                </td>
+
+                                <!-- Trạng thái -->
+                                <td class="text-center">
+                                    @if (item.available_status == "Available")
+                                    {
+                                        <span class="badge user-status status-active">
+                                            <i class="bi bi-check-circle"
+                                               aria-hidden="true"></i>
+                                            Có sẵn
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge user-status status-inactive">
+                                            <i class="bi bi-slash-circle"
+                                               aria-hidden="true"></i>
+                                            Không khả dụng
+                                        </span>
+                                    }
+                                </td>
+
+                                <!-- Thao tác -->
+                                <td class="text-end text-nowrap">
+                                    <div class="table-actions">
+                                        <a class="btn btn-sm btn-action btn-view"
+                                           href="@Url.Action(
+                                               "Details",
+                                               "RoomManage",
+                                               new { id = item.room_id })"
+                                           title="Xem chi tiết / Chỉnh sửa"
+                                           aria-label="Xem phòng @item.room_name">
+                                            <i class="bi bi-eye"
+                                               aria-hidden="true"></i>
+                                        </a>
+
+                                        @using (Html.BeginForm(
+"Delete",
+"RoomManage",
+new { id = item.room_id },
+FormMethod.Post,
+new
+{
+onsubmit = "return confirm('Bạn có chắc chắn muốn xóa phòng này không?');",
+@class = "d-inline"
+}))
+                                        {
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    title="Xóa phòng">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        }
+                                        
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Phân trang -->
+            <div class="d-flex flex-column flex-sm-row
+                        align-items-sm-center justify-content-between
+                        gap-3 mt-3">
+
+                <p class="text-muted small mb-0">
+                    Hiển thị @firstRoom - @lastRoom
+                    trong tổng số @totalRooms phòng học
+                </p>
+
+                @if (totalPages > 1)
+                {
+                    <nav aria-label="Room pagination">
+                        <ul class="pagination pagination-sm mb-0">
+
+                            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", new {
+                                       page = currentPage - 1,
+                                       roomCode = ViewBag.RoomCode,
+                                       roomName = ViewBag.RoomName,
+                                       status = ViewBag.Status
+                                   })">
+                                    Trước
+                                </a>
+                            </li>
+
+                            @for (int pageNumber = 1;
+                                  pageNumber <= totalPages;
+                                  pageNumber++)
+                            {
+                                <li class="page-item @(pageNumber == currentPage ? "active" : "")">
+                                    <a class="page-link"
+                                       href="@Url.Action("Index", new {
+                                           page = pageNumber,
+                                           roomCode = ViewBag.RoomCode,
+                                           roomName = ViewBag.RoomName,
+                                           status = ViewBag.Status
+                                       })">
+                                        @pageNumber
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", new {
+                                       page = currentPage + 1,
+                                       roomCode = ViewBag.RoomCode,
+                                       roomName = ViewBag.RoomName,
+                                       status = ViewBag.Status
+                                   })">
+                                    Sau
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                }
+            </div>
+
+        </section>
+    </div>
+</main>

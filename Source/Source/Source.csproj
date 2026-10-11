@@ -192,10 +192,12 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\ClassManageController.cs" />
     <Compile Include="Controllers\CourseManageController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\RoomManageController.cs" />
     <Compile Include="Controllers\UserManageController.cs" />
     <Compile Include="Service\CloudinaryService.cs" />
     <Compile Include="ViewModels\UserManageViewModels\QualificationViewModel.cs" />
@@ -616,6 +618,12 @@
     <Content Include="Views\CourseManage\Details.cshtml" />
     <Content Include="Views\Error\NotFound.cshtml" />
     <Content Include="Views\Error\ServerError.cshtml" />
+    <Content Include="Views\ClassManage\Create.cshtml" />
+    <Content Include="Views\ClassManage\Details.cshtml" />
+    <Content Include="Views\ClassManage\Index.cshtml" />
+    <Content Include="Views\RoomManage\Create.cshtml" />
+    <Content Include="Views\RoomManage\Details.cshtml" />
+    <Content Include="Views\RoomManage\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,0 +1,252 @@
+
+@model Source.Models.Room
+
+@{
+    ViewBag.Title = "Thêm phòng học";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-plus-circle" aria-hidden="true"></i>
+                </span>
+                <div>
+                    <p class="eyebrow mb-1">Quản lý phòng học</p>
+                    <h1 class="h3 mb-1">Thêm phòng học mới</h1>
+                    <p class="text-muted mb-0">Nhập thông tin phòng học bên dưới.</p>
+                </div>
+            </div>
+            <div class="heading-actions">
+                <a class="btn btn-outline-secondary btn-sm"
+                   href="@Url.Action("Index", "RoomManage")">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                    Quay lại
+                </a>
+            </div>
+        </div>
+
+        <!-- Validation summary -->
+        @Html.ValidationSummary(
+            true,
+            "",
+            new { @class = "alert alert-danger" })
+
+        <div class="row g-4">
+
+            <!-- Left: Preview -->
+            <div class="col-12 col-lg-4">
+                <div class="panel bg-white rounded-3 shadow-sm h-100">
+                    <div class="panel-header p-3 border-bottom">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Thông tin
+                        </h5>
+                    </div>
+
+                    <div class="p-4 text-center">
+                        <div class="rounded-circle bg-primary bg-opacity-10
+                                    d-inline-flex align-items-center justify-content-center mb-3"
+                             style="width: 100px; height: 100px;">
+                            <i class="bi bi-building text-primary"
+                               style="font-size: 3rem;"></i>
+                        </div>
+
+                        <h5 class="fw-bold mb-2">Phòng học mới</h5>
+                        <p class="text-muted small">
+                            Vui lòng nhập đầy đủ và chính xác thông tin phòng học.
+                        </p>
+
+                        <hr class="my-4" />
+
+                        <div class="text-start mb-3">
+                            <div class="text-muted small mb-1">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Mã phòng
+                            </div>
+                            <div class="fw-semibold">
+                                Mã phòng phải là duy nhất.
+                            </div>
+                        </div>
+
+                        <div class="text-start mb-3">
+                            <div class="text-muted small mb-1">
+                                <i class="bi bi-people me-2"></i>
+                                Sức chứa
+                            </div>
+                            <div class="fw-semibold">
+                                Phải lớn hơn 0 người.
+                            </div>
+                        </div>
+
+                        <div class="text-start">
+                            <div class="text-muted small mb-1">
+                                <i class="bi bi-toggle-on me-2"></i>
+                                Trạng thái
+                            </div>
+                            <div class="fw-semibold">
+                                Có thể chọn hoạt động hoặc ngừng sử dụng.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Create form -->
+            <div class="col-12 col-lg-8">
+                <div class="panel bg-white rounded-3 shadow-sm">
+                    <div class="panel-header p-3 border-bottom">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Thông tin phòng học
+                        </h5>
+                    </div>
+
+                    <div class="p-4">
+                        @using (Html.BeginForm(
+                            "Create",
+                            "RoomManage",
+                            FormMethod.Post,
+                            new { @class = "row g-3" }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Mã phòng <span class="text-danger">*</span>
+                                </label>
+
+                                @Html.TextBoxFor(
+                                    m => m.room_code,
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        placeholder = "Ví dụ: ROOM001",
+                                        required = "required",
+                                        maxlength = "50"
+                                    })
+
+                                @Html.ValidationMessageFor(
+                                    m => m.room_code,
+                                    "",
+                                    new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Tên phòng <span class="text-danger">*</span>
+                                </label>
+
+                                @Html.TextBoxFor(
+                                    m => m.room_name,
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        placeholder = "Ví dụ: Phòng học A101",
+                                        required = "required",
+                                        maxlength = "150"
+                                    })
+
+                                @Html.ValidationMessageFor(
+                                    m => m.room_name,
+                                    "",
+                                    new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Sức chứa <span class="text-danger">*</span>
+                                </label>
+
+                                @Html.TextBoxFor(
+                                    m => m.max_capacity,
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        type = "number",
+                                        min = "1",
+                                        required = "required",
+                                        value = "20"
+                                    })
+
+                                @Html.ValidationMessageFor(
+                                    m => m.max_capacity,
+                                    "",
+                                    new { @class = "text-danger small" })
+
+                                <div class="form-text">
+                                    Nhập số lượng học viên tối đa của phòng.
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Trạng thái
+                                </label>
+
+                                <select name="available_status" class="form-select">
+                                    <option value="Available"
+                                            @(Model == null || Model.available_status == "Available" ? "selected" : "")>
+                                        Đang hoạt động
+                                    </option>
+
+                                    <option value="Unavailable"
+                                            @(Model != null && Model.available_status == "Unavailable" ? "selected" : "")>
+                                        Ngừng sử dụng
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    Vị trí phòng
+                                </label>
+
+                                @Html.TextAreaFor(
+                                    m => m.location,
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        rows = "3",
+                                        placeholder = "Ví dụ: Tầng 1, khu A..."
+                                    })
+
+                                @Html.ValidationMessageFor(
+                                    m => m.location,
+                                    "",
+                                    new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="col-12">
+                                <hr class="my-2" />
+
+                                <div class="d-flex flex-wrap justify-content-end gap-2">
+                                    <a href="@Url.Action("Index", "RoomManage")"
+                                       class="btn btn-outline-secondary">
+                                        <i class="bi bi-x-circle me-1"></i>
+                                        Hủy
+                                    </a>
+
+                                    <button type="reset"
+                                            class="btn btn-outline-warning">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i>
+                                        Nhập lại
+                                    </button>
+
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-save me-1"></i>
+                                        Tạo phòng học
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
