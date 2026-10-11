@@ -12,29 +12,20 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
 
 namespace Source.Controllers
 {
     public class UserManageController : Controller
     {
         // Khai báo DBContext
-        private readonly NewGen_english_center_dbEntities db =
-            new NewGen_english_center_dbEntities();
-
-        /// <summary>Chuyển các exception chưa được xử lý sang trang lỗi 500 dùng chung.</summary>
-        protected override void OnException(ExceptionContext filterContext)
-        {
-            // Đánh dấu exception đã được MVC xử lý.
-            filterContext.ExceptionHandled = true;
-            // Hiển thị trang lỗi 500 dùng chung.
-            filterContext.Result = View("~/Views/Shared/Error_500.cshtml");
-        }
+        private readonly NewGen_english_center_dbEntities db = new NewGen_english_center_dbEntities();
 
         // GET: Lấy toàn bộ danh sách người dùng và trả về trang User Index.
         // Nếu gặp lỗi thì trả về trang Error.
-        [HttpGet]
         /// <summary>Hiển thị danh sách user, hỗ trợ lọc, thống kê và phân trang.</summary>
         /// <param name="username">Tên đăng nhập cần lọc.</param>
         /// <param name="email">Email cần lọc.</param>
@@ -43,16 +34,14 @@ namespace Source.Controllers
         /// <param name="status">Trạng thái tài khoản cần lọc.</param>
         /// <param name="page">Số trang hiện tại.</param>
         /// <returns>View danh sách user hoặc trang lỗi 500.</returns>
-        public ActionResult Index(
-            string username,
-            string email,
-            string phone,
-            string role,
-            string status,
-            int page = 1)
+        [HttpGet]
+        public ActionResult Index( string username, string email, string phone, string role, string status, int page = 1) 
         {
             try
             {
+                //Tạo view model cho trang index
+                UserListViewModel userListViewModel = new UserListViewModel();
+
                 // Quy định số lượng user hiển thị trên mỗi trang.
                 const int pageSize = 15;
 
@@ -94,50 +83,24 @@ namespace Source.Controllers
                 // Lọc theo role được chọn.
                 if (!string.IsNullOrWhiteSpace(role))
                 {
-                    filteredUsers = filteredUsers.Where(
-                        u =>
-                            u.Roles.Any(r => r.role_name == role) &&
-                            (
-                                role == "Administrator" ||
-                                (
-                                    role == "Teacher" &&
-                                    !u.Roles.Any(
-                                        r => r.role_name == "Administrator")
-                                ) ||
-                                (
-                                    role == "Student" &&
-                                    !u.Roles.Any(
-                                        r =>
-                                            r.role_name == "Administrator" ||
-                                            r.role_name == "Teacher")
-                                )
-                            ));
+                    filteredUsers = filteredUsers.Where( u => u.Roles.Any(r => r.role_name == role) 
+                                                    && ( role == "Administrator" || ( role == "Teacher" && !u.Roles.Any( r => r.role_name == "Administrator")) 
+                                                    || ( role == "Student" && !u.Roles.Any( r => r.role_name == "Administrator" || r.role_name == "Teacher"))));
                 }
 
-                // Summary dùng toàn bộ user;
-                // table dùng toàn bộ kết quả sau filter.
-                // Tính các số liệu tổng quan cho các metric card.
-                var totalUsers = users.Count;
+                // Tính các số liệu tổng quan.
+                userListViewModel.totalUsers = users.Count;
 
-                var totalStudents = users.Count(
-                    u =>
-                        u.Roles.Any(r => r.role_name == "Student") &&
-                        !u.Roles.Any(
-                            r =>
-                                r.role_name == "Administrator" ||
-                                r.role_name == "Teacher"));
+                userListViewModel.totalStudents = users.Count( u => u.Roles.Any(r => r.role_name == "Student") && !u.Roles.Any( r => r.role_name == "Administrator" || r.role_name == "Teacher"));
 
-                var totalActiveUsers = users.Count(
-                    u => u.active_status == "Active");
+                userListViewModel.totalActiveUsers = users.Count( u => u.active_status == "Active");
 
-                var totalInactiveUsers = users.Count(
-                    u => u.active_status == "Inactive");
+                userListViewModel.totalInactiveUsers = users.Count( u => u.active_status == "Inactive");
 
                 // Thực thi truy vấn lọc để lấy tổng số user phù hợp.
                 var filteredUserCount = filteredUsers.Count();
 
-                var totalPages = (int)Math.Ceiling(
-                    (double)filteredUserCount / pageSize);
+                var totalPages = (int)Math.Ceiling((double)filteredUserCount / pageSize);
 
                 if (totalPages > 0 && page > totalPages)
                 {
@@ -146,11 +109,11 @@ namespace Source.Controllers
 
                 // Chỉ phân trang sau khi đã filter.
                 // Sắp xếp và phân trang sau khi đã áp dụng toàn bộ bộ lọc.
-                var result = filteredUsers
-                    .OrderBy(u => u.full_name)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
+                userListViewModel.filteredUserList = filteredUsers
+                                                    .OrderBy(u => u.full_name)
+                                                    .Skip((page - 1) * pageSize)
+                                                    .Take(pageSize)
+                                                    .ToList(); ;
 
                 // Giữ lại bộ lọc và thông tin phân trang khi render view.
                 ViewBag.Username = username;
@@ -160,252 +123,386 @@ namespace Source.Controllers
                 ViewBag.Status = status;
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
-                ViewBag.TotalUsers = totalUsers;
                 ViewBag.FilteredUserCount = filteredUserCount;
-                ViewBag.TotalStudents = totalStudents;
-                ViewBag.TotalActiveUsers = totalActiveUsers;
-                ViewBag.TotalInactiveUsers = totalInactiveUsers;
                 ViewBag.PageSize = pageSize;
 
                 // Trả dữ liệu trang hiện tại về UserManage/Index.
-                return View(result);
+                return View(userListViewModel);
             }
             catch (Exception ex)
             {
                 // Có lỗi khi truy vấn hoặc xử lý dữ liệu thì hiển thị trang lỗi 500.
-                return View("~/Views/Shared/Error_500.cshtml");
+                return RedirectToAction("ServerError", "Error"); ;
             }
         }
 
-        [HttpGet]
+        private SelectList AvailableRoleOptions(Guid? selectedRoleId = null)
+        {
+            var roles = db.Roles
+                .Where(r => r.available_status == "Available")
+                .OrderBy(r => r.role_name)
+                .ToList()
+                .Select(r => new SelectListItem
+                {
+                    Value = r.role_id.ToString(),
+                    Text = r.role_name == "Student"
+                        ? "Học viên"
+                        : r.role_name == "Teacher"
+                            ? "Giáo viên"
+                            : r.role_name == "Administrator"
+                                ? "Quản trị viên"
+                                : r.role_name,
+                    Selected = selectedRoleId == r.role_id
+                });
+
+            return new SelectList(roles, "Value", "Text", selectedRoleId);
+        }
+
+        // GET: Truy cập trang trang User Create.
+        // Nếu gặp lỗi thì trả về trang Error.
         /// <summary>Mở form tạo tài khoản và nạp danh sách role khả dụng.</summary>
         /// <returns>View tạo tài khoản hoặc trang lỗi 500.</returns>
+        [HttpGet]
         public ActionResult Create()
         {
             try
             {
                 // Lấy các role đang khả dụng để hiển thị trong combobox.
-                ViewBag.Roles = new SelectList(
-                    db.Roles
-                        .Where(r => r.available_status == "Available")
-                        .OrderBy(r => r.role_name),
-                    "role_id",
-                    "role_name");
+                ViewBag.Roles = AvailableRoleOptions();
 
                 return View();
             }
             catch (Exception ex)
             {
-                return View("~/Views/Shared/Error_500.cshtml");
+                // Có lỗi thì hiển thị trang lỗi 500.
+                return RedirectToAction("ServerError", "Error"); ;
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        /// <summary>Kiểm tra và tạo tài khoản cùng role/profile liên quan.</summary>
+        // Post: Thêm tài khoản mới vào Database.
+        // Nếu gặp lỗi thì trả về trang Error.
+        /// <summary>Kiểm tra và tạo tài khoản cùng profile liên quan với role nhưng không thêm bất kì thông tin nào.</summary>
         /// <param name="user">Dữ liệu tài khoản từ form.</param>
         /// <param name="role_id">ID role được chọn.</param>
         /// <returns>Form có lỗi, redirect về danh sách hoặc trang lỗi 500.</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(User user, Guid? role_id)
         {
-            // Kiểm tra username bắt buộc và không được trùng.
-            if (string.IsNullOrWhiteSpace(user.username))
+            try
             {
-                ModelState.AddModelError(
-                    "username",
-                    "Tên đăng nhập không được để trống.");
-            }
-            else if (db.Users.Any(u => u.username == user.username))
-            {
-                ModelState.AddModelError(
-                    "username",
-                    "Tên đăng nhập đã tồn tại.");
-            }
+                // Kiểm tra username bắt buộc và không được trùng.
+                if (string.IsNullOrWhiteSpace(user.username))
+                {
+                    ModelState.AddModelError(
+                        "username",
+                        "Tên đăng nhập không được để trống.");
+                }
+                else if (db.Users.Any(u => u.username == user.username))
+                {
+                    ModelState.AddModelError(
+                        "username",
+                        "Tên đăng nhập đã tồn tại.");
+                }
 
-            // Kiểm tra email bắt buộc và không được trùng.
-            if (string.IsNullOrWhiteSpace(user.email))
-            {
-                ModelState.AddModelError(
-                    "email",
-                    "Email không được để trống.");
-            }
-            else if (db.Users.Any(u => u.email == user.email))
-            {
-                ModelState.AddModelError(
-                    "email",
-                    "Email đã được sử dụng.");
-            }
+                // Kiểm tra email bắt buộc và không được trùng.
+                if (string.IsNullOrWhiteSpace(user.email))
+                {
+                    ModelState.AddModelError(
+                        "email",
+                        "Email không được để trống.");
+                }
+                else if (db.Users.Any(u => u.email == user.email))
+                {
+                    ModelState.AddModelError(
+                        "email",
+                        "Email đã được sử dụng.");
+                }
 
-            if (string.IsNullOrWhiteSpace(user.hashed_password))
-            {
-                ModelState.AddModelError(
-                    "hashed_password",
-                    "Mật khẩu không được để trống.");
-            }
+                if (string.IsNullOrWhiteSpace(user.hashed_password))
+                {
+                    ModelState.AddModelError(
+                        "hashed_password",
+                        "Mật khẩu không được để trống.");
+                }
+                else if (user.hashed_password.Length < 8)
+                {
+                    ModelState.AddModelError(
+                        "hashed_password",
+                        "Mật khẩu phải có ít nhất 8 ký tự.");
+                }
 
-            // Nếu dữ liệu không hợp lệ, nạp lại role và trả lại form.
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Roles = new SelectList(
-                    db.Roles
-                        .Where(r => r.available_status == "Available")
-                        .OrderBy(r => r.role_name),
-                    "role_id",
-                    "role_name",
-                    role_id);
+                // Nếu dữ liệu không hợp lệ, nạp lại role và trả lại form.
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.Roles = AvailableRoleOptions(role_id);
 
-                return View(user);
-            }
+                    return View(user);
+                }
 
-            // Tìm role được chọn trong các role đang khả dụng.
-            var role = role_id.HasValue
-                ? db.Roles.SingleOrDefault(
-                    r =>
-                        r.role_id == role_id.Value &&
-                        r.available_status == "Available")
-                : null;
+                // Tìm role được chọn trong các role đang khả dụng.
+                var role = role_id.HasValue
+                    ? db.Roles.SingleOrDefault(
+                        r =>
+                            r.role_id == role_id.Value &&
+                            r.available_status == "Available")
+                    : null;
 
-            if (role == null)
-            {
-                ModelState.AddModelError(
-                    "role_id",
-                    "Vui lòng chọn vai trò.");
+                if (role == null)
+                {
+                    ModelState.AddModelError(
+                        "role_id",
+                        "Vui lòng chọn vai trò.");
 
-                ViewBag.Roles = new SelectList(
-                    db.Roles
-                        .Where(r => r.available_status == "Available")
-                        .OrderBy(r => r.role_name),
-                    "role_id",
-                    "role_name",
-                    role_id);
+                    ViewBag.Roles = AvailableRoleOptions(role_id);
 
-                return View(user);
-            }
+                    return View(user);
+                }
 
-            // Khởi tạo ID và các giá trị mặc định cho user mới.
-            user.user_id = Guid.NewGuid();
-            user.full_name = user.username;
-            user.created_at = DateTime.Now;
-            user.updated_at = DateTime.Now;
-            user.active_status =
-                string.IsNullOrWhiteSpace(user.active_status)
-                    ? "Active"
-                    : user.active_status;
+                // Khởi tạo ID và các giá trị mặc định cho user mới.
+                user.user_id = Guid.NewGuid();
+                user.full_name = user.username;
+                user.created_at = DateTime.Now;
+                user.updated_at = DateTime.Now;
+                user.active_status =
+                    string.IsNullOrWhiteSpace(user.active_status)
+                        ? "Active"
+                        : user.active_status;
 
-            var roleHierarchy = new Dictionary<string, int>
+                var roleHierarchy = new Dictionary<string, int>
             {
                 { "Student", 1 },
                 { "Teacher", 2 },
                 { "Administrator", 3 }
             };
 
-            var selectedLevel = roleHierarchy[role.role_name];
+                var selectedLevel = roleHierarchy[role.role_name];
 
-            var rolesToAssign = db.Roles
-                .Where(r => r.available_status == "Available")
-                .ToList()
-                .Where(
-                    r =>
-                        roleHierarchy.ContainsKey(r.role_name) &&
-                        roleHierarchy[r.role_name] <= selectedLevel)
-                .ToList();
+                var rolesToAssign = db.Roles
+                    .Where(r => r.available_status == "Available")
+                    .ToList()
+                    .Where(
+                        r =>
+                            roleHierarchy.ContainsKey(r.role_name) &&
+                            roleHierarchy[r.role_name] <= selectedLevel)
+                    .ToList();
 
-            // Thêm user và các role vào Entity Framework context.
-            db.Users.Add(user);
+                // Thêm user và các role vào Entity Framework context.
+                db.Users.Add(user);
 
-            foreach (var assignedRole in rolesToAssign)
-            {
-                user.Roles.Add(assignedRole);
-            }
-
-            var now = DateTime.Now;
-
-            // Student_Profile chỉ được tạo khi role được chọn là Student.
-            if (role.role_name == "Student")
-            {
-                db.Student_Profile.Add(
-                    new Student_Profile
-                    {
-                        student_id = Guid.NewGuid(),
-                        user_id = user.user_id,
-                        student_code = "STU-" + user.username,
-                        student_status = "Active",
-                        created_at = now,
-                        updated_at = now,
-                        available_status = "Available"
-                    });
-            }
-
-            if (
-                role.role_name == "Teacher" ||
-                role.role_name == "Administrator")
-            {
-                var staff = new Staff_Profile
+                foreach (var assignedRole in rolesToAssign)
                 {
-                    staff_id = Guid.NewGuid(),
-                    user_id = user.user_id,
-                    staff_code = "STF-" + user.username,
-                    employment_status = "Active",
-                    created_at = now,
-                    updated_at = now,
-                    available_status = "Available"
-                };
+                    user.Roles.Add(assignedRole);
+                }
 
-                db.Staff_Profile.Add(staff);
+                var now = DateTime.Now;
 
-                if (role.role_name == "Teacher")
+                // Student_Profile chỉ được tạo khi role được chọn là Student.
+                if (role.role_name == "Student")
                 {
-                    db.Teacher_profile.Add(
-                        new Teacher_profile
+                    db.Student_Profile.Add(
+                        new Student_Profile
                         {
-                            teacher_id = Guid.NewGuid(),
-                            staff_id = staff.staff_id,
+                            student_id = Guid.NewGuid(),
+                            user_id = user.user_id,
+                            student_code = "STU-" + user.username,
+                            student_status = "Active",
                             created_at = now,
                             updated_at = now,
                             available_status = "Available"
                         });
                 }
+
+                if (
+                    role.role_name == "Teacher" ||
+                    role.role_name == "Administrator")
+                {
+                    var staff = new Staff_Profile
+                    {
+                        staff_id = Guid.NewGuid(),
+                        user_id = user.user_id,
+                        staff_code = "STF-" + user.username,
+                        employment_status = "Active",
+                        created_at = now,
+                        updated_at = now,
+                        available_status = "Available"
+                    };
+
+                    db.Staff_Profile.Add(staff);
+
+                    if (role.role_name == "Teacher")
+                    {
+                        db.Teacher_profile.Add(
+                            new Teacher_profile
+                            {
+                                teacher_id = Guid.NewGuid(),
+                                staff_id = staff.staff_id,
+                                created_at = now,
+                                updated_at = now,
+                                available_status = "Available"
+                            });
+                    }
+                }
+
+                // Lưu user, role và profile xuống database.
+                db.SaveChanges();
+
+                return RedirectToAction("Index");
             }
-
-            // Lưu user, role và profile xuống database.
-            db.SaveChanges();
-
-            return RedirectToAction("Index");
+            catch (Exception ex)
+            {
+                // Có lỗi thì hiển thị trang lỗi 500.
+                return RedirectToAction("ServerError", "Error"); ;
+            }
         }
 
-        [HttpGet]
+        // GET: Truy cập trong trang User Details.
+        // Nếu gặp lỗi thì trả về trang Error.
         /// <summary>Hiển thị thông tin chi tiết của một user.</summary>
         /// <param name="userId">ID user cần xem.</param>
         /// <returns>View chi tiết hoặc 404 nếu không tìm thấy.</returns>
-        public ActionResult Details(Guid userId)
+        [HttpGet]
+        public async Task<ActionResult> Details(Guid userId)
         {
-            // Nạp user cùng các profile và role liên quan.
-            var user = LoadUser(userId);
-
-            if (user == null)
+            try
             {
-                return HttpNotFound();
+                // Tìm người dùng theo ID
+                User user = await db.Users.FindAsync(userId);
+
+                // Kiểm tra người dùng có tồn tại hay không
+                if (user == null)
+                {
+                    return RedirectToAction("NotFound", "Error");
+                }
+
+                // Khởi tạo ViewModel
+                UserDetailsViewModel userDetailsViewModel = new UserDetailsViewModel
+                {
+                    //Gán thông tin vào userDetailsViewModel
+                    UserId = user.user_id,
+                    CreatedAt = user.created_at,
+                    UpdatedAt = user.updated_at,
+
+                    PasswordStatus = string.IsNullOrWhiteSpace(user.hashed_password)
+                        ? "Chưa thiết lập"
+                        : "Đã thiết lập",
+
+                    //Hiên chức vụ cao nhất
+                    Roles = HighestRole(user),
+                    SelectedRole = HighestRole(user),
+
+                    Username = user.username,
+                    Email = user.email,
+
+                    AuthProvider = user.auth_provider,
+                    AuthProviderKey = user.auth_provider_key,
+
+                    FullName = user.full_name,
+                    DateOfBirth = user.date_of_birth,
+                    PhoneNumber = user.phone_number,
+                    Gender = user.gender,
+                    AvatarUrl = user.avatar_url,
+
+                    NativeLanguage = user.native_language,
+
+                    EmergencyContactNumber = user.emergency_contact_number,
+                    EmergencyContactName = user.emergency_contact_name,
+
+                    ActiveStatus = user.active_status,
+
+                    //Gán thông tin vào StudentProfileViewModel (nếu có)
+                    StudentProfiles = user.Student_Profile.Select( p => new StudentProfileViewModel
+                    {
+                        StudentId = p.student_id,
+                        UserId = p.user_id,
+                        StudentCode = p.student_code,
+                        StudentStatus = p.student_status,
+                        EnrollmentDate = p.enrollment_date,
+                        CurrentLevel = p.current_level,
+                        LearningGoal = p.learning_goal,
+                        CreatedAt = p.created_at,
+                        UpdatedAt = p.updated_at,
+                        AvailableStatus = p.available_status
+                    }).ToList(),
+
+                    //Gán thông tin vào StaffProfileViewModel (nếu có)
+                    StaffProfiles = user.Staff_Profile.Select( p => new StaffProfileViewModel
+                    {
+                        StaffId = p.staff_id,
+                        UserId = p.user_id,
+                        StaffCode = p.staff_code,
+                        JobTitle = p.job_title,
+                        EmploymentType = p.employment_type,
+                        EmploymentStatus = p.employment_status,
+                        Department = p.department,
+                        Salary = p.salary,
+                        HireDate = p.hire_date,
+                        TerminationDate = p.termination_date,
+                        CreatedAt = p.created_at,
+                        UpdatedAt = p.updated_at,
+                        AvailableStatus = p.available_status,
+
+                        //Gán thông tin vào TeacherProfileViewModel (nếu có)
+                        Teachers = p.Teacher_profile.Select(t => new TeacherProfileViewModel
+                        {
+                            TeacherId = t.teacher_id,
+                            StaffId = t.staff_id,
+                            ProfessionalTitle = t.professional_title,
+                            YearsOfExperience = t.years_of_experience,
+                            TeachingBio = t.teaching_bio,
+                            Specializations = t.specializations,
+                            CreatedAt = t.created_at,
+                            UpdatedAt = t.updated_at,
+                            AvailableStatus = t.available_status,
+
+                            //Gán thông tin vào QualificationViewModel (nếu có)
+                            Qualifications = t.Teacher_qualification.Select(q => new QualificationViewModel
+                            {
+                                QualificationId = q.qualification_id,
+                                TeacherId = q.teacher_id,
+                                QualificationName = q.qualification_name,
+                                Institution = q.institution,
+                                IssuedDate = q.issued_date,
+                                ExpiryDate = q.expiry_date,
+                                CreatedAt = q.created_at,
+                                UpdatedAt = q.updated_at,
+                                AvailableStatus = q.available_status,
+                                IsDeleted = q.available_status == "Unavailable"
+                             })
+                            .ToList()})
+                        .ToList()})
+                    .ToList()};
+
+                // Trả dữ liệu sang trang Details
+                return View(userDetailsViewModel);
+            }
+            catch (Exception ex)
+            {
+                // Có lỗi thì hiển thị trang lỗi 500.
+                return RedirectToAction("ServerError", "Error");
             }
 
-            // Chuyển entity sang ViewModel trước khi hiển thị.
-            return View(ToDetailsViewModel(user));
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        // Post: Cập nhật thông tin trong trang User Details.
+        // Nếu gặp lỗi thì trả về trang Error.
         /// <summary>Cập nhật thông tin user và các profile liên quan.</summary>
         /// <param name="model">Dữ liệu chi tiết gửi từ form.</param>
         /// <returns>View có lỗi, redirect về chi tiết hoặc trang lỗi 500.</returns>
-        public ActionResult Details(UserDetailsViewModel model)
+        [HttpPost]
+        [ValidateAntiForgeryToken] 
+        public async Task<ActionResult> Details(UserDetailsViewModel model)
         {
             // Tìm user cần cập nhật từ ID trong form.
-            var user = LoadUser(model.UserId);
+            User user = await db.Users.FindAsync(model.UserId);
 
+            // Kiểm tra người dùng có tồn tại hay không
             if (user == null)
             {
-                return HttpNotFound();
+                return RedirectToAction("NotFound", "Error");
             }
 
+            //Kiểm tra tên đăng nhập có trùng hay không
             if (
                 db.Users.Any(
                     u =>
@@ -417,6 +514,7 @@ namespace Source.Controllers
                     "Tên đăng nhập đã tồn tại.");
             }
 
+            //Kiểm tra tên email có trùng hay không
             if (
                 db.Users.Any(
                     u =>
@@ -428,6 +526,7 @@ namespace Source.Controllers
                     "Email đã được sử dụng.");
             }
 
+            //Kiểm tra giới tính có hợp lệ không
             ValidateChoice(
                 model.Gender,
                 new[]
@@ -440,6 +539,7 @@ namespace Source.Controllers
                 "Gender",
                 "Giới tính");
 
+            //Kiểm tra trạng thái tài khoản có hợp lệ không
             ValidateChoice(
                 model.ActiveStatus,
                 new[]
@@ -450,6 +550,7 @@ namespace Source.Controllers
                 "ActiveStatus",
                 "Trạng thái tài khoản");
 
+            //Kiểm tra chức vụ có hợp lệ không
             ValidateChoice(
                 model.SelectedRole,
                 new[]
@@ -461,11 +562,13 @@ namespace Source.Controllers
                 "SelectedRole",
                 "Vai trò");
 
+            //Tìm role hợp lệ trong database dựa trên role mà người dùng chọn trong form
             var selectedRole = db.Roles.SingleOrDefault(
                 r =>
                     r.role_name == model.SelectedRole &&
                     r.available_status == "Available");
 
+            //Báo lỗi nếu không tìm thấy
             if (selectedRole == null)
             {
                 ModelState.AddModelError(
@@ -473,11 +576,8 @@ namespace Source.Controllers
                     "Vai trò không hợp lệ.");
             }
 
-            for (
-                var i = 0;
-                i < (model.StudentProfiles ??
-                     new List<StudentProfileViewModel>()).Count;
-                i++)
+            //Kiểm tra các thông tin ENUM trong StudentProfileViewModel
+            for (var i = 0;i < (model.StudentProfiles ?? new List<StudentProfileViewModel>()).Count; i++)
             {
                 var item = model.StudentProfiles[i];
 
@@ -519,11 +619,8 @@ namespace Source.Controllers
                     "Trạng thái sử dụng");
             }
 
-            for (
-                var i = 0;
-                i < (model.StaffProfiles ??
-                     new List<StaffProfileViewModel>()).Count;
-                i++)
+            //Kiểm tra các thông tin ENUM trong StaffProfileViewModel
+            for ( var i = 0; i < (model.StaffProfiles ?? new List<StaffProfileViewModel>()).Count; i++)
             {
                 var item = model.StaffProfiles[i];
 
@@ -561,11 +658,8 @@ namespace Source.Controllers
                     "StaffProfiles[" + i + "].AvailableStatus",
                     "Trạng thái sử dụng");
 
-                for (
-                    var j = 0;
-                    j < (item.Teachers ??
-                         new List<TeacherProfileViewModel>()).Count;
-                    j++)
+                //Kiểm tra các thông tin ENUM trong TeacherProfileViewModel
+                for ( var j = 0;j < (item.Teachers ?? new List<TeacherProfileViewModel>()).Count; j++)
                 {
                     var teacher = item.Teachers[j];
 
@@ -579,11 +673,8 @@ namespace Source.Controllers
                         "StaffProfiles[" + i + "].Teachers[" + j + "].AvailableStatus",
                         "Trạng thái giáo viên");
 
-                    for (
-                        var k = 0;
-                        k < (teacher.Qualifications ??
-                             new List<QualificationViewModel>()).Count;
-                        k++)
+                    //Kiểm tra các thông tin ENUM trong QualificationViewModel
+                    for ( var k = 0; k < (teacher.Qualifications ?? new List<QualificationViewModel>()).Count; k++)
                     {
                         var qualification = teacher.Qualifications[k];
 
@@ -601,74 +692,121 @@ namespace Source.Controllers
                 }
             }
 
-            var studentIds =
-                model.StudentProfiles == null
-                    ? new HashSet<Guid>()
-                    : new HashSet<Guid>(
-                        model.StudentProfiles
-                            .Where(x => x.StudentId != Guid.Empty)
-                            .Select(x => x.StudentId));
-
-            var staffIds =
-                model.StaffProfiles == null
-                    ? new HashSet<Guid>()
-                    : new HashSet<Guid>(
-                        model.StaffProfiles
-                            .Where(x => x.StaffId != Guid.Empty)
-                            .Select(x => x.StaffId));
-
-            var teacherIds = new HashSet<Guid>(
-                (model.StaffProfiles ??
-                 new List<StaffProfileViewModel>())
-                    .SelectMany(
-                        x =>
-                            x.Teachers ??
-                            new List<TeacherProfileViewModel>())
-                    .Where(x => x.TeacherId != Guid.Empty)
-                    .Select(x => x.TeacherId));
-
-            var qualificationIds = new HashSet<Guid>(
-                (model.StaffProfiles ??
-                 new List<StaffProfileViewModel>())
-                    .SelectMany(
-                        x =>
-                            x.Teachers ??
-                            new List<TeacherProfileViewModel>())
-                    .SelectMany(
-                        x =>
-                            x.Qualifications ??
-                            new List<QualificationViewModel>())
-                    .Where(x => x.QualificationId != Guid.Empty)
-                    .Select(x => x.QualificationId));
-
-            var userTeacherIds = new HashSet<Guid>(
-                user.Staff_Profile
-                    .SelectMany(x => x.Teacher_profile)
-                    .Select(x => x.teacher_id));
-
-            var userQualificationIds = new HashSet<Guid>(
-                user.Staff_Profile
-                    .SelectMany(x => x.Teacher_profile)
-                    .SelectMany(x => x.Teacher_qualification)
-                    .Select(x => x.qualification_id));
-
-            if (
-                studentIds.Any(
-                    id =>
-                        !user.Student_Profile.Any(
-                            x => x.student_id == id)) ||
-                staffIds.Any(
-                    id =>
-                        !user.Staff_Profile.Any(
-                            x => x.staff_id == id)) ||
-                teacherIds.Any(
-                    id => !userTeacherIds.Contains(id)) ||
-                qualificationIds.Any(
-                    id => !userQualificationIds.Contains(id)))
+            // Danh sách ID của các Student Profile được gửi từ form.
+            HashSet<Guid> studentIds;
+            if (model.StudentProfiles == null)
             {
-                ModelState.AddModelError(
-                    "",
-                    "Dữ liệu profile không thuộc người dùng này.");
+                // Nếu form không gửi StudentProfiles,
+                // tạo một HashSet rỗng để tránh lỗi null.
+                studentIds = new HashSet<Guid>();
+            }
+            else
+            {
+                // Lấy giá trị StudentId của từng profile.
+                studentIds = new HashSet<Guid>(
+                    model.StudentProfiles
+                        .Where(x => x.StudentId != Guid.Empty)
+                        .Select(x => x.StudentId));
+            }
+
+            // Danh sách ID của các Staff Profile được gửi từ form.
+            HashSet<Guid> staffIds;
+            if (model.StaffProfiles == null)
+            {
+                // Nếu form không gửi StaffProfiles,
+                // tạo một HashSet rỗng để tránh lỗi null.
+                staffIds = new HashSet<Guid>();
+            }
+            else
+            {
+                // Lấy StaffId từ mỗi profile.
+                staffIds = new HashSet<Guid>(
+                    model.StaffProfiles
+                        .Where(x => x.StaffId != Guid.Empty)
+                        .Select(x => x.StaffId));
+            }
+
+            // Danh sách ID của các Teacher Profile được gửi từ form.
+            HashSet<Guid> teacherIds;
+            if (model.StaffProfiles == null)
+            {
+                // Không có Staff Profile thì chắc chắn không có Teacher Profile.
+                teacherIds = new HashSet<Guid>();
+            }
+            else
+            {
+                // Lấy TeacherId của từng Teacher.
+                teacherIds = new HashSet<Guid>(
+                    model.StaffProfiles
+                        .SelectMany(x =>
+                            x.Teachers ?? new List<TeacherProfileViewModel>())
+                        .Where(x => x.TeacherId != Guid.Empty)
+                        .Select(x => x.TeacherId));
+            }
+
+            // Tập hợp ID của các Qualification được gửi từ form.
+            HashSet<Guid> qualificationIds;
+            if (model.StaffProfiles == null)
+            {
+                // Không có Staff thì không có Teacher và Qualification.
+                qualificationIds = new HashSet<Guid>();
+            }
+            else
+            {
+
+                // Lấy QualificationId của từng qualification.
+                qualificationIds = new HashSet<Guid>(
+                    model.StaffProfiles
+                        .SelectMany(x =>
+                            x.Teachers ?? new List<TeacherProfileViewModel>())
+                        .SelectMany(x =>
+                            x.Qualifications ?? new List<QualificationViewModel>())
+                        .Where(x => x.QualificationId != Guid.Empty)
+                        .Select(x => x.QualificationId));
+            }
+
+            // Danh sách ID của các Teacher Profile thật sự thuộc user hiện tại.
+            HashSet<Guid> userTeacherIds;
+            if (user.Staff_Profile == null)
+            {
+                // Nếu user không có Staff Profile,
+                // danh sách Teacher ID của user là rỗng.
+                userTeacherIds = new HashSet<Guid>();
+            }
+            else
+            {
+                // Lấy TeacherId của user trong database.
+                userTeacherIds = new HashSet<Guid>(
+                    user.Staff_Profile
+                        .SelectMany(x => x.Teacher_profile)
+                        .Select(x => x.teacher_id));
+            }
+
+
+            // Danh sách ID của các Qualification thật sự thuộc user hiện tại.
+            HashSet<Guid> userQualificationIds;
+            if (user.Staff_Profile == null)
+            {
+                // Nếu user không có Staff Profile,
+                // user không có Qualification nào.
+                userQualificationIds = new HashSet<Guid>();
+            }
+            else
+            {
+                // Lấy QualificationId của user trong database.
+                userQualificationIds = new HashSet<Guid>(
+                    user.Staff_Profile
+                        .SelectMany(x => x.Teacher_profile)
+                        .SelectMany(x => x.Teacher_qualification)
+                        .Select(x => x.qualification_id));
+            }
+
+            //kiểm tra xem các profile được gửi từ form có thực sự thuộc về user đang được chỉnh sửa hay không. 
+            if ( studentIds.Any( id => !user.Student_Profile.Any( x => x.student_id == id)) 
+                || staffIds.Any( id => !user.Staff_Profile.Any( x => x.staff_id == id)) 
+                || teacherIds.Any( id => !userTeacherIds.Contains(id)) || qualificationIds.Any( id => !userQualificationIds.Contains(id)))
+            {
+                ModelState.AddModelError( "", "Dữ liệu profile không thuộc người dùng này.");
             }
 
             if (!ModelState.IsValid)
@@ -676,6 +814,7 @@ namespace Source.Controllers
                 model.Roles = HighestRole(user);
                 model.SelectedRole = HighestRole(user);
                 model.PasswordStatus = "Đã thiết lập";
+                model.AvatarUrl = user.avatar_url;
 
                 return View(model);
             }
@@ -688,17 +827,15 @@ namespace Source.Controllers
             user.phone_number = model.PhoneNumber;
             user.gender = model.Gender;
             user.native_language = model.NativeLanguage;
-            user.emergency_contact_number =
-                model.EmergencyContactNumber;
-            user.emergency_contact_name =
-                model.EmergencyContactName;
+            user.emergency_contact_number =model.EmergencyContactNumber;
+            user.emergency_contact_name = model.EmergencyContactName;
             user.active_status = model.ActiveStatus;
             user.updated_at = DateTime.Now;
 
+            //Bcrypt mật khẩu
             if (!string.IsNullOrWhiteSpace(model.NewPassword))
             {
-                user.hashed_password =
-                    BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+                user.hashed_password = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
             }
 
             // Đồng bộ role mới được chọn.
@@ -708,9 +845,8 @@ namespace Source.Controllers
             // Tạo hoặc cập nhật profile theo role.
             ApplyRoleProfiles(user, model.SelectedRole);
 
-            foreach (
-                var item in model.StudentProfiles ??
-                new List<StudentProfileViewModel>())
+
+            foreach ( var item in model.StudentProfiles ?? new List<StudentProfileViewModel>())
             {
                 var profile = user.Student_Profile.Single(
                     x => x.student_id == item.StudentId);
@@ -754,9 +890,7 @@ namespace Source.Controllers
                 profile.updated_at = DateTime.Now;
             }
 
-            foreach (
-                var item in model.StaffProfiles ??
-                new List<StaffProfileViewModel>())
+            foreach ( var item in model.StaffProfiles ??  new List<StaffProfileViewModel>())
             {
                 var profile = user.Staff_Profile.Single(
                     x => x.staff_id == item.StaffId);
@@ -802,9 +936,7 @@ namespace Source.Controllers
 
                 profile.updated_at = DateTime.Now;
 
-                foreach (
-                    var teacherItem in item.Teachers ??
-                    new List<TeacherProfileViewModel>())
+                foreach ( var teacherItem in item.Teachers ?? new List<TeacherProfileViewModel>())
                 {
                     var teacher = profile.Teacher_profile.Single(
                         x => x.teacher_id == teacherItem.TeacherId);
@@ -832,9 +964,7 @@ namespace Source.Controllers
 
                     teacher.updated_at = DateTime.Now;
 
-                    foreach (
-                        var qualificationItem in teacherItem.Qualifications ??
-                        new List<QualificationViewModel>())
+                    foreach ( var qualificationItem in teacherItem.Qualifications ?? new List<QualificationViewModel>())
                     {
                         if (qualificationItem.QualificationId == Guid.Empty)
                         {
@@ -913,25 +1043,19 @@ namespace Source.Controllers
                 // Lưu toàn bộ thay đổi vào database.
                 db.SaveChanges();
 
-                TempData["SuccessMessage"] =
-                    "Đã lưu thông tin người dùng.";
+                TempData["SuccessMessage"] = "Đã lưu thông tin người dùng.";
 
-                return RedirectToAction(
-                    "Details",
-                    new { userId = model.UserId });
+                return RedirectToAction("Details", new { userId = model.UserId });
             }
             catch (DbEntityValidationException ex)
             {
-                return View("~/Views/Shared/Error_500.cshtml");
+                // Có lỗi thì hiển thị trang lỗi 500.
+                return RedirectToAction("ServerError", "Error");
             }
         }
 
         /// <summary>Kiểm tra một giá trị có thuộc danh sách lựa chọn hợp lệ hay không.</summary>
-        private void ValidateChoice(
-            string value,
-            string[] choices,
-            string key,
-            string label)
+        private void ValidateChoice( string value, string[] choices, string key, string label)
         {
             // Thêm lỗi nếu giá trị không nằm trong danh sách được phép.
             if (
@@ -945,9 +1069,7 @@ namespace Source.Controllers
         }
 
         /// <summary>Giữ giá trị cũ nếu giá trị mới rỗng, ngược lại trả về giá trị đã trim.</summary>
-        private static string KeepValue(
-            string submitted,
-            string current)
+        private static string KeepValue( string submitted, string current)
         {
             // Giữ giá trị hiện tại nếu dữ liệu mới rỗng; ngược lại loại bỏ khoảng trắng.
             return string.IsNullOrWhiteSpace(submitted)
@@ -956,9 +1078,7 @@ namespace Source.Controllers
         }
 
         /// <summary>Đồng bộ trạng thái student/staff/teacher profile theo role của user.</summary>
-        private void ApplyRoleProfiles(
-            User user,
-            string roleName)
+        private void ApplyRoleProfiles( User user, string roleName)
         {
             // Đồng bộ trạng thái các profile theo role mới của user.
             var now = DateTime.Now;
@@ -1053,11 +1173,7 @@ namespace Source.Controllers
         }
 
         /// <summary>Tạo staff profile và teacher profile còn thiếu cho user.</summary>
-        private void EnsureStaffAndTeacher(
-            User user,
-            ref Staff_Profile staff,
-            ref Teacher_profile teacher,
-            DateTime now)
+        private void EnsureStaffAndTeacher(  User user,  ref Staff_Profile staff, ref Teacher_profile teacher, DateTime now)
         {
             // Tạo staff profile và teacher profile nếu chúng chưa tồn tại.
             if (staff == null)
@@ -1090,25 +1206,27 @@ namespace Source.Controllers
                 db.Teacher_profile.Add(teacher);
             }
         }
-
-        [HttpGet]
+        // GET: Xóa User và thông tin liên quan theo id.
+        // Nếu gặp lỗi thì trả về trang Error.
         /// <summary>Xóa user và toàn bộ dữ liệu liên quan trong một transaction.</summary>
         /// <param name="id">ID user cần xóa.</param>
         /// <returns>Redirect về danh sách, 404 hoặc trang lỗi 500.</returns>
-        public ActionResult Delete(Guid id)
+        [HttpGet]
+        public async Task<ActionResult> Delete(Guid id)
         {
             // Tìm user và nạp các dữ liệu liên quan trước khi xóa.
-            var user = db.Users
+            var user = await db.Users
                 .Include("Student_Profile.Enrollments.AssessmentScores")
                 .Include("Student_Profile.Enrollments.AttendanceRecords")
                 .Include("Student_Profile.Enrollments.Payments")
                 .Include("Staff_Profile.Teacher_profile.Teacher_qualification")
                 .Include("Roles")
-                .SingleOrDefault(u => u.user_id == id);
+                .FirstAsync(u => u.user_id == id);
 
+            // Kiểm tra người dùng có tồn tại hay không
             if (user == null)
             {
-                return HttpNotFound();
+                return RedirectToAction("NotFound", "Error");
             }
 
             using (var transaction = db.Database.BeginTransaction())
@@ -1206,21 +1324,33 @@ namespace Source.Controllers
                     // Hoàn tác nếu một thao tác xóa thất bại.
                     transaction.Rollback();
 
-                    return View("~/Views/Shared/Error_500.cshtml");
+                    //Trả về trang 500 nếu lỗi
+                    return RedirectToAction("ServerError", "Error");
                 }
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+
+        // Post: Cập nhật avatar người dùng.
+        // Nếu gặp lỗi thì trả về trang Error.
+        /// <summary>Xóa user và toàn bộ dữ liệu liên quan trong một transaction.</summary>
+        /// <param name="id">ID user cần xóa.</param>
+        /// <returns>Redirect về danh sách, 404 hoặc trang lỗi 500.</returns>
         /// <summary>Kiểm tra và upload avatar của user lên Cloudinary.</summary>
         /// <param name="userId">ID user cần cập nhật avatar.</param>
         /// <returns>JSON kết quả upload hoặc trang lỗi 500.</returns>
-        public ActionResult UploadAvatar(Guid userId)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UploadAvatar(Guid userId)
         {
             // Tìm user và lấy file avatar từ request.
-            var user = db.Users.SingleOrDefault(
-                u => u.user_id == userId);
+            var user = await db.Users.FindAsync(userId);
+
+            // Kiểm tra người dùng có tồn tại hay không
+            if (user == null)
+            {
+                return RedirectToAction("NotFound", "Error");
+            }
 
             var file = Request.Files["avatar"];
 
@@ -1404,25 +1534,22 @@ namespace Source.Controllers
                             url = result.secure_url
                         });
                 }
-                catch (DbEntityValidationException ex)
+                catch (Exception ex)
                 {
-                    return View(
-                        "~/Views/Shared/Error_500.cshtml");
-                }
-                catch (DbUpdateException ex)
-                {
-                    return View(
-                        "~/Views/Shared/Error_500.cshtml");
-                }
+                    //Trả về trang 500 nếu lỗi
+                    return RedirectToAction("ServerError", "Error");
+                } 
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        // Post: Xóa chứng chỉ người dùng.
+        // Nếu gặp lỗi thì trả về trang Error.
         /// <summary>Ẩn hoặc xóa vĩnh viễn qualification của giáo viên.</summary>
         /// <param name="qualificationId">ID qualification cần xử lý.</param>
         /// <param name="permanent">True để xóa khỏi database, false để ẩn.</param>
         /// <returns>JSON kết quả hoặc trang lỗi 500.</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult DeleteQualification(
             Guid qualificationId,
             bool permanent = false)
@@ -1473,8 +1600,8 @@ namespace Source.Controllers
             }
             catch (Exception)
             {
-                return View(
-                    "~/Views/Shared/Error_500.cshtml");
+                //Trả về trang 500 nếu lỗi
+                return RedirectToAction("ServerError", "Error");
             }
         }
 
@@ -1530,156 +1657,6 @@ namespace Source.Controllers
 
                 return builder.ToString();
             }
-        }
-
-        /// <summary>Load user cùng các navigation property cần cho trang chi tiết.</summary>
-        /// <param name="userId">ID user cần load.</param>
-        /// <returns>User tìm được hoặc null.</returns>
-        private User LoadUser(Guid userId)
-        {
-            // Load user cùng các navigation property phục vụ trang chi tiết.
-            return db.Users
-                .Include("Student_Profile")
-                .Include("Staff_Profile.Teacher_profile.Teacher_qualification")
-                .Include("Roles")
-                .SingleOrDefault(
-                    u => u.user_id == userId);
-        }
-
-        /// <summary>Chuyển entity User thành ViewModel dùng bởi form chi tiết.</summary>
-        /// <param name="user">Entity user cần chuyển đổi.</param>
-        /// <returns>ViewModel chứa thông tin user và các profile.</returns>
-        private static UserDetailsViewModel ToDetailsViewModel(
-            User user)
-        {
-            // Chuyển entity User và các profile con thành ViewModel cho form Details.
-            return new UserDetailsViewModel
-            {
-                UserId = user.user_id,
-                CreatedAt = user.created_at,
-                UpdatedAt = user.updated_at,
-
-                PasswordStatus =
-                    string.IsNullOrWhiteSpace(user.hashed_password)
-                        ? "Chưa thiết lập"
-                        : "Đã thiết lập",
-
-                Roles = HighestRole(user),
-                SelectedRole = HighestRole(user),
-
-                Username = user.username,
-                Email = user.email,
-
-                AuthProvider = user.auth_provider,
-                AuthProviderKey = user.auth_provider_key,
-
-                FullName = user.full_name,
-                DateOfBirth = user.date_of_birth,
-                PhoneNumber = user.phone_number,
-                Gender = user.gender,
-                AvatarUrl = user.avatar_url,
-
-                NativeLanguage = user.native_language,
-
-                EmergencyContactNumber =
-                    user.emergency_contact_number,
-
-                EmergencyContactName =
-                    user.emergency_contact_name,
-
-                ActiveStatus = user.active_status,
-
-                StudentProfiles = user.Student_Profile
-                    .Select(
-                        p =>
-                            new StudentProfileViewModel
-                            {
-                                StudentId = p.student_id,
-                                UserId = p.user_id,
-                                StudentCode = p.student_code,
-                                StudentStatus = p.student_status,
-                                EnrollmentDate = p.enrollment_date,
-                                CurrentLevel = p.current_level,
-                                LearningGoal = p.learning_goal,
-                                CreatedAt = p.created_at,
-                                UpdatedAt = p.updated_at,
-                                AvailableStatus = p.available_status
-                            })
-                    .ToList(),
-
-                StaffProfiles = user.Staff_Profile
-                    .Select(
-                        p =>
-                            new StaffProfileViewModel
-                            {
-                                StaffId = p.staff_id,
-                                UserId = p.user_id,
-                                StaffCode = p.staff_code,
-                                JobTitle = p.job_title,
-                                EmploymentType = p.employment_type,
-                                EmploymentStatus = p.employment_status,
-                                Department = p.department,
-                                Salary = p.salary,
-                                HireDate = p.hire_date,
-                                TerminationDate = p.termination_date,
-                                CreatedAt = p.created_at,
-                                UpdatedAt = p.updated_at,
-                                AvailableStatus = p.available_status,
-
-                                Teachers = p.Teacher_profile
-                                    .Select(
-                                        t =>
-                                            new TeacherProfileViewModel
-                                            {
-                                                TeacherId = t.teacher_id,
-                                                StaffId = t.staff_id,
-                                                ProfessionalTitle =
-                                                    t.professional_title,
-                                                YearsOfExperience =
-                                                    t.years_of_experience,
-                                                TeachingBio =
-                                                    t.teaching_bio,
-                                                Specializations =
-                                                    t.specializations,
-                                                CreatedAt = t.created_at,
-                                                UpdatedAt = t.updated_at,
-                                                AvailableStatus =
-                                                    t.available_status,
-
-                                                Qualifications =
-                                                    t.Teacher_qualification
-                                                        .Select(
-                                                            q =>
-                                                                new QualificationViewModel
-                                                                {
-                                                                    QualificationId =
-                                                                        q.qualification_id,
-                                                                    TeacherId =
-                                                                        q.teacher_id,
-                                                                    QualificationName =
-                                                                        q.qualification_name,
-                                                                    Institution =
-                                                                        q.institution,
-                                                                    IssuedDate =
-                                                                        q.issued_date,
-                                                                    ExpiryDate =
-                                                                        q.expiry_date,
-                                                                    CreatedAt =
-                                                                        q.created_at,
-                                                                    UpdatedAt =
-                                                                        q.updated_at,
-                                                                    AvailableStatus =
-                                                                        q.available_status,
-                                                                    IsDeleted =
-                                                                        q.available_status ==
-                                                                        "Unavailable"
-                                                                })
-                                                        .ToList()
-                                            })
-                                    .ToList()
-                            })
-                    .ToList()
-            };
         }
 
         /// <summary>Lấy role cao nhất theo thứ tự Administrator, Teacher, Student.</summary>

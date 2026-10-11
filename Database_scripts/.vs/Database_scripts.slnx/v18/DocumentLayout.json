@@ -39,26 +39,26 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Seed_data.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (69))",
+              "Title": "Seed_data.sql - LILITH\\SQLEXPRESS.NewGen_english_center_db (LILITH\\phamb (73))",
               "DocumentMoniker": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\Seed_data.sql",
               "RelativeDocumentMoniker": "Seed_data.sql",
-              "ToolTip": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\Seed_data.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (69))",
-              "RelativeToolTip": "Seed_data.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (69))",
+              "ToolTip": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\Seed_data.sql - LILITH\\SQLEXPRESS.NewGen_english_center_db (LILITH\\phamb (73))",
+              "RelativeToolTip": "Seed_data.sql - LILITH\\SQLEXPRESS.NewGen_english_center_db (LILITH\\phamb (73))",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
               "WhenOpened": "2026-10-07T08:03:54.45Z",
-              "EditorCaption": " - LILITH\\SQLEXPRESS.master (LILITH\\phamb (69))"
+              "EditorCaption": " - LILITH\\SQLEXPRESS.NewGen_english_center_db (LILITH\\phamb (73))"
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "NewGen_english_center_db.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (83))",
+              "Title": "NewGen_english_center_db.sql - LILITH\\SQLEXPRESS.NewGen_english_center_db (LILITH\\phamb (77))",
               "DocumentMoniker": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\NewGen_english_center_db.sql",
               "RelativeDocumentMoniker": "NewGen_english_center_db.sql",
-              "ToolTip": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\NewGen_english_center_db.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (83))",
-              "RelativeToolTip": "NewGen_english_center_db.sql - LILITH\\SQLEXPRESS.master (LILITH\\phamb (83))",
+              "ToolTip": "D:\\Projects\\School\\Github\\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\\Database_scripts\\NewGen_english_center_db.sql - LILITH\\SQLEXPRESS.NewGen_english_center_db (LILITH\\phamb (77))",
+              "RelativeToolTip": "NewGen_english_center_db.sql - LILITH\\SQLEXPRESS.NewGen_english_center_db (LILITH\\phamb (77))",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
               "WhenOpened": "2026-10-06T07:07:37.437Z",
-              "EditorCaption": " - LILITH\\SQLEXPRESS.master (LILITH\\phamb (83))"
+              "EditorCaption": " - LILITH\\SQLEXPRESS.NewGen_english_center_db (LILITH\\phamb (77))"
             }
           ]
         }

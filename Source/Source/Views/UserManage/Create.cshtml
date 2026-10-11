@@ -45,7 +45,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" for="hashed_password">Mật khẩu</label>
-                                @Html.PasswordFor(model => model.hashed_password, new { @class = "form-control", required = "required" })
+                                @Html.PasswordFor(model => model.hashed_password, new { @class = "form-control", required = "required", minlength = "8" })
                                 @Html.ValidationMessageFor(model => model.hashed_password, "", new { @class = "text-danger" })
                             </div>
                             <div class="col-md-6">

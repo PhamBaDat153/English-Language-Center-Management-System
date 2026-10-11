@@ -1,5 +1,5 @@
 ﻿
-@model IEnumerable<Source.Models.User>
+@model Source.ViewModels.UserListViewModel
 
 @{
     ViewBag.Title = "Quản lý người dùng";
@@ -19,7 +19,7 @@
                     <p class="eyebrow mb-1">Trang quản lý</p>
                     <h1 class="h3 mb-1">Người dùng</h1>
                     <p class="text-muted mb-0">
-                        Xem tài khoản, vai trò, trạng thái tài khoản.
+                        Trang quản lý tài khoản và thông tin người dùng
                     </p>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                     </div>
 
                     <div class="metric-value">
-                        @(ViewBag.TotalUsers ?? 0)
+                        @Model.totalUsers
                     </div>
                 </article>
             </div>
@@ -66,7 +66,7 @@
                     </div>
 
                     <div class="metric-value">
-                        @(ViewBag.TotalStudents ?? 0)
+                       @Model.totalStudents
                     </div>
                 </article>
             </div>
@@ -84,7 +84,7 @@
                     </div>
 
                     <div class="metric-value">
-                        @(ViewBag.TotalActiveUsers ?? 0)
+                        @Model.totalActiveUsers
                     </div>
                 </article>
             </div>
@@ -102,7 +102,7 @@
                     </div>
 
                     <div class="metric-value">
-                        @(ViewBag.TotalInactiveUsers ?? 0)
+                        @Model.totalInactiveUsers
                     </div>
                 </article>
             </div>
@@ -127,11 +127,12 @@
                         </label>
 
                         <input class="form-control form-control-sm"
+                              
                                id="username"
                                name="username"
                                type="search"
                                value="@ViewBag.Username"
-                               placeholder="Nhập tên đăng nhập">
+                               placeholder="Tên đăng nhập">
                     </div>
 
                     <div class="user-filter-field user-filter-email">
@@ -145,7 +146,7 @@
                                name="email"
                                type="search"
                                value="@ViewBag.Email"
-                               placeholder="Nhập email">
+                               placeholder="Email">
                     </div>
 
                     <div class="user-filter-field user-filter-phone">
@@ -159,7 +160,7 @@
                                name="phone"
                                type="search"
                                value="@ViewBag.Phone"
-                               placeholder="Nhập số điện thoại">
+                               placeholder="Số điện thoại">
                     </div>
 
                     <div class="user-filter-field user-filter-role">
@@ -255,7 +256,6 @@
                             <th>Liên hệ</th>
                             <th class="text-center">Giới tính</th>
                             <th>Vai trò</th>
-                            <th class="text-center">Google</th>
                             <th class="text-center">Trạng thái</th>
                             <th class="text-end">Thao tác</th>
                         </tr>
@@ -263,7 +263,7 @@
 
                     <tbody>
 
-                        @if (Model == null || !Model.Any())
+                        @if (Model.filteredUserList == null || !Model.filteredUserList.Any())
                         {
                             <tr>
                                 <td class="text-center text-muted py-5"
@@ -272,14 +272,13 @@
                                     <i class="bi bi-person-x d-block fs-2 mb-2"
                                        aria-hidden="true"></i>
 
-                                    Không tìm thấy người dùng phù hợp
-                                    với bộ lọc.
+                                        Không tìm thấy người dùng phù hợp
+                                    
                                 </td>
                             </tr>
                         }
 
-                        @foreach (var item in Model
-                            ?? Enumerable.Empty<Source.Models.User>())
+                        @foreach (var user in Model.filteredUserList)
                         {
                             <tr>
 
@@ -293,7 +292,7 @@
 
                                         <div>
                                             <strong class="d-block">
-                                                @item.username
+                                               @user.username
                                             </strong>
                                         </div>
 
@@ -301,20 +300,27 @@
                                 </td>
 
                                 <td>
-                                    <span class="d-block">
-                                        @(item.email ?? "Chưa cập nhật")
-                                    </span>
-
-                                    <small class="text-muted">
-                                        @(string.IsNullOrWhiteSpace(
-                                            item.phone_number)
-                                            ? "Chưa có số điện thoại"
-                                            : item.phone_number)
-                                    </small>
+                                    @if (string.IsNullOrWhiteSpace(user.email))
+                                    {
+                                        <span>Chưa có Email</span>
+                                    }
+                                    else
+                                    {
+                                        <span><strong>Email: </strong> @user.email</span>
+                                    }
+                                    <br />
+                                    @if (string.IsNullOrWhiteSpace(user.phone_number))
+                                    {
+                                        <span><small class="text-muted">Chưa có số điện thoại</small></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">SĐT: </span><small class="text-muted">@user.phone_number </small>
+                                    }
                                 </td>
 
                                 <td class="text-center">
-                                    @if (item.gender == "Male")
+                                    @if (user.gender == "Male")
                                     {
                                         <span class="user-gender gender-male">
                                             <i class="bi bi-gender-male"
@@ -322,7 +328,7 @@
                                             Nam
                                         </span>
                                     }
-                                    else if (item.gender == "Female")
+                                    else if (user.gender == "Female")
                                     {
                                         <span class="user-gender gender-female">
                                             <i class="bi bi-gender-female"
@@ -330,12 +336,20 @@
                                             Nữ
                                         </span>
                                     }
-                                    else
+                                    else if (user.gender == "Other")
                                     {
                                         <span class="user-gender gender-other">
                                             <i class="bi bi-gender-ambiguous"
                                                aria-hidden="true"></i>
                                             Khác
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="user-gender gender-other">
+                                             <i class="bi bi-question-circle"
+                                                aria-hidden="true"></i>
+                                            Không muốn tiết lộ
                                         </span>
                                     }
                                 </td>
@@ -351,7 +365,7 @@
 
                                         var highestRole = rolePriority
                                             .FirstOrDefault(priority =>
-                                                item.Roles.Any(role =>
+                                                user.Roles.Any(role =>
                                                     string.Equals(
                                                         role.role_name,
                                                         priority,
@@ -392,28 +406,9 @@
                                             Chưa phân quyền
                                         </span>
                                     }
-                                </td>
 
                                 <td class="text-center">
-                                    @if (!string.IsNullOrEmpty(
-                                        item.auth_provider_key))
-                                    {
-                                        <span class="user-link-status linked">
-                                            <i class="bi bi-google"
-                                               aria-hidden="true"></i>
-                                            Đã liên kết
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="user-link-status">
-                                            Chưa liên kết
-                                        </span>
-                                    }
-                                </td>
-
-                                <td class="text-center">
-                                    @if (item.active_status == "Active")
+                                    @if (user.active_status == "Active")
                                     {
                                         <span class="badge user-status status-active">
                                             <i class="bi bi-check-circle"
@@ -437,10 +432,10 @@
                                         <a class="btn btn-sm btn-action btn-view"
                                            href="@Url.Action(
                                                "Details",
-                                               new { userId = item.user_id }
+                                               new { userId = user.user_id }
                                            )"
                                            title="Xem chi tiết"
-                                           aria-label="Xem chi tiết tài khoản @item.username">
+                                           aria-label="Xem chi tiết tài khoản @user.username">
                                             <i class="bi bi-eye"
                                                aria-hidden="true"></i>
                                         </a>
@@ -448,21 +443,19 @@
                                         <a class="btn btn-sm btn-action btn-delete"
                                            href="@Url.Action(
                                                "Delete",
-                                               new { id = item.user_id }
+                                               new { id = user.user_id }
                                            )"
                                            title="Xóa tài khoản"
-                                           aria-label="Xóa tài khoản @item.username"
+                                           aria-label="Xóa tài khoản @user.username"
                                            onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này không? Tất cả dữ liệu liên quan cũng sẽ bị xóa.');">
                                             <i class="bi bi-trash3"
                                                aria-hidden="true"></i>
                                         </a>
-
                                     </div>
                                 </td>
 
                             </tr>
                         }
-
                     </tbody>
                 </table>
             </div>
@@ -573,7 +566,6 @@
                     </nav>
                 }
             </div>
-
         </section>
     </div>
 </main>

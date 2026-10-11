@@ -184,3 +184,5 @@ C:\Project WEB\Source\Source\obj\Debug\Source.dll
 C:\Project WEB\Source\Source\obj\Debug\Source.pdb
 C:\Project WEB\Source\Source\bin\CloudinaryDotNet.dll
 C:\Project WEB\Source\Source\bin\CloudinaryDotNet.xml
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\CloudinaryDotNet.dll
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\CloudinaryDotNet.xml
