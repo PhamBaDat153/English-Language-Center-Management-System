@@ -521,6 +521,7 @@ namespace Source.Controllers
                     on t.staff_id equals s.staff_id
                 join u in db.Users
                     on s.user_id equals u.user_id
+                where t.available_status == "Available"
                 orderby u.full_name
                 select new
                 {
