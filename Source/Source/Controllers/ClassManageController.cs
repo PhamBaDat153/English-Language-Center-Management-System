@@ -680,6 +680,37 @@ namespace Source.Controllers
                 s.class_schedule_id != model.class_schedule_id))
                 ModelState.AddModelError("", "Lớp đã có lịch học vào ngày và khung giờ này.");
 
+            var classItem = db.Classes
+                .SingleOrDefault(c => c.class_id == model.class_id);
+
+            if (classItem != null && classItem.teacher_id.HasValue &&
+                db.ClassSchedules.Any(s =>
+                    s.class_id != model.class_id &&
+                    s.week_day == model.week_day &&
+                    s.time_slot_id == model.time_slot_id &&
+                    db.Classes.Any(c =>
+                        c.class_id == s.class_id &&
+                        c.teacher_id == classItem.teacher_id)))
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Giáo viên đã có lịch dạy vào ngày và khung giờ này.");
+            }
+
+            if (classItem != null && classItem.room_id.HasValue &&
+                db.ClassSchedules.Any(s =>
+                    s.class_id != model.class_id &&
+                    s.week_day == model.week_day &&
+                    s.time_slot_id == model.time_slot_id &&
+                    db.Classes.Any(c =>
+                        c.class_id == s.class_id &&
+                        c.room_id == classItem.room_id)))
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Phòng học đã được sử dụng vào ngày và khung giờ này.");
+            }
+
             model.room_name = string.IsNullOrWhiteSpace(model.room_name)
                 ? null : model.room_name.Trim();
         }
