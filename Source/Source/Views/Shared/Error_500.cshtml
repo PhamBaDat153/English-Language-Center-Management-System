@@ -1,0 +1,14 @@
+@{
+    ViewBag.Title = "Lỗi hệ thống";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<main class="dashboard-content">
+    <div class="container py-5">
+        <div class="alert alert-danger">
+            <h1 class="h4">Đã xảy ra lỗi</h1>
+            <p class="mb-3">Không thể xử lý yêu cầu. Vui lòng thử lại sau.</p>
+            <a class="btn btn-outline-secondary" href="@Url.Action("Index", "Home")">Về trang chủ</a>
+        </div>
+    </div>
+</main>

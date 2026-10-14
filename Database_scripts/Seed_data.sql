@@ -318,3 +318,21 @@ BEGIN CATCH
     THROW;
 END CATCH;
 
+
+DECLARE @Now DATETIME2(3) = SYSDATETIME();
+
+INSERT INTO dbo.[TimeSlot] (
+    time_slot_id,
+    slot_name,
+    start_time,
+    end_time,
+    created_at,
+    updated_at,
+    available_status
+)
+VALUES
+    (NEWID(), N'Ca 1', '07:30', '09:30', @Now, @Now, 'Available'),
+    (NEWID(), N'Ca 2', '10:00', '12:00', @Now, @Now, 'Available'),
+    (NEWID(), N'Ca 3', '13:00', '15:00', @Now, @Now, 'Available'),
+    (NEWID(), N'Ca 4', '15:30', '17:30', @Now, @Now, 'Available'),
+    (NEWID(), N'Ca 5', '18:00', '20:00', @Now, @Now, 'Available');

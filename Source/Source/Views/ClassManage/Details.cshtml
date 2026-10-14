@@ -30,6 +30,24 @@
             </div>
         </div>
 
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                <i class="bi bi-check-circle me-1" aria-hidden="true"></i>
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+            </div>
+        }
+
         <section class="panel mt-3">
             @using (Html.BeginForm("Details", "ClassManage", FormMethod.Post))
             {
@@ -149,5 +167,249 @@
                 </div>
             }
         </section>
+
+        <section class="panel mt-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div>
+                    <h2 class="h5 mb-1">Lịch học hàng tuần</h2>
+                    <p class="text-muted mb-0">Các khung giờ lặp lại của lớp @Model.class_code.</p>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm"
+                        data-bs-toggle="modal" data-bs-target="#scheduleModal"
+                        data-mode="add">
+                    <i class="bi bi-plus-circle" aria-hidden="true"></i>
+                    Thêm lịch học
+                </button>
+            </div>
+
+            @if (Model.ClassSchedules == null || !Model.ClassSchedules.Any())
+            {
+                <div class="alert alert-light border mb-0">
+                    Chưa có lịch học nào cho lớp này.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Ngày học</th>
+                                <th>Khung giờ</th>
+                                <th>Thời gian</th>
+                                <th>Phòng</th>
+                                <th class="text-end">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var schedule in Model.ClassSchedules
+                                .OrderBy(s => s.week_day)
+                                .ThenBy(s => s.TimeSlot == null ? TimeSpan.MaxValue : s.TimeSlot.start_time))
+                            {
+                                <tr>
+                                    <td>@schedule.week_day</td>
+                                    <td>@(schedule.TimeSlot == null ? "-" : schedule.TimeSlot.slot_name)</td>
+                                    <td>
+                                        @(schedule.TimeSlot == null
+                                            ? "-"
+                                            : schedule.TimeSlot.start_time.ToString(@"hh\:mm") + " - " +
+                                              schedule.TimeSlot.end_time.ToString(@"hh\:mm"))
+                                    </td>
+                                    <td>@(string.IsNullOrWhiteSpace(schedule.room_name) ? "-" : schedule.room_name)</td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-1">
+                                            <button type="button"
+                                                    class="btn btn-outline-primary btn-sm js-edit-schedule"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#scheduleModal"
+                                                    data-id="@schedule.class_schedule_id"
+                                                    data-class-id="@schedule.class_id"
+                                                    data-week-day="@schedule.week_day"
+                                                    data-time-slot-id="@schedule.time_slot_id"
+                                                    data-room-name="@schedule.room_name">
+                                                <i class="bi bi-pencil" aria-hidden="true"></i>
+                                                Sửa
+                                            </button>
+                                             <button type="button"
+                                                     class="btn btn-outline-danger btn-sm js-delete-schedule"
+                                                     data-id="@schedule.class_schedule_id">
+                                                     <i class="bi bi-trash3" aria-hidden="true"></i>
+                                                     Xóa
+                                             </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+
+        <div class="modal fade" id="scheduleModal" tabindex="-1"
+             aria-labelledby="scheduleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    @using (Html.BeginForm("AddSchedule", "ClassManage",
+                        FormMethod.Post, new { id = "scheduleForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="scheduleModalLabel">Thêm lịch học</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Đóng"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-danger d-none" id="scheduleFormError"></div>
+                            <input type="hidden" id="scheduleId" name="class_schedule_id" />
+                            <input type="hidden" id="scheduleClassId" name="class_id"
+                                   value="@Model.class_id" />
+
+                            <div class="mb-3">
+                                <label for="scheduleWeekDay" class="form-label">Ngày học</label>
+                                <select class="form-select" id="scheduleWeekDay" name="week_day" required>
+                                    <option value="">-- Chọn ngày học --</option>
+                                    <option value="Monday">Thứ hai</option>
+                                    <option value="Tuesday">Thứ ba</option>
+                                    <option value="Wednesday">Thứ tư</option>
+                                    <option value="Thursday">Thứ năm</option>
+                                    <option value="Friday">Thứ sáu</option>
+                                    <option value="Saturday">Thứ bảy</option>
+                                    <option value="Sunday">Chủ nhật</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="scheduleTimeSlot" class="form-label">Khung giờ</label>
+                                @Html.DropDownList("time_slot_id",
+                                    (SelectList)ViewBag.ScheduleTimeSlots,
+                                    "-- Chọn khung giờ --",
+                                    new { @class = "form-select", id = "scheduleTimeSlot", required = "required" })
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary"
+                                    data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save" aria-hidden="true"></i> Lưu lịch học
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 </main>
+
+<script>
+    (function () {
+        var form = document.getElementById("scheduleForm");
+        var addButton = document.querySelector('[data-mode="add"]');
+        var title = document.getElementById("scheduleModalLabel");
+        var error = document.getElementById("scheduleFormError");
+        var submit = form.querySelector('button[type="submit"]');
+
+        function clearError() {
+            error.textContent = "";
+            error.classList.add("d-none");
+        }
+
+        addButton.addEventListener("click", function () {
+            form.action = "@Url.Action("AddSchedule", "ClassManage")";
+            title.textContent = "Thêm lịch học";
+            document.getElementById("scheduleId").value = "";
+            document.getElementById("scheduleClassId").value = "@Model.class_id";
+            document.getElementById("scheduleWeekDay").value = "";
+            document.getElementById("scheduleTimeSlot").value = "";
+            clearError();
+        });
+
+        document.querySelectorAll(".js-edit-schedule").forEach(function (button) {
+            button.addEventListener("click", function () {
+                form.action = "@Url.Action("EditSchedule", "ClassManage")";
+                title.textContent = "Sửa lịch học";
+                document.getElementById("scheduleId").value = button.dataset.id;
+                document.getElementById("scheduleClassId").value = button.dataset.classId;
+                document.getElementById("scheduleWeekDay").value = button.dataset.weekDay;
+                document.getElementById("scheduleTimeSlot").value = button.dataset.timeSlotId;
+                clearError();
+            });
+        });
+
+        document.querySelectorAll(".js-delete-schedule").forEach(function (button) {
+            button.addEventListener("click", function () {
+                if (!confirm("Bạn có chắc muốn xóa lịch học này không?")) {
+                    return;
+                }
+
+                var data = new URLSearchParams();
+                data.append("id", button.dataset.id);
+                data.append(
+                    "__RequestVerificationToken",
+                    document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+                button.disabled = true;
+
+                fetch('@Url.Action("DeleteSchedule", "ClassManage")', {
+                    method: "POST",
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                    },
+                    body: data
+                })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("HTTP " + response.status);
+                    }
+                    return response.json();
+                })
+                .then(function (result) {
+                    if (!result.success) {
+                        throw new Error(result.message || "Không thể xóa lịch học.");
+                    }
+                    window.location.href = result.redirectUrl;
+                })
+                .catch(function (requestError) {
+                    alert(requestError.message || "Không thể xóa lịch học. Vui lòng thử lại.");
+                    button.disabled = false;
+                });
+            });
+        });
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+            clearError();
+            submit.disabled = true;
+
+            fetch(form.action, {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                body: new URLSearchParams(new FormData(form))
+            })
+            .then(function (response) {
+                if (!response.ok) throw new Error("HTTP " + response.status);
+                return response.json();
+            })
+            .then(function (result) {
+                if (result.success) {
+                    window.location.href = result.redirectUrl;
+                    return;
+                }
+
+                error.textContent = (result.errors || ["Không thể lưu lịch học."]).join(" ");
+                error.classList.remove("d-none");
+                submit.disabled = false;
+            })
+            .catch(function () {
+                error.textContent = "Không thể lưu lịch học. Vui lòng kiểm tra dữ liệu và thử lại.";
+                error.classList.remove("d-none");
+                submit.disabled = false;
+            });
+        });
+    })();
+</script>

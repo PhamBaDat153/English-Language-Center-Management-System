@@ -1,4 +1,5 @@
 ﻿using Source.Models;
+using Source.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -308,6 +309,8 @@ namespace Source.Controllers
                 }
 
                 var classItem = db.Classes
+                    .Include(c => c.ClassSchedules.Select(s => s.TimeSlot))
+                    .Include(c => c.Room)
                     .SingleOrDefault(c => c.class_id == id.Value);
 
                 if (classItem == null)
@@ -319,6 +322,21 @@ namespace Source.Controllers
                     classItem.course_id,
                     classItem.teacher_id,
                     classItem.room_id);
+
+                ViewBag.ScheduleTimeSlots = new SelectList(
+                    db.TimeSlots
+                        .Where(t => t.available_status == "Available")
+                        .OrderBy(t => t.start_time)
+                        .ToList()
+                        .Select(t => new
+                        {
+                            Id = t.time_slot_id,
+                            Name = t.slot_name + " (" +
+                                t.start_time.ToString(@"hh\:mm") + " - " +
+                                t.end_time.ToString(@"hh\:mm") + ")"
+                        }),
+                    "Id",
+                    "Name");
 
                 return View(classItem);
             }
@@ -450,6 +468,237 @@ namespace Source.Controllers
 
                 return View("~/Views/Shared/Error_500.cshtml");
             }
+        }
+
+        private static readonly string[] ScheduleWeekDays =
+        {
+            "Monday", "Tuesday", "Wednesday", "Thursday",
+            "Friday", "Saturday", "Sunday"
+        };
+
+        [HttpGet]
+        public ActionResult AddSchedule(Guid? classId)
+        {
+            if (!classId.HasValue)
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            if (!db.Classes.Any(c => c.class_id == classId.Value))
+                return HttpNotFound();
+
+            var model = new ClassScheduleViewModel { class_id = classId.Value };
+            LoadScheduleDropdowns(model);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddSchedule(ClassScheduleViewModel model)
+        {
+            var classItem = db.Classes
+                .Include(c => c.Room)
+                .SingleOrDefault(c => c.class_id == model.class_id);
+
+            if (classItem == null)
+                return HttpNotFound();
+
+            // The ID is generated server-side; it must not be required from the form.
+            ModelState.Remove("class_schedule_id");
+            model.class_schedule_id = Guid.NewGuid();
+            model.room_name = classItem.Room == null ? null : classItem.Room.room_name;
+            ValidateSchedule(model);
+            if (!ModelState.IsValid)
+            {
+                LoadScheduleDropdowns(model);
+                if (Request.IsAjaxRequest())
+                    return Json(new { success = false, errors = ModelStateErrors() });
+                return View(model);
+            }
+
+            var now = DateTime.Now;
+            db.ClassSchedules.Add(new ClassSchedule
+            {
+                class_schedule_id = Guid.NewGuid(),
+                class_id = model.class_id,
+                time_slot_id = model.time_slot_id,
+                week_day = model.week_day,
+                room_name = classItem.Room == null ? null : classItem.Room.room_name,
+                created_at = now,
+                updated_at = now
+            });
+
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("ClassManageController.AddSchedule: {0}", ex);
+                ModelState.AddModelError("", "Không thể thêm lịch học. Vui lòng thử lại.");
+                if (Request.IsAjaxRequest())
+                    return Json(new { success = false, errors = ModelStateErrors() });
+                LoadScheduleDropdowns(model);
+                return View(model);
+            }
+
+            TempData["SuccessMessage"] = "Đã thêm lịch học thành công.";
+            if (Request.IsAjaxRequest())
+                return Json(new { success = true, redirectUrl = Url.Action("Details", new { id = model.class_id }) });
+            return RedirectToAction("Details", new { id = model.class_id });
+        }
+
+        [HttpGet]
+        public ActionResult EditSchedule(Guid? id)
+        {
+            if (!id.HasValue)
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            var schedule = db.ClassSchedules.Find(id.Value);
+            if (schedule == null)
+                return HttpNotFound();
+
+            var model = new ClassScheduleViewModel
+            {
+                class_schedule_id = schedule.class_schedule_id,
+                class_id = schedule.class_id,
+                time_slot_id = schedule.time_slot_id,
+                week_day = schedule.week_day,
+                room_name = schedule.room_name
+            };
+            LoadScheduleDropdowns(model);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditSchedule(ClassScheduleViewModel model)
+        {
+            var schedule = db.ClassSchedules.Find(model.class_schedule_id);
+            if (schedule == null)
+                return HttpNotFound();
+
+            if (schedule.class_id != model.class_id)
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+
+            var classItem = db.Classes
+                .Include(c => c.Room)
+                .SingleOrDefault(c => c.class_id == schedule.class_id);
+            model.room_name = classItem == null || classItem.Room == null
+                ? null : classItem.Room.room_name;
+
+            ValidateSchedule(model);
+            if (!ModelState.IsValid)
+            {
+                LoadScheduleDropdowns(model);
+                if (Request.IsAjaxRequest())
+                    return Json(new { success = false, errors = ModelStateErrors() });
+                return View(model);
+            }
+
+            schedule.time_slot_id = model.time_slot_id;
+            schedule.week_day = model.week_day;
+            schedule.room_name = model.room_name;
+            schedule.updated_at = DateTime.Now;
+
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("ClassManageController.EditSchedule: {0}", ex);
+                ModelState.AddModelError("", "Không thể cập nhật lịch học. Vui lòng thử lại.");
+                if (Request.IsAjaxRequest())
+                    return Json(new { success = false, errors = ModelStateErrors() });
+                LoadScheduleDropdowns(model);
+                return View(model);
+            }
+
+            TempData["SuccessMessage"] = "Đã cập nhật lịch học thành công.";
+            if (Request.IsAjaxRequest())
+                return Json(new { success = true, redirectUrl = Url.Action("Details", new { id = schedule.class_id }) });
+            return RedirectToAction("Details", new { id = schedule.class_id });
+        }
+
+        private string[] ModelStateErrors()
+        {
+            return ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage)
+                    ? "Dữ liệu không hợp lệ."
+                    : e.ErrorMessage)
+                .ToArray();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteSchedule(Guid id)
+        {
+            var schedule = db.ClassSchedules.Find(id);
+            if (schedule == null)
+            {
+                if (Request.IsAjaxRequest())
+                    return Json(new { success = false, message = "Không tìm thấy lịch học." });
+                return HttpNotFound();
+            }
+
+            var classId = schedule.class_id;
+            db.ClassSchedules.Remove(schedule);
+            try
+            {
+                db.SaveChanges();
+                TempData["SuccessMessage"] = "Đã xóa lịch học thành công.";
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("ClassManageController.DeleteSchedule: {0}", ex);
+                if (Request.IsAjaxRequest())
+                    return Json(new { success = false, message = "Không thể xóa lịch học. Vui lòng thử lại." });
+                TempData["ErrorMessage"] = "Không thể xóa lịch học. Vui lòng thử lại.";
+            }
+
+            if (Request.IsAjaxRequest())
+                return Json(new
+                {
+                    success = true,
+                    redirectUrl = Url.Action("Details", new { id = classId })
+                });
+
+            return RedirectToAction("Details", new { id = classId });
+        }
+
+        private void ValidateSchedule(ClassScheduleViewModel model)
+        {
+            if (!ScheduleWeekDays.Contains(model.week_day))
+                ModelState.AddModelError("week_day", "Ngày học không hợp lệ.");
+
+            if (!db.TimeSlots.Any(t => t.time_slot_id == model.time_slot_id &&
+                t.available_status == "Available"))
+                ModelState.AddModelError("time_slot_id", "Vui lòng chọn khung giờ đang khả dụng.");
+
+            if (db.ClassSchedules.Any(s => s.class_id == model.class_id &&
+                s.week_day == model.week_day && s.time_slot_id == model.time_slot_id &&
+                s.class_schedule_id != model.class_schedule_id))
+                ModelState.AddModelError("", "Lớp đã có lịch học vào ngày và khung giờ này.");
+
+            model.room_name = string.IsNullOrWhiteSpace(model.room_name)
+                ? null : model.room_name.Trim();
+        }
+
+        private void LoadScheduleDropdowns(ClassScheduleViewModel model)
+        {
+            var slots = db.TimeSlots
+                .Where(t => t.available_status == "Available")
+                .OrderBy(t => t.start_time)
+                .ToList()
+                .Select(t => new
+                {
+                    Id = t.time_slot_id,
+                    Name = t.slot_name + " (" + t.start_time.ToString(@"hh\:mm") +
+                        " - " + t.end_time.ToString(@"hh\:mm") + ")"
+                });
+
+            model.TimeSlots = new SelectList(slots, "Id", "Name", model.time_slot_id);
+            model.WeekDays = new SelectList(ScheduleWeekDays, model.week_day);
         }
 
         // POST: ClassManage/Delete/{id}

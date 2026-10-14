@@ -200,6 +200,7 @@
     <Compile Include="Controllers\RoomManageController.cs" />
     <Compile Include="Controllers\UserManageController.cs" />
     <Compile Include="Service\CloudinaryService.cs" />
+    <Compile Include="ViewModels\ClassScheduleViewModel.cs" />
     <Compile Include="ViewModels\UserManageViewModels\QualificationViewModel.cs" />
     <Compile Include="ViewModels\UserManageViewModels\StaffProfileViewModel.cs" />
     <Compile Include="ViewModels\UserManageViewModels\StudentProfileViewModel.cs" />
@@ -627,7 +628,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="ViewModels\NewFolder1\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
