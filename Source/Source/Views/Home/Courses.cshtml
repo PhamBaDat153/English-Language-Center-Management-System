@@ -1,0 +1,97 @@
+﻿@{
+    ViewBag.Title = "Courses";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model Source.ViewModels.HomePageViewModel
+@using System.Globalization
+
+<!-- START COURSE -->
+<section class="home_course section-padding">
+    <div class="container">
+        <div class="row">
+            @foreach (var item in Model.Courses)
+            {
+                <div class="col-lg-4 col-sm-6 col-xs-12">
+                    <div class="single_course">
+                        <div class="single_c_img">
+                            <img src="/Resources/eduleb/eduleb/assets/img/course/1.png" class="img-fluid" alt="course-image" />
+                        </div>
+                        <h4><a href="@Url.Action("Details", "CourseManage", new { id = item.course_id })">@item.course_name</a></h4>
+                        <p><span class="ti-star"> </span>@item.level</p>
+                        <br />
+                        <p><span class="ti-book"> </span>@item.description</p>
+                        <br />
+                        <p><span class="ti-alarm-clock"> </span>@item.duration_weeks Tuần</p>
+                        <br />
+                        <div class="price">@item.tuition_fee.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) ₫</div>
+                    </div>
+                </div><!-- END COL -->
+            }
+        </div><!--- END ROW -->
+
+        @if (Model.TotalPages > 1)
+        {
+            <div class="d-flex flex-column flex-sm-row
+                align-items-sm-center justify-content-center
+                gap-3 mt-4">
+
+                <nav aria-label="Phân trang khóa học">
+                    <ul class="pagination pagination-sm mb-0">
+
+                        @if (Model.CurrentPage <= 1)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">Trước</span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="@Url.Action("Courses", "Home", new { page = Model.CurrentPage - 1 })">
+                                    Trước
+                                </a>
+                            </li>
+                        }
+
+                        @for (int page = 1; page <= Model.TotalPages; page++)
+                        {
+                            <li class="page-item @(page == Model.CurrentPage ? "active" : "")">
+                                @if (page == Model.CurrentPage)
+                                {
+                                    <span class="page-link" aria-current="page">@page</span>
+                                }
+                                else
+                                {
+                                    <a class="page-link"
+                                       href="@Url.Action("Courses", "Home", new { page = page })">
+                                        @page
+                                    </a>
+                                }
+                            </li>
+                        }
+
+                        @if (Model.CurrentPage >= Model.TotalPages)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">Sau</span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="@Url.Action("Courses", "Home", new { page = Model.CurrentPage + 1 })">
+                                    Sau
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div><!--- END CONTAINER -->
+</section>
+<!-- END COURSE -->

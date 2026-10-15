@@ -15,24 +15,16 @@
                             <a href="@Url.Action("Index","Home")">Trang chủ</a>
                         </li>
                         <li>
-                            <a href="about.html">About</a>
+                            <a href="@Url.Action("Courses", "Home")">Khóa học</a>
                         </li>
-                        <li class="menu-item-has-children">
-                            <a href="course.html">Course</a>
-                            <ul>
-                                <li><a href="course.html">Course</a></li>
-                                <li><a href="course_details.html">Course Details</a></li>
-                            </ul>
+                        <li>
+                            <a href="@Url.Action("About", "Home")">Về chúng tôi</a>
                         </li>
-                        <li class="menu-item-has-children">
-                            <a href="#">Pages</a>
-                            <ul>
-                                <li><a href="instructor.html">Instructor</a></li>
-                                <li><a href="ins_details.html">Instructor Details</a></li>
-                                <li><a href="pricing.html">Pricing Plan</a></li>
-                                <li><a href="faq.html">Faq Page</a></li>
-                                <li><a href="404.html">404</a></li>
-                            </ul>
+                        <li>
+                            <a href="@Url.Action("Contact", "Home")">Liên hệ</a>
+                        </li>
+                        <li >
+                            <a href="@Url.Action("Index", "Dashboard")">Quản trị</a>
                         </li>
                         <li class="menu-item-has-children">
                             <a href="blog.html">Blog</a>
@@ -41,7 +33,7 @@
                                 <li><a href="blog_single.html">Blog Details</a></li>
                             </ul>
                         </li>
-                        <li><a href="contact.html">Contact</a></li>
+
                     </ul>
                 </nav>
             </div><!--- END Col -->

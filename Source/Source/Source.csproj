@@ -626,6 +626,7 @@
     <Content Include="Views\RoomManage\Create.cshtml" />
     <Content Include="Views\RoomManage\Details.cshtml" />
     <Content Include="Views\RoomManage\Index.cshtml" />
+    <Content Include="Views\Home\Courses.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

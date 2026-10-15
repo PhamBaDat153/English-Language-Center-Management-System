@@ -1,19 +1,82 @@
 ﻿@{
     ViewBag.Title = "Contact";
 }
-<main aria-labelledby="title">
-    <h2 id="title">@ViewBag.Title.</h2>
-    <h3>@ViewBag.Message</h3>
-
-    <address>
-        One Microsoft Way<br />
-        Redmond, WA 98052-6399<br />
-        <abbr title="Phone">P:</abbr>
-        425.555.0100
-    </address>
-
-    <address>
-        <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
-        <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-    </address>
-</main>
+<!-- START SECTION TOP --><section class="section-top">
+    <div class="container">
+        <div class="col-lg-10 offset-lg-1 text-center">
+            <div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                <h1>Liên Hệ Với Chúng Tôi</h1>
+                <ul>
+                    <li><a href="index.html">Trang chủ</a></li>
+                    <li> / Liên hệ</li>
+                </ul>
+            </div><!-- //.HERO-TEXT -->
+        </div><!--- END COL -->
+    </div><!--- END CONTAINER -->
+</section>	<!-- END SECTION TOP -->
+<!-- START ADDRESS --><section class="address_area section-padding">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-lg-4 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                <div class="single_address sa_one">
+                    <i class="ti-map"></i>
+                    <h4>Địa chỉ cơ sở</h4>
+                    <p>141 Điện Biên Phủ, Quận Bình Thạnh <br /> Thành phố Hồ Chí Minh</p>
+                </div>
+            </div><!-- END COL -->
+            <div class="col-lg-4 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                <div class="single_address sa_two">
+                    <i class="ti-mobile"></i>
+                    <h4>Hotline tư vấn</h4>
+                    <p>(+84) 098 765 4321</p>
+                    <p>(+84) 024 3999 8888</p>
+                </div>
+            </div><!-- END COL -->
+            <div class="col-lg-4 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                <div class="single_address sa_three">
+                    <i class="ti-email"></i>
+                    <h4>Email liên hệ</h4>
+                    <p>contact@newgenenglish.edu.vn</p>
+                    <p>support@newgenenglish.edu.vn</p>
+                </div>
+            </div><!-- END COL -->
+        </div><!--- END ROW -->
+    </div><!--- END CONTAINER -->
+</section><!-- END ADDRESS -->	<!-- CONTACT --><div id="contact" class="contact_area section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-7 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                <div class="contact">
+                    <form class="form" name="enq" method="post" action="contact.php" onsubmit="return validation();">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="">Họ và tên</label>
+                                <input type="text" name="name" class="form-control" required="required">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="">Email của bạn</label>
+                                <input type="email" name="email" class="form-control" required="required">
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="">Chủ đề / Khóa học quan tâm</label>
+                                <input type="text" name="subject" class="form-control" required="required">
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="">Nội dung tin nhắn</label>
+                                <textarea rows="6" name="message" class="form-control" required="required"></textarea>
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <button type="submit" value="Send message" name="submit" id="submitButton" class="btn_one" title="Gửi tin nhắn của bạn!">Gửi tin nhắn</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- END COL  -->
+            <div class="col-lg-5 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                <div class="map">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.263884877717!2d106.70222037588145!3d10.790938389358826!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317528b3211516f1%3A0x67db20e365cb1812!2s141%20%C10i%E1%BB%87n%20Bi%C3%AAn%20Ph%E1%BB%A7%2C%20Ph%C6%B0%E1%BB%9Dng%2015%2C%20B%C3%ACnh%20Th%E1%BA%A1nh%2C%20H%E1%BB%93%20Ch%C3%AD%20Minh!5e0!3m2!1svi!2svn!4v1710000000000!5m2!1svi!2svn" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+                </div>
+            </div><!-- END COL  -->
+        </div><!-- END ROW -->
+    </div><!--- END CONTAINER -->
+</div><!-- END CONTACT -->

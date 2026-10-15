@@ -1,9 +1,204 @@
 ﻿@{
     ViewBag.Title = "About";
 }
-<main aria-labelledby="title">
-    <h2 id="title">@ViewBag.Title.</h2>
-    <h3>@ViewBag.Message</h3>
 
-    <p>Use this area to provide additional information.</p>
-</main>
+@model Source.ViewModels.HomePageViewModel
+
+
+<!-- START CATEGORY -->
+<section class="top_cat__area section-padding" style="background-image: url(/Resources/eduleb/eduleb/assets/img/bg/shape-1.png);  background-size:cover; background-position: center center;">
+    <div class="container">
+        <div class="section-title text-center">
+            <h2>Hành Trình Bứt Phá Cùng NewGen</h2>
+            <p>Khám phá phương pháp học tiếng Anh hoàn toàn mới, giúp bạn làm chủ ngôn ngữ một cách tự nhiên, hiệu quả và nhanh chóng đạt được mục tiêu của mình.</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                <div class="single_tp">
+                    <span class="sc_one">01</span>
+                    <h3>Đội Ngũ <br />Giảng Viên Giỏi</h3>
+                    <p>Giảng viên bản xứ và Việt Nam giàu kinh nghiệm, sở hữu chứng chỉ quốc tế TESOL/CELTA.</p>
+                </div>
+            </div><!-- END COL -->
+            <div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                <div class="single_tp">
+                    <span class="sc_two">02</span>
+                    <h3>Chất Lượng <br />Đào Tạo Chuẩn</h3>
+                    <p>Giáo trình chuẩn quốc tế kết hợp lộ trình học tập được cá nhân hóa cho từng học viên.</p>
+                </div>
+            </div><!-- END COL -->
+            <div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                <div class="single_tp">
+                    <span class="sc_three">03</span>
+                    <h3>Học Linh Hoạt <br />Online & Offline</h3>
+                    <p>Lịch học đa dạng, kết hợp nền tảng học thông minh giúp bạn chủ động thời gian.</p>
+                </div>
+            </div><!-- END COL -->
+            <div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                <div class="single_tp">
+                    <span class="sc_four">04</span>
+                    <h3>Đồng Hành <br />Trọn Đời</h3>
+                    <p>Đội ngũ trợ giảng và cố vấn học tập luôn sẵn sàng hỗ trợ, đồng hành cùng bạn 24/7.</p>
+                </div>
+            </div><!-- END COL -->
+        </div><!-- END ROW -->
+    </div><!--- END CONTAINER -->
+</section>
+<!-- END CATEGORY -->
+<!-- START ABOUT US -->
+<section class="ab_area section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                <div class="ab_img">
+                    <img src="/Resources/eduleb/eduleb/assets/img/about1.png" class="img-fluid" alt="Về NewGen English">
+                </div>
+            </div><!--- END COL -->
+            <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                <div class="ab_content">
+                    <h2>NewGen – Tiên Phong Trong Đào Tạo Tiếng Anh Thế Hệ Mới</h2>
+                    <p>Tại NewGen, chúng tôi mang đến phương pháp học tiếng Anh hiện đại, kết hợp giữa tư duy ngôn ngữ tự nhiên và ứng dụng công nghệ trong giảng dạy, giúp học viên phát triển toàn diện cả 4 kỹ năng.</p>
+                    <p>Với chương trình học được cá nhân hóa tối đa, NewGen cam kết đồng hành cùng học viên trên con đường tự tin giao tiếp, chinh phục các chứng chỉ quốc tế và sẵn sàng vươn ra thế giới.</p>
+                    <ul>
+                        <li><span class="ti-check"></span> Tiếp cận kho tài liệu phong phú với <b>100%</b> bài giảng chuẩn quốc tế</li>
+                        <li><span class="ti-check"></span> Các khóa học đa dạng từ Giao tiếp, IELTS đến Tiếng Anh cho người đi làm</li>
+                        <li><span class="ti-check"></span> Đội ngũ giảng viên bản xứ và Việt Nam tâm huyết, giàu kinh nghiệm</li>
+                    </ul>
+                    <a class="btn_one" href="@Url.Action("Courses", "Home")">Khám Phá Khóa Học <i class="ti-arrow-top-right"></i></a>
+                </div>
+            </div><!--- END COL -->
+        </div><!--- END ROW -->
+    </div><!--- END CONTAINER -->
+</section>
+<!-- END ABOUT US -->
+<!-- START COUNTER -->
+<section class="count_area counter_feature">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-sm-6 col-xs-12">
+                <div class="single-counter">
+                    <span class="ti-folder sc_one"></span>
+                    <h2 class="counter-num">@Model.courseCount</h2>
+                    <p>Khóa học</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 col-xs-12">
+                <div class="single-counter">
+                    <span class="ti-check-box sc_three"></span>
+                    <h2 class="counter-num">@Model.classCount</h2>
+                    <p>Lớp học</p>
+                </div>
+            </div><!-- END COL -->
+            <div class="col-lg-3 col-sm-6 col-xs-12">
+                <div class="single-counter">
+                    <span class="ti-user sc_four"></span>
+                    <h2 class="counter-num">@Model.activeTeacherCount</h2>
+                    <p>Giáo viên</p>
+                </div>
+            </div><!-- END COL -->
+            <div class="col-lg-3 col-sm-6 col-xs-12">
+                <div class="single-counter">
+                    <span class="ti-user sc_two"></span>
+                    <h2 class="counter-num">@Model.activeStudentCount</h2>
+                    <p>Học viên hoạt động</p>
+                </div>
+            </div><!-- END COL -->
+        </div><!--- END ROW -->
+    </div><!--- END CONTAINER -->
+</section>
+<!-- END COUNTER -->
+<!-- START TESTIMONIALS -->
+<section class="testi_area section-padding">
+    <div class="container">
+        <div class="section-title">
+            <h2>Cảm Nhận Của Học Viên <br />Về Các Khóa Học Tại NewGen</h2>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-sm-12 col-xs-12">
+                <div id="testimonial-slider2" class="owl-carousel">
+                    <div class="testimonial">
+                        <img src="/Resources/eduleb/eduleb/assets/img/quote.png" alt="" />
+                        <div class="testimonial_content">
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <p>Phương pháp giảng dạy tại NewGen thực sự khác biệt. Giảng viên rất nhiệt tình và hỗ trợ chỉnh sửa phát âm chi tiết giúp mình tự tin hơn hẳn khi giao tiếp.</p>
+                        </div>
+                        <div class="testi_pic_title">
+                            <img src="/Resources/eduleb/eduleb/assets/img/testimonial/1.png" alt="">
+                            <h4>Nguyễn Minh Anh</h4>
+                            <p>Học viên Khóa Giao Tiếp</p>
+                        </div>
+                    </div><!-- END TESTIMONIAL -->
+                    <div class="testimonial">
+                        <img src="/Resources/eduleb/eduleb/assets/img/quote.png" alt="" />
+                        <div class="testimonial_content">
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <p>Nhờ lộ trình luyện thi IELTS bài bản tại NewGen, mình đã đạt mục tiêu 7.5 IELTS chỉ sau 6 tháng học tập. Cảm ơn thầy cô NewGen rất nhiều!</p>
+                        </div>
+                        <div class="testi_pic_title">
+                            <img src="/Resources/eduleb/eduleb/assets/img/testimonial/2.png" alt="">
+                            <h4>Trần Hoàng Nam</h4>
+                            <p>Học viên Khóa IELTS Intensive</p>
+                        </div>
+                    </div><!-- END TESTIMONIAL -->
+                    <div class="testimonial">
+                        <img src="/Resources/eduleb/eduleb/assets/img/quote.png" alt="" />
+                        <div class="testimonial_content">
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <p>Lịch học linh hoạt và các buổi thực hành tương tác giúp mình cải thiện phản xạ nhanh chóng, phục vụ rất tốt cho công việc hàng ngày tại công ty đa quốc gia.</p>
+                        </div>
+                        <div class="testi_pic_title">
+                            <img src="/Resources/eduleb/eduleb/assets/img/testimonial/3.png" alt="">
+                            <h4>Lê Thi Phương</h4>
+                            <p>Học viên Tiếng Anh Người Đi Làm</p>
+                        </div>
+                    </div><!-- END TESTIMONIAL -->
+                    <div class="testimonial">
+                        <img src="/Resources/eduleb/eduleb/assets/img/quote.png" alt="" />
+                        <div class="testimonial_content">
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <p>Môi trường học tập thân thiện, cơ sở vật chất hiện đại. Đội ngũ trợ giảng luôn đồng hành và nhắc nhở việc làm bài tập sát sao.</p>
+                        </div>
+                        <div class="testi_pic_title">
+                            <img src="/Resources/eduleb/eduleb/assets/img/testimonial/4.png" alt="">
+                            <h4>Phạm Đức Huy</h4>
+                            <p>Học viên Khóa TOEIC Target 750+</p>
+                        </div>
+                    </div><!-- END TESTIMONIAL -->
+                    <div class="testimonial">
+                        <img src="/Resources/eduleb/eduleb/assets/img/quote.png" alt="" />
+                        <div class="testimonial_content">
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <i class="ti-star"></i>
+                            <p>Khóa học đã đem lại sự tự tin rất lớn cho mình. Từ một người sợ nói tiếng Anh, giờ đây mình có thể thuyết trình hoàn toàn bằng tiếng Anh trước đồng nghiệp.</p>
+                        </div>
+                        <div class="testi_pic_title">
+                            <img src="/Resources/eduleb/eduleb/assets/img/testimonial/5.png" alt="">
+                            <h4>Đỗ Thảo Linh</h4>
+                            <p>Học viên Khóa Tiếng Anh Thuyết Trình</p>
+                        </div>
+                    </div><!-- END TESTIMONIAL -->
+                </div><!-- END TESTIMONIAL SLIDER -->
+            </div><!-- END COL -->
+        </div><!--- END ROW -->
+    </div><!--- END CONTAINER -->
+</section>
+<!-- END TESTINUNIALS -->
