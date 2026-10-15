@@ -4,21 +4,19 @@
         <div class="row">
             <div class="col-20 align-self-center">
                 <div class="site-logo">
-                    <a href="index.html"><img src="/Resources/eduleb/eduleb/assets/img/logo.png" alt=""></a>
+                    <a href="@Url.Action("Index","Home")"><h1><strong>NewGen</strong></h1></a>
                 </div>
             </div><!--- END Col -->
 
             <div class="col-60 d-flex">
                 <nav id="main-menu">
                     <ul>
-                        <li class="menu-item-has-children">
-                            <a href="#">Home</a>
-                            <ul>
-                                <li><a href="index.html">Home 01</a></li>
-                                <li><a href="index2.html">Home 02</a></li>
-                            </ul>
+                        <li>
+                            <a href="@Url.Action("Index","Home")">Trang chủ</a>
                         </li>
-                        <li><a href="about.html">About</a></li>
+                        <li>
+                            <a href="about.html">About</a>
+                        </li>
                         <li class="menu-item-has-children">
                             <a href="course.html">Course</a>
                             <ul>

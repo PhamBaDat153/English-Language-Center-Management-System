@@ -3,8 +3,36 @@
   "WorkspaceRootPath": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\controllers\\classmanagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\controllers\\classmanagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\views\\shared\\_header.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\views\\shared\\_header.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\resources\\eduleb\\eduleb\\assets\\css\\style.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\resources\\eduleb\\eduleb\\assets\\css\\style.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\models\\course.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\models\\course.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\controllers\\usermanagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\controllers\\usermanagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\viewmodels\\homepageviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\viewmodels\\homepageviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\models\\enums.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\models\\enums.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,7 +42,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -37,20 +65,107 @@
               "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:3:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "_Header.cshtml",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Shared\\_Header.cshtml",
+              "RelativeDocumentMoniker": "Source\\Views\\Shared\\_Header.cshtml",
+              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Shared\\_Header.cshtml*",
+              "RelativeToolTip": "Source\\Views\\Shared\\_Header.cshtml*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-10-15T05:19:23.641Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ClassManageController.cs",
-              "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Controllers\\ClassManageController.cs",
-              "RelativeDocumentMoniker": "Source\\Controllers\\ClassManageController.cs",
-              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Controllers\\ClassManageController.cs*",
-              "RelativeToolTip": "Source\\Controllers\\ClassManageController.cs*",
-              "ViewState": "AgIAAI0CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "style.css",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Resources\\eduleb\\eduleb\\assets\\css\\style.css",
+              "RelativeDocumentMoniker": "Source\\Resources\\eduleb\\eduleb\\assets\\css\\style.css",
+              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Resources\\eduleb\\eduleb\\assets\\css\\style.css",
+              "RelativeToolTip": "Source\\Resources\\eduleb\\eduleb\\assets\\css\\style.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-10-15T05:16:12.3Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Course.cs",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Models\\Course.cs",
+              "RelativeDocumentMoniker": "Source\\Models\\Course.cs",
+              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Models\\Course.cs",
+              "RelativeToolTip": "Source\\Models\\Course.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABsAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-14T16:14:32.502Z",
+              "WhenOpened": "2026-10-15T04:57:02.656Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Enums.cs",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Models\\Enums.cs",
+              "RelativeDocumentMoniker": "Source\\Models\\Enums.cs",
+              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Models\\Enums.cs",
+              "RelativeToolTip": "Source\\Models\\Enums.cs",
+              "ViewState": "AgIAAD4AAAAAAAAAAAAAwEoAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-15T04:32:37.649Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "Source\\Controllers\\HomeController.cs",
+              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "Source\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAwFUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-15T04:02:04.427Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "Source\\Views\\Home\\Index.cshtml",
+              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "Source\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAH4AAAAAAAAAAAAAAMYAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-10-15T03:56:50.556Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "HomePageViewModel.cs",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\ViewModels\\HomePageViewModel.cs",
+              "RelativeDocumentMoniker": "Source\\ViewModels\\HomePageViewModel.cs",
+              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\ViewModels\\HomePageViewModel.cs",
+              "RelativeToolTip": "Source\\ViewModels\\HomePageViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-15T03:56:40.135Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "UserManageController.cs",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Controllers\\UserManageController.cs",
+              "RelativeDocumentMoniker": "Source\\Controllers\\UserManageController.cs",
+              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Controllers\\UserManageController.cs",
+              "RelativeToolTip": "Source\\Controllers\\UserManageController.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAAQwCkAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-15T03:56:38.313Z",
               "EditorCaption": ""
             }
           ]

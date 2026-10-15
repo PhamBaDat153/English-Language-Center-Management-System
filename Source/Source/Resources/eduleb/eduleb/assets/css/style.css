@@ -2798,3 +2798,31 @@ font-weight: 700;
 * 18.END SECTION TOP DESIGN
 * ----------------------------------------------------------------------------------------
 */
+/* Homepage course cards */
+.course-card {
+    height: 100%;
+    margin-bottom: 30px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .06);
+    transition: .3s ease;
+}
+
+.course-card:hover { transform: translateY(-6px); box-shadow: 0 14px 35px rgba(0, 0, 0, .12); }
+.course-card-image { position: relative; height: 210px; overflow: hidden; background: #f5f5f5; }
+.course-card-image img { width: 100%; height: 100%; object-fit: cover; transition: .4s ease; }
+.course-card:hover .course-card-image img { transform: scale(1.06); }
+.course-level { position: absolute; top: 15px; left: 15px; padding: 6px 13px; color: #fff; background: #ff642f; border-radius: 20px; font-size: 13px; }
+.course-card-content { display: flex; min-height: 275px; padding: 22px; flex-direction: column; }
+.course-title { min-height: 48px; margin: 0 0 12px; line-height: 1.45; font-size: 19px; font-weight: 600; }
+.course-title a { color: #222; text-decoration: none; }
+.course-title a:hover { color: #ff642f; }
+.course-description { display: -webkit-box; min-height: 48px; margin-bottom: 18px; overflow: hidden; color: #777; line-height: 1.6; font-size: 14px; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.course-info { display: flex; justify-content: space-between; padding: 14px 0; gap: 10px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; color: #777; font-size: 14px; }
+.course-info i { margin-right: 4px; color: #ff642f; }
+.course-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 18px; }
+.course-price { color: #ff642f; font-size: 19px; font-weight: 700; }
+.course-detail-btn { padding: 8px 13px; color: #ff642f; border: 1px solid #ff642f; border-radius: 5px; font-size: 13px; text-decoration: none; }
+.course-detail-btn:hover { color: #fff; background: #ff642f; text-decoration: none; }

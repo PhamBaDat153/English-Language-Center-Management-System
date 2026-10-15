@@ -1,33 +1,199 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<main>
-    <section class="row" aria-labelledby="aspnetTitle">
-        <h1 id="title">ASP.NET</h1>
-        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-        <p><a href="https://asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
-    </section>
+@using System.Globalization
+@model Source.ViewModels.HomePageViewModel
 
-    <div class="row">
-        <section class="col-md-4" aria-labelledby="gettingStartedTitle">
-            <h2 id="gettingStartedTitle">Getting started</h2>
-            <p>
-                ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-                enables a clean separation of concerns and gives you full control over markup
-                for enjoyable, agile development.
-            </p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="librariesTitle">
-            <h2 id="librariesTitle">Get more libraries</h2>
-            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="hostingTitle">
-            <h2 id="hostingTitle">Web Hosting</h2>
-            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-        </section>
-    </div>
-</main>
+
+
+<!-- START HOME -->
+<section class="home_bg hb_height" style="background-image: url(/Resources/eduleb/eduleb/assets/img/bg/home-bg.jpg);  background-size:cover; background-position: center center;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-sm-12 col-xs-12">
+                <div class="hero-text ht_top">
+                    <h1><span>NewGen</span> Khai Mở Tiềm Năng Bứt Phá Tương Lai</h1>
+                    <p>Hành trình chinh phục tiếng Anh chuẩn quốc tế cùng phương pháp giảng dạy hiện đại và lộ trình cá nhân hóa tại NewGen.</p>
+                </div>
+            </div><!--- END COL -->
+            <div class="col-lg-6 col-sm-12 col-xs-12">
+                <div class="hero-text-img">
+                    <img src="/Resources/eduleb/eduleb/assets/img/home-img2.png" class="img-fluid" alt="" />
+                </div>
+            </div><!--- END COL -->
+        </div><!--- END ROW -->
+    </div><!--- END CONTAINER -->
+</section>
+<!-- END  HOME -->
+<!-- START COUNTER -->
+<section class="count_area counter_feature">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-sm-6 col-xs-12">
+                <div class="single-counter">
+                    <span class="ti-folder sc_one"></span>
+                    <h2 class="counter-num">@Model.courseCount</h2>
+                    <p>Khóa học</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 col-xs-12">
+                <div class="single-counter">
+                    <span class="ti-check-box sc_three"></span>
+                    <h2 class="counter-num">@Model.classCount</h2>
+                    <p>Lớp học</p>
+                </div>
+            </div><!-- END COL -->
+            <div class="col-lg-3 col-sm-6 col-xs-12">
+                <div class="single-counter">
+                    <span class="ti-user sc_four"></span>
+                    <h2 class="counter-num">@Model.activeTeacherCount</h2>
+                    <p>Giáo viên</p>
+                </div>
+            </div><!-- END COL -->
+            <div class="col-lg-3 col-sm-6 col-xs-12">
+                <div class="single-counter">
+                    <span class="ti-user sc_two"></span>
+                    <h2 class="counter-num">@Model.activeStudentCount</h2>
+                    <p>Học viên hoạt động</p>
+                </div>
+            </div><!-- END COL -->
+        </div><!--- END ROW -->
+    </div><!--- END CONTAINER -->
+</section>
+<!-- END COUNTER -->
+<!-- START CATEGORY -->
+<section class="top_cat__area section-padding" style="background-image: url(/Resources/eduleb/eduleb/assets/img/bg/shape-1.png);  background-size:cover; background-position: center center;">
+    <div class="container">
+        <div class="section-title text-center">
+            <h2>Hành Trình Bứt Phá Cùng NewGen</h2>
+            <p>Khám phá phương pháp học tiếng Anh hoàn toàn mới, giúp bạn làm chủ ngôn ngữ một cách tự nhiên, hiệu quả và nhanh chóng đạt được mục tiêu của mình.</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                <div class="single_tp">
+                    <span class="sc_one">01</span>
+                    <h3>Đội Ngũ <br />Giảng Viên Giỏi</h3>
+                    <p>Giảng viên bản xứ và Việt Nam giàu kinh nghiệm, đạt chứng chỉ quốc tế TESOL/CELTA.</p>
+                </div>
+            </div><!-- END COL -->
+            <div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                <div class="single_tp">
+                    <span class="sc_two">02</span>
+                    <h3>Chất Lượng <br />Đào Tạo Chuẩn</h3>
+                    <p>Giáo trình chuẩn quốc tế kết hợp lộ trình học tập được cá nhân hóa cho từng học viên.</p>
+                </div>
+            </div><!-- END COL -->
+            <div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                <div class="single_tp">
+                    <span class="sc_three">03</span>
+                    <h3>Học Linh Hoạt <br />Online & Offline</h3>
+                    <p>Lịch học đa dạng, kết hợp nền tảng học thông minh giúp bạn chủ động thời gian.</p>
+                </div>
+            </div><!-- END COL -->
+            <div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                <div class="single_tp">
+                    <span class="sc_four">04</span>
+                    <h3>Đồng Hành <br />Trọn Đời</h3>
+                    <p>Đội ngũ trợ giảng và cố vấn học tập luôn sẵn sàng hỗ trợ, đồng hành cùng bạn 24/7.</p>
+                </div>
+            </div><!-- END COL -->
+        </div><!-- END ROW -->
+    </div><!--- END CONTAINER -->
+</section>
+<!-- END CATEGORY -->
+<!-- START ABOUT US -->
+<section class="ab_area section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                <div class="ab_img">
+                    <img src="/Resources/eduleb/eduleb/assets/img/about1.png" class="img-fluid" alt="Về NewGen English">
+                </div>
+            </div><!--- END COL -->
+            <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                <div class="ab_content">
+                    <h2>NewGen – Tiên Phong Trong Đào Tạo Tiếng Anh Thế Hệ Mới</h2>
+                    <p>Tại NewGen, chúng tôi mang đến phương pháp học tiếng Anh hiện đại, kết hợp giữa tư duy ngôn ngữ tự nhiên và ứng dụng công nghệ trong giảng dạy, giúp học viên phát triển toàn diện cả 4 kỹ năng.</p>
+                    <p>Với chương trình học được cá nhân hóa tối đa, NewGen cam kết đồng hành cùng học viên trên con đường tự tin giao tiếp, chinh phục các chứng chỉ quốc tế và sẵn sàng vươn ra thế giới.</p>
+                    <ul>
+                        <li><span class="ti-check"></span> Tiếp cận kho tài liệu phong phú với <b>100%</b> bài giảng chuẩn quốc tế</li>
+                        <li><span class="ti-check"></span> Các khóa học đa dạng từ Giao tiếp, IELTS đến Tiếng Anh cho người đi làm</li>
+                        <li><span class="ti-check"></span> Đội ngũ giảng viên bản xứ và Việt Nam tâm huyết, giàu kinh nghiệm</li>
+                    </ul>
+                </div>
+            </div><!--- END COL -->
+        </div><!--- END ROW -->
+    </div><!--- END CONTAINER -->
+</section>
+<!-- END ABOUT US -->
+<!-- START COURSE -->
+<section class="home_course section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-sm-6 col-xs-12">
+                <div class="section-title">
+                    <h2>Đồng hành cùng hơn <b>@Model.activeStudentCount</b> <br />Học viên bứt phá tiếng Anh tại NewGen.</h2>
+                </div>
+            </div><!--- END COL -->
+            <div class="col-lg-4 col-sm-6 col-xs-12">
+                <div class="cour_btn">
+                    <a href="course.html" class="btn_one">Tất cả khóa học <i class="ti-arrow-top-right"></i></a>
+                </div>
+            </div><!--- END COL -->
+        </div><!--- END ROW -->
+        <div class="row">
+            @foreach (var item in Model.Courses)
+            {
+                <div class="col-lg-4 col-sm-6 col-xs-12">
+                    <div class="single_course">
+                        <div class="single_c_img">
+                            <img src="/Resources/eduleb/eduleb/assets/img/course/1.png" class="img-fluid" alt="course-image" />
+                        </div>
+                        <h4><a href="course.html">@item.course_name</a></h4>
+                        <p><span class="ti-star"> </span>@item.level</p>
+                        <br />
+                        <p><span class="ti-book"> </span>@item.description</p>
+                        <br />
+                        <p><span class="ti-alarm-clock"> </span>@item.duration_weeks Tuần</p>
+                        <br />
+                        <div class="price">@item.tuition_fee.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) ₫</div>
+                    </div>
+                </div><!-- END COL -->
+            }
+        </div><!--- END ROW -->
+    </div><!--- END CONTAINER -->
+</section>
+<!-- END COURSE -->
+
+<!-- START PROMO --><section class="ab_area section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                <div class="ab_content">
+                    <h2>Tại Sao Lựa Chọn Học Tiếng Anh Tại NewGen?</h2>
+                    <p>NewGen tiên phong áp dụng phương pháp giảng dạy tương tác thế hệ mới, giúp học viên xóa bỏ rào cản tâm lý, tự tin phản xạ và làm chủ tiếng Anh một cách tự nhiên.</p>
+                    <p>Dù mục tiêu của bạn là giao tiếp thành thạo, đạt điểm cao trong các kỳ thi quốc tế hay thăng tiến sự nghiệp, NewGen luôn xây dựng lộ trình tối ưu nhất dành cho bạn.</p>
+                    <ul>
+                        <li><span class="ti-check"></span> Lộ trình học cá nhân hóa theo trình độ và mục tiêu của từng học viên</li>
+                        <li><span class="ti-check"></span> 100% Giảng viên có chứng chỉ sư phạm quốc tế TESOL / CELTA</li>
+                        <li><span class="ti-check"></span> Cam kết đầu ra bằng hợp đồng và hỗ trợ học lại miễn phí</li>
+                    </ul>
+                    <a class="btn_one" href="course.html">Khám Phá Khóa Học <i class="ti-arrow-top-right"></i></a>
+                </div>
+            </div><!--- END COL -->
+            <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                <div class="ab_img">
+                    <img src="/Resources/eduleb/eduleb/assets/img/about3.png" class="img-fluid" alt="Lý do chọn NewGen English">
+                    <div class="home_ps2">
+                        <span class="ti-book"></span>
+                        <h2>100%</h2>
+                        <p>Cam kết đầu ra</p>
+                    </div>
+                </div>
+            </div><!--- END COL -->
+        </div><!--- END ROW -->
+    </div><!--- END CONTAINER -->
+</section><!-- END PROMO -->
