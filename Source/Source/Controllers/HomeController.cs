@@ -2,7 +2,9 @@
 using Source.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Source.Controllers
@@ -114,6 +116,37 @@ namespace Source.Controllers
                     CurrentPage = 1,
                     TotalPages = 0
                 });
+            }
+        }
+
+        public async Task<ActionResult> Details(Guid id)
+        {
+            try
+            {
+                Course course = await db.Courses.FirstOrDefaultAsync(c => c.course_id == id && c.available_status == "Available");
+
+                CourseDetailViewModel detailViewModel = new CourseDetailViewModel
+                {
+                    course_code = course.course_code,
+                    course_name = course.course_name,
+                    description = course.description,
+                    duration_weeks = course.duration_weeks,
+                    level = course.level,
+                    tuition_fee = course.tuition_fee,
+                    RelatedCourses = await db.Courses
+                                    .Where(c => c.level == course.level
+                                             && c.course_id != course.course_id
+                                             && c.available_status == "Available")
+                                    .ToListAsync()
+                };
+
+                return View(detailViewModel);
+
+            }
+            catch
+            {
+                // Có lỗi khi truy vấn hoặc xử lý dữ liệu thì hiển thị trang lỗi 500.
+                return RedirectToAction("ServerError", "Error"); ;
             }
         }
 

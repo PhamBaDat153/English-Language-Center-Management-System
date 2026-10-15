@@ -1,0 +1,73 @@
+﻿@model Source.ViewModels.CourseDetailViewModel
+@using System.Globalization
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<!-- START SECTION TOP -->
+<section class="section-top">
+    <div class="container">
+        <div class="col-lg-10 offset-lg-1 text-center">
+            <div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                <h1>Thông tin khóa học</h1>
+                <ul>
+                    <li><a href="@Url.Action("Index","Home")">Trang chủ</a></li>
+                    <li> / Thông tin khóa học</li>
+                </ul>
+            </div><!-- //.HERO-TEXT -->
+        </div><!--- END COL -->
+    </div><!--- END CONTAINER -->
+</section>
+<!-- END SECTION TOP -->
+<!-- START COURSE -->
+<section class="our_event section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-sm-8 col-xs-12">
+                <div class="single_event_single">
+                    <img alt="" class="img-fluid" src="/Resources/eduleb/eduleb/assets/img/sc.png" />
+                    <div class="single_event_text_single">
+                        <h4>@Model.course_name</h4>
+                        <span><i class="fa fa-clock-o"></i>@Model.duration_weeks tuần</span>
+                        <p>@Model.description</p>
+
+                    </div>
+                </div><!--- END SINGLE EVENT -->
+            </div><!--- END COL -->
+            <div class="col-lg-4 col-sm-4 col-xs-12">
+                <div class="course_features">
+                    <h3>Thông tin nổi bật</h3>
+                    <ul>
+                        <li><i class="fa fa-calendar"></i> Độ dài khóa học <b>@Model.duration_weeks tuần</b></li>
+                        <li><i class="fa fa-user"></i> Total Lectures <b>30</b></li>
+                        <li><i class="fa fa-user"></i> Total Students <b>1000</b></li>
+                    </ul>
+                </div>
+                <div class="event_info_price">
+                    <h4>Học phí - @Model.tuition_fee.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) ₫</h4>
+                </div>
+                <div class="event_info_register">
+                    <a class="btn_one" href="#">Đăng ký ngay</a>
+                </div>
+                <div class="related_course">
+                    <h3>Khóa học liên quan</h3>
+                    @foreach (var item in Model.RelatedCourses)
+                    {
+                        <div class="single_rc">
+                            <div class="rc_img">
+                                <img src="/Resources/eduleb/eduleb/assets/img/rc-1.png" alt="" />
+                            </div>
+                            <h4><a href="@Url.Action("Details", "Home", new { id = item.course_id })">@item.course_name</a></h4>
+                            <span>@item.tuition_fee.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) </span>
+                        </div><!--- END SINGLE RELATED COURSE -->
+                    }
+                </div><!--- END RELATED COURSE -->
+                </div><!-- END SIDEBAR POST -->
+            </div><!--- END COL -->
+        </div><!-- END ROW -->
+    </div><!-- END CONTAINER -->
+</section>
+<!-- END COURSE -->
