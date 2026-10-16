@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -7,16 +6,47 @@
 @using System.Globalization
 @model Source.ViewModels.HomePageViewModel
 
-
-
 <!-- START HOME -->
-<section class="home_bg hb_height" style="background-image: url(/Resources/eduleb/eduleb/assets/img/bg/home-bg.jpg);  background-size:cover; background-position: center center;">
+<section class="home_bg hb_height" style="background-image: url(/Resources/eduleb/eduleb/assets/img/bg/home-bg.jpg); background-size:cover; background-position: center center;">
     <div class="container">
         <div class="row">
             <div class="col-lg-6 col-sm-12 col-xs-12">
                 <div class="hero-text ht_top">
                     <h1><span>NewGen</span> Khai Mở Tiềm Năng Bứt Phá Tương Lai</h1>
                     <p>Hành trình chinh phục tiếng Anh chuẩn quốc tế cùng phương pháp giảng dạy hiện đại và lộ trình cá nhân hóa tại NewGen.</p>
+
+                    <!-- THANH TÌM KIẾM KHÓA HỌC -->
+                    <div class="hero-search-box mt-4 p-3 style-search-form" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.3);">
+                        <form action="@Url.Action("Courses", "Home")" method="get">
+                            <div class="row g-2 align-items-center">
+                                <!-- Nhập tên khóa học -->
+                                <div class="col-md-5 col-12 mb-2 mb-md-0">
+                                    <input type="text" name="searchName" class="form-control" placeholder="Nhập tên khóa học..." style="height: 45px; border-radius: 5px;" />
+                                </div>
+                                <!-- Chọn trình độ -->
+                                <div class="col-md-4 col-12 mb-2 mb-md-0">
+                                    <select name="level" class="form-control" style="height: 45px; border-radius: 5px;">
+                                        <option value="">-- Tất cả trình độ --</option>
+                                        <option value="Beginner">Beginner</option>
+                                        <option value="Elementary">Elementary</option>
+                                        <option value="Intermediate">Intermediate</option>
+                                        <option value="UpperIntermediate">Upper Intermediate</option>
+                                        <option value="Advanced">Advanced</option>
+                                        <option value="IELTS">IELTS</option>
+                                        <option value="TOEIC">TOEIC</option>
+                                    </select>
+                                </div>
+                                <!-- Nút tìm kiếm -->
+                                <div class="col-md-3 col-12">
+                                    <button type="submit" class="btn btn-primary w-100" style="height: 45px; border-radius: 5px; font-weight: bold; background-color: #ff5e14; border: none;">
+                                        <i class="ti-search"></i> Tìm kiếm
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- END THANH TÌM KIẾM -->
+
                 </div>
             </div><!--- END COL -->
             <div class="col-lg-6 col-sm-12 col-xs-12">
@@ -27,7 +57,7 @@
         </div><!--- END ROW -->
     </div><!--- END CONTAINER -->
 </section>
-<!-- END  HOME -->
+<!-- END HOME -->
 <!-- START COUNTER -->
 <section class="count_area counter_feature">
     <div class="container">
@@ -65,7 +95,7 @@
 </section>
 <!-- END COUNTER -->
 <!-- START CATEGORY -->
-<section class="top_cat__area section-padding" style="background-image: url(/Resources/eduleb/eduleb/assets/img/bg/shape-1.png);  background-size:cover; background-position: center center;">
+<section class="top_cat__area section-padding" style="background-image: url(/Resources/eduleb/eduleb/assets/img/bg/shape-1.png); background-size:cover; background-position: center center;">
     <div class="container">
         <div class="section-title text-center">
             <h2>Hành Trình Bứt Phá Cùng NewGen</h2>
@@ -167,8 +197,8 @@
     </div><!--- END CONTAINER -->
 </section>
 <!-- END COURSE -->
-
-<!-- START PROMO --><section class="ab_area section-padding">
+<!-- START PROMO -->
+<section class="ab_area section-padding">
     <div class="container">
         <div class="row">
             <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
@@ -181,7 +211,7 @@
                         <li><span class="ti-check"></span> 100% Giảng viên có chứng chỉ sư phạm quốc tế TESOL / CELTA</li>
                         <li><span class="ti-check"></span> Cam kết đầu ra bằng hợp đồng và hỗ trợ học lại miễn phí</li>
                     </ul>
-                    <a class="btn_one" href="course.html">Khám Phá Khóa Học <i class="ti-arrow-top-right"></i></a>
+                    <a class="btn_one" href="@Url.Action("Courses", "Home")">Khám Phá Khóa Học <i class="ti-arrow-top-right"></i></a>
                 </div>
             </div><!--- END COL -->
             <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
@@ -196,4 +226,5 @@
             </div><!--- END COL -->
         </div><!--- END ROW -->
     </div><!--- END CONTAINER -->
-</section><!-- END PROMO -->
+</section>
+<!-- END PROMO -->
