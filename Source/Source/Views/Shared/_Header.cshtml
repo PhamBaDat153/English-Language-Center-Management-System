@@ -23,9 +23,14 @@
                         <li>
                             <a href="@Url.Action("Contact", "Home")">Liên hệ</a>
                         </li>
-                        <li >
-                            <a href="@Url.Action("Index", "Dashboard")">Quản trị</a>
-                        </li>
+                        @if (Request.IsAuthenticated)
+                        {
+                            <li>
+                                <a href="@Url.Action("Index", "Dashboard")">
+                         Trang quản lý
+                    </a>
+                            </li>
+                        }
                         <li class="menu-item-has-children">
                             <a href="blog.html">Blog</a>
                             <ul>
@@ -39,9 +44,40 @@
             </div><!--- END Col -->
 
             <div class="col-20 d-none d-xl-block text-end align-self-center">
-                <a href="#" class="header-btn">Sign In</a>
-                <a href="contact.html" class="btn_one">Sign Up</a>
-            </div><!--- END Col -->
+                @if (Request.IsAuthenticated)
+                {
+                    <a href="@Url.Action("Index", "Profile")"
+                       class="header-btn">
+                        Hồ sơ cá nhân
+                    </a>
+
+                    using (Html.BeginForm(
+                        "Logout",
+                        "Authentication",
+                        FormMethod.Post,
+                        new { style = "display:inline;" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn_one border-0">
+                             Đăng xuất
+                        </button>
+                    }
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Authentication")"
+                       class="header-btn">
+                         Đăng nhập
+                    </a>
+
+                    <a href="@Url.Action("Register", "Authentication")"
+                       class="btn_one">
+                        Đăng ký
+                    </a>
+                }
+            </div>
 
             <ul class="mobile_menu">
                 <li>

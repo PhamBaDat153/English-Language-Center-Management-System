@@ -1,0 +1,124 @@
+﻿@model Source.ViewModels.LoginViewModel
+
+@{
+    ViewBag.Title = "Đăng nhập";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+                    <h2 class="text-center mb-2">Chào mừng bạn trở lại</h2>
+
+                    <p class="text-center text-muted mb-4">
+                        Đăng nhập vào tài khoản NewGen của bạn
+                    </p>
+
+                    @if (TempData["AuthenticationError"] != null)
+                    {
+                        <div class="alert alert-danger">
+                            @TempData["AuthenticationError"]
+                        </div>
+                    }
+
+                    @Html.ValidationSummary(
+                        true,
+                        "",
+                        new { @class = "alert alert-danger" })
+
+                    @using (Html.BeginForm(
+                        "Login",
+                        "Authentication",
+                        FormMethod.Post,
+                        new { @class = "login-form" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="returnUrl"
+                               value="@ViewBag.ReturnUrl" />
+
+                        <div class="mb-3">
+                            @Html.LabelFor(
+                                model => model.Identifier,
+                                new { @class = "form-label" })
+
+                            @Html.TextBoxFor(
+                                model => model.Identifier,
+                                new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Tên đăng nhập hoặc email",
+                                    autocomplete = "username"
+                                })
+
+                            @Html.ValidationMessageFor(
+                                model => model.Identifier,
+                                "",
+                                new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(
+                                model => model.Password,
+                                new { @class = "form-label" })
+
+                            @Html.PasswordFor(
+                                model => model.Password,
+                                new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Mật khẩu",
+                                    autocomplete = "current-password"
+                                })
+
+                            @Html.ValidationMessageFor(
+                                model => model.Password,
+                                "",
+                                new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-check mb-4">
+                            @Html.CheckBoxFor(
+                                model => model.RememberMe,
+                                new { @class = "form-check-input" })
+
+                            @Html.LabelFor(
+                                model => model.RememberMe,
+                                new { @class = "form-check-label" })
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            Đăng nhập
+                        </button>
+                    }
+
+                    <div class="d-flex align-items-center my-4">
+                        <hr class="flex-grow-1" />
+                        <span class="px-3 text-muted">or</span>
+                        <hr class="flex-grow-1" />
+                    </div>
+
+                    <a href="@Url.Action(
+                        "GoogleLogin",
+                        "Authentication",
+                        new { returnUrl = ViewBag.ReturnUrl })"
+                       class="btn btn-outline-dark w-100">
+                        Đăng nhập bằng Google
+                    </a>
+
+                    <p class="text-center text-muted mt-4 mb-0">
+                        Chưa có tài khoản?
+                        <a href="@Url.Action("Register", "Authentication")">
+                            Đăng ký ngay
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

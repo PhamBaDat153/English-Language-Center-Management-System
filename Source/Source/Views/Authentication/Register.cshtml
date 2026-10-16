@@ -1,0 +1,105 @@
+@model Source.ViewModels.RegisterViewModel
+
+@{
+    ViewBag.Title = "Đăng ký tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+                    <h2 class="text-center mb-2">Tạo tài khoản</h2>
+                    <p class="text-center text-muted mb-4">
+                        Đăng ký tài khoản học viên tại NewGen
+                    </p>
+
+                    @Html.ValidationSummary(
+                        true,
+                        "",
+                        new { @class = "alert alert-danger" })
+
+                    @using (Html.BeginForm(
+                        "Register",
+                        "Authentication",
+                        FormMethod.Post,
+                        new { @class = "register-form" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.FullName, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.FullName, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Nguyễn Văn A",
+                                autocomplete = "name"
+                            })
+                            @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Username, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.Username, new
+                            {
+                                @class = "form-control",
+                                placeholder = "nguyen.van.a",
+                                autocomplete = "username"
+                            })
+                            @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger" })
+                            <small class="form-text text-muted">
+                                Chỉ dùng chữ không dấu, số, dấu chấm, gạch dưới hoặc gạch ngang.
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Email, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.Email, new
+                            {
+                                @class = "form-control",
+                                type = "email",
+                                placeholder = "email@example.com",
+                                autocomplete = "email"
+                            })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Password, new { @class = "form-label" })
+                            @Html.PasswordFor(model => model.Password, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Tối thiểu 6 ký tự",
+                                autocomplete = "new-password"
+                            })
+                            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-4">
+                            @Html.LabelFor(model => model.ConfirmPassword, new { @class = "form-label" })
+                            @Html.PasswordFor(model => model.ConfirmPassword, new
+                            {
+                                @class = "form-control",
+                                placeholder = "Nhập lại mật khẩu",
+                                autocomplete = "new-password"
+                            })
+                            @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            Đăng ký
+                        </button>
+                    }
+
+                    <p class="text-center text-muted mt-4 mb-0">
+                        Đã có tài khoản?
+                        <a href="@Url.Action("Login", "Authentication")">
+                            Đăng nhập
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

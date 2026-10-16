@@ -1,0 +1,297 @@
+@model Source.ViewModels.ProfileViewModel
+
+@{
+    ViewBag.Title = "Hồ sơ cá nhân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var defaultAvatar = Url.Content("~/Resources/adminhmd-1.0.0/assets/images/avatar/avatar-1.jpg");
+    var avatarUrl = string.IsNullOrWhiteSpace(Model.AvatarUrl) ? defaultAvatar : Model.AvatarUrl;
+}
+
+<style>
+    .profile-page { background: #f7f9fc; }
+    .profile-hero { background: linear-gradient(135deg, #0f6bff, #6b4eff); border-radius: 18px; color: #fff; overflow: hidden; }
+    .profile-hero .profile-avatar { width: 128px; height: 128px; object-fit: cover; border: 5px solid rgba(255,255,255,.75); box-shadow: 0 12px 30px rgba(15,107,255,.25); }
+    .profile-card { border: 0; border-radius: 16px; box-shadow: 0 8px 28px rgba(26,42,71,.08); }
+    .profile-card .card-header { background: transparent; border-bottom: 1px solid #edf0f5; padding: 1.25rem 1.5rem; }
+    .profile-card .card-body { padding: 1.5rem; }
+    .profile-card .form-control, .profile-card .form-select { border-radius: 8px; min-height: 46px; }
+    .profile-stat { background: rgba(255,255,255,.12); border-radius: 10px; padding: .8rem; }
+    .profile-stat strong { display: block; font-size: 1.05rem; }
+    .profile-stat small { opacity: .8; }
+    .profile-avatar-wrap { position: relative; display: inline-block; }
+    .avatar-upload-button { position: absolute; right: 0; bottom: 2px; width: 38px; height: 38px; border: 0; border-radius: 50%; background: #fff; color: #0f6bff; box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+    .role-badge { border-radius: 999px; padding: .45rem .8rem; }
+    .readonly-field { background: #f5f7fa !important; }
+</style>
+
+<section class="section_padding profile-page">
+    <div class="container">
+        <div class="section-title text-center mb-5">
+            <span class="sub_title">Tài khoản</span>
+            <h2>Hồ sơ cá nhân</h2>
+            <p>Quản lý thông tin cá nhân và xem hồ sơ theo vai trò của bạn.</p>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        }
+
+        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+        @using (Html.BeginForm("Index", "Profile", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="profile-hero p-4 h-100">
+                        <div class="text-center">
+                            <div class="profile-avatar-wrap mb-3">
+                                <img id="profile-avatar"
+                                     class="profile-avatar rounded-circle"
+                                     src="@avatarUrl"
+                                     alt="Ảnh đại diện của @Model.FullName"
+                                     onerror="this.onerror=null;this.src='@defaultAvatar';">
+                                <label for="avatar-upload" class="avatar-upload-button" title="Đổi ảnh đại diện">
+                                    <i class="fa fa-camera" aria-hidden="true"></i>
+                                </label>
+                            </div>
+                            <input id="avatar-upload" type="file" accept="image/jpeg,image/png,image/webp" class="d-none">
+                            <div id="avatar-message" class="small mb-3">Nhấn biểu tượng máy ảnh để đổi ảnh</div>
+                            <h4 class="text-white mb-1">@Model.FullName</h4>
+                            <p class="mb-3 opacity-75">@Model.Username</p>
+                            <div class="mb-4">
+                                <span class="badge bg-light text-primary role-badge">@Model.HighestRole</span>
+                            </div>
+                            <div class="row g-2 text-start mt-2">
+                                <div class="col-6"><div class="profile-stat"><small>Email</small><strong class="text-truncate">@Model.Email</strong></div></div>
+                                <div class="col-6"><div class="profile-stat"><small>Đăng nhập bằng</small><strong>@Model.AuthProvider</strong></div></div>
+                                <div class="col-6"><div class="profile-stat"><small>Trạng thái</small><strong>@(Model.ActiveStatus == "Active" ? "Hoạt động" : "Không hoạt động")</strong></div></div>
+                                <div class="col-6"><div class="profile-stat"><small>Ngày tham gia</small><strong>@Model.CreatedAt.ToString("dd/MM/yyyy")</strong></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="profile-card card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0"><i class="ti-user me-2 text-primary"></i>Thông tin cá nhân</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.FullName, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Tên đăng nhập</label>
+                                    <input class="form-control readonly-field" value="@Model.Username" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email</label>
+                                    <input class="form-control readonly-field" value="@Model.Email" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.DateOfBirth, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.DateOfBirth, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.PhoneNumber, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.Gender, new { @class = "form-label" })
+                                    @Html.DropDownListFor(m => m.Gender, new SelectList(new[]
+                                    {
+                                        new { Value = "", Text = "Chưa cập nhật" },
+                                        new { Value = "Male", Text = "Nam" },
+                                        new { Value = "Female", Text = "Nữ" },
+                                        new { Value = "Other", Text = "Khác" },
+                                        new { Value = "PreferNotToSay", Text = "Không muốn tiết lộ" }
+                                    }, "Value", "Text", Model.Gender), new { @class = "form-select" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.NativeLanguage, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.NativeLanguage, new { @class = "form-control" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.EmergencyContactName, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.EmergencyContactName, new { @class = "form-control" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.EmergencyContactNumber, new { @class = "form-label" })
+                                    @Html.TextBoxFor(m => m.EmergencyContactNumber, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.HasStudentProfile && Model.StudentStatus == "Active" && Model.StudentAvailableStatus == "Available")
+                    {
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h4 class="mb-4"><i class="ti-book me-2"></i>Hồ sơ học viên</h4>
+                                <div class="row g-3">
+                                    <div class="col-md-6"><label class="form-label">Mã học viên</label><input class="form-control" value="@Model.StudentCode" readonly></div>
+                                    <div class="col-md-6"><label class="form-label">Trạng thái</label><input class="form-control" value="@Model.StudentStatus" readonly></div>
+                                    <div class="col-md-6"><label class="form-label">Ngày nhập học</label><input class="form-control" value="@(Model.EnrollmentDate?.ToString("dd/MM/yyyy"))" readonly></div>
+                                    <div class="col-md-6">
+                                        @Html.LabelFor(m => m.CurrentLevel, new { @class = "form-label" })
+                                        @Html.DropDownListFor(m => m.CurrentLevel, new SelectList(new[]
+                                        {
+                                            new { Value = "", Text = "Chưa cập nhật" }, new { Value = "Beginner", Text = "Beginner" },
+                                            new { Value = "Elementary", Text = "Elementary" }, new { Value = "Intermediate", Text = "Intermediate" },
+                                            new { Value = "UpperIntermediate", Text = "Upper-intermediate" }, new { Value = "Advanced", Text = "Advanced" },
+                                            new { Value = "IELTS", Text = "IELTS" }, new { Value = "TOEIC", Text = "TOEIC" }
+                                        }, "Value", "Text", Model.CurrentLevel), new { @class = "form-select" })
+                                    </div>
+                                    <div class="col-12">
+                                        @Html.LabelFor(m => m.LearningGoal, new { @class = "form-label" })
+                                        @Html.TextAreaFor(m => m.LearningGoal, 4, 1, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.LearningGoal, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.StaffProfiles.Any())
+                    {
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h4 class="mb-4"><i class="ti-briefcase me-2"></i>Hồ sơ nhân sự</h4>
+                                @foreach (var staff in Model.StaffProfiles)
+                                {
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6"><label class="form-label">Mã nhân viên</label><input class="form-control" value="@staff.StaffCode" readonly></div>
+                                        <div class="col-md-6"><label class="form-label">Chức danh</label><input class="form-control" value="@staff.JobTitle" readonly></div>
+                                        <div class="col-md-6"><label class="form-label">Loại hình làm việc</label><input class="form-control" value="@staff.EmploymentType" readonly></div>
+                                        <div class="col-md-6"><label class="form-label">Trạng thái làm việc</label><input class="form-control" value="@staff.EmploymentStatus" readonly></div>
+                                        <div class="col-md-6"><label class="form-label">Phòng ban</label><input class="form-control" value="@staff.Department" readonly></div>
+                                        <div class="col-md-6"><label class="form-label">Ngày bắt đầu</label><input class="form-control" value="@(staff.HireDate?.ToString("dd/MM/yyyy"))" readonly></div>
+                                        <div class="col-md-6"><label class="form-label">Ngày kết thúc</label><input class="form-control" value="@(staff.TerminationDate?.ToString("dd/MM/yyyy"))" readonly></div>
+                                        <div class="col-md-6"><label class="form-label">Trạng thái hồ sơ</label><input class="form-control" value="@staff.AvailableStatus" readonly></div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.TeacherProfiles.Any())
+                    {
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h4 class="mb-4"><i class="ti-blackboard me-2"></i>Hồ sơ giáo viên</h4>
+                                @foreach (var teacher in Model.TeacherProfiles)
+                                {
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6"><label class="form-label">Chức danh chuyên môn</label><input class="form-control" value="@teacher.ProfessionalTitle" readonly></div>
+                                        <div class="col-md-6"><label class="form-label">Kinh nghiệm</label><input class="form-control" value="@(teacher.YearsOfExperience?.ToString() ?? "Chưa cập nhật") năm" readonly></div>
+                                        <div class="col-12"><label class="form-label">Giới thiệu giảng dạy</label><textarea class="form-control" rows="3" readonly>@teacher.TeachingBio</textarea></div>
+                                        <div class="col-12"><label class="form-label">Chuyên môn</label><textarea class="form-control" rows="2" readonly>@teacher.Specializations</textarea></div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.Qualifications.Any())
+                    {
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h4 class="mb-4"><i class="ti-medall me-2"></i>Chứng chỉ chuyên môn</h4>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead><tr><th>Tên chứng chỉ</th><th>Đơn vị cấp</th><th>Ngày cấp</th><th>Ngày hết hạn</th></tr></thead>
+                                        <tbody>
+                                            @foreach (var qualification in Model.Qualifications)
+                                            {
+                                                <tr>
+                                                    <td>@qualification.QualificationName</td>
+                                                    <td>@qualification.Institution</td>
+                                                    <td>@(qualification.IssuedDate?.ToString("dd/MM/yyyy"))</td>
+                                                    <td>@(qualification.ExpiryDate?.ToString("dd/MM/yyyy") ?? "Không thời hạn")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h4 class="mb-4"><i class="ti-lock me-2"></i>Đổi mật khẩu</h4>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.NewPassword, new { @class = "form-label" })
+                                    @Html.PasswordFor(m => m.NewPassword, new { @class = "form-control", autocomplete = "new-password" })
+                                    @Html.ValidationMessageFor(m => m.NewPassword, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label" })
+                                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", autocomplete = "new-password" })
+                                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <small class="text-muted d-block mt-2">Để trống nếu bạn không muốn đổi mật khẩu.</small>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button class="btn btn-primary" type="submit"><i class="ti-save me-1"></i>Lưu thay đổi</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<script>
+    (function () {
+        var input = document.getElementById('avatar-upload');
+        var image = document.getElementById('profile-avatar');
+        var message = document.getElementById('avatar-message');
+        if (!input) return;
+
+        input.addEventListener('change', function () {
+            if (!input.files || !input.files.length) return;
+
+            var file = input.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                message.textContent = 'Ảnh không được vượt quá 5 MB.';
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('avatar', file);
+            formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+            message.textContent = 'Đang tải ảnh lên...';
+
+            fetch('@Url.Action("UploadAvatar", "Profile")', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(function (response) { return response.json(); })
+            .then(function (result) {
+                if (!result.success) {
+                    message.textContent = result.message;
+                    return;
+                }
+
+                image.src = result.url + '?v=' + Date.now();
+                message.textContent = 'Đã cập nhật ảnh đại diện.';
+            })
+            .catch(function () {
+                message.textContent = 'Không thể tải ảnh lên. Vui lòng thử lại.';
+            });
+        });
+    })();
+</script>

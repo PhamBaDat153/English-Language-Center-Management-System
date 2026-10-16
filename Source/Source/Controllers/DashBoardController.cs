@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 namespace Source.Controllers
 {
+    [Authorize]
     public class DashboardController : Controller
     {
         // GET: Dashboard
