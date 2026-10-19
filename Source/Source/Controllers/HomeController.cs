@@ -132,6 +132,7 @@ namespace Source.Controllers
 
                 CourseDetailViewModel detailViewModel = new CourseDetailViewModel
                 {
+                    course_id = course.course_id,
                     course_code = course.course_code,
                     course_name = course.course_name,
                     description = course.description,

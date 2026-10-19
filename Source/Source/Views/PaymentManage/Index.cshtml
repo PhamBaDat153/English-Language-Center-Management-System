@@ -1,0 +1,317 @@
+﻿@model IEnumerable<Source.Models.Payment>
+@using System.Globalization
+
+@{
+    ViewBag.Title = "Quản lý thanh toán";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 0;
+    int totalPayments = ViewBag.TotalPayments ?? (Model != null ? Model.Count() : 0);
+    int pendingPayments = ViewBag.PendingPayments ?? (Model != null ? Model.Count(p => p.payment_status == "Pending") : 0);
+    int completedPayments = ViewBag.CompletedPayments ?? (Model != null ? Model.Count(p => p.payment_status == "Completed") : 0);
+    int filteredCount = ViewBag.FilteredCount ?? (Model != null ? Model.Count() : 0);
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <!-- Tiêu đề trang -->
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-credit-card-2-front" aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">Trang quản lý</p>
+                    <h1 class="h3 mb-1">Quản lý thanh toán</h1>
+                    <p class="text-muted mb-0">
+                        Theo dõi, tra cứu, duyệt và xóa các giao dịch thanh toán học phí.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông báo -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                <i class="bi bi-check-circle me-2" aria-hidden="true"></i>
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Thống kê (3 cột) -->
+        <div class="row g-3 mt-2">
+            <div class="col-12 col-md-4">
+                <div class="panel p-3 h-100">
+                    <p class="text-muted mb-2">Tổng số hóa đơn</p>
+                    <h3 class="mb-0">@totalPayments</h3>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="panel p-3 h-100">
+                    <p class="text-muted mb-2">Chờ duyệt (Pending)</p>
+                    <h3 class="mb-0 text-warning">@pendingPayments</h3>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="panel p-3 h-100">
+                    <p class="text-muted mb-2">Đã hoàn thành</p>
+                    <h3 class="mb-0 text-success">@completedPayments</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bộ lọc và tìm kiếm -->
+        <section class="panel mt-4">
+            <div class="panel-header p-3">
+                <h2 class="h5 mb-0 section-title">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    Tìm kiếm hóa đơn
+                </h2>
+            </div>
+
+            <div class="p-3">
+                @using (Html.BeginForm("Index", "PaymentManage", FormMethod.Get))
+                {
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-lg-6">
+                            <label for="search" class="form-label">
+                                Từ khóa tìm kiếm
+                            </label>
+                            <input type="text"
+                                   id="search"
+                                   name="search"
+                                   class="form-control"
+                                   value="@ViewBag.Search"
+                                   placeholder="Nhập tên học viên, email, mã GD hoặc tên khóa học..." />
+                        </div>
+
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label for="statusFilter" class="form-label">
+                                Trạng thái thanh toán
+                            </label>
+                            <select id="statusFilter" name="statusFilter" class="form-select">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="Pending" @(ViewBag.StatusFilter as string == "Pending" ? "selected" : "")>Chờ duyệt (Pending)</option>
+                                <option value="Completed" @(ViewBag.StatusFilter as string == "Completed" ? "selected" : "")>Đã hoàn thành (Completed)</option>
+                                <option value="Cancelled" @(ViewBag.StatusFilter as string == "Cancelled" ? "selected" : "")>Đã hủy (Cancelled)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-lg-3 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search" aria-hidden="true"></i>
+                                Tìm kiếm
+                            </button>
+
+                            <a href="@Url.Action("Index", "PaymentManage")"
+                               class="btn btn-outline-secondary">
+                                Xóa lọc
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <!-- Bảng danh sách hóa đơn -->
+        <section class="panel mt-4">
+            <div class="panel-header p-3">
+                <h2 class="h5 mb-1 section-title">
+                    <i class="bi bi-table" aria-hidden="true"></i>
+                    Danh sách hóa đơn
+                </h2>
+                <p class="text-muted mb-0 mt-2">
+                    Tìm thấy @filteredCount hóa đơn phù hợp.
+                </p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Mã GD / Ngày tạo</th>
+                            <th>Học viên</th>
+                            <th>Khóa học</th>
+                            <th class="text-end">Số tiền</th>
+                            <th class="text-center">Phương thức</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model == null || !Model.Any())
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-5">
+                                    Không tìm thấy hóa đơn thanh toán nào.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                string studentName = item.Enrollment?.Student_Profile?.User?.full_name ?? "N/A";
+                                string studentEmail = item.Enrollment?.Student_Profile?.User?.email ?? "";
+                                string courseName = item.Enrollment?.Class?.Course?.course_name ?? "N/A";
+
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-uppercase" style="font-family: monospace;">
+                                            #@item.payment_id.ToString().Substring(0, 8)
+                                        </div>
+                                        <small class="text-muted">@item.created_at.ToString("dd/MM/yyyy HH:mm")</small>
+                                    </td>
+
+                                    <td>
+                                        <div class="fw-bold">@studentName</div>
+                                        <small class="text-muted">@studentEmail</small>
+                                    </td>
+
+                                    <td>
+                                        <strong>@courseName</strong>
+                                    </td>
+
+                                    <td class="text-end fw-bold text-danger">
+                                        @item.amount.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) ₫
+                                    </td>
+
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark border">@item.payment_method</span>
+                                    </td>
+
+                                    <td class="text-center">
+                                        @if (item.payment_status == "Pending")
+                                        {
+                                            <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                                        }
+                                        else if (item.payment_status == "Completed")
+                                        {
+                                            <span class="badge bg-success">Đã hoàn thành</span>
+                                        }
+                                        else if (item.payment_status == "Cancelled")
+                                        {
+                                            <span class="badge bg-secondary">Đã hủy</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@item.payment_status</span>
+                                        }
+                                    </td>
+
+                                    <td class="text-center text-nowrap">
+                                        <div class="d-inline-flex align-items-center gap-2">
+
+                                            <!-- Xem chi tiết -->
+                                            <a class="btn btn-sm btn-action btn-view"
+                                               href="@Url.Action("Details", "PaymentManage", new { id = item.payment_id })"
+                                               title="Xem chi tiết">
+                                                <i class="bi bi-eye" aria-hidden="true"></i>
+                                            </a>
+
+                                            <!-- Nút Duyệt (chỉ hiển thị khi ở trạng thái Pending) -->
+                                            @if (item.payment_status == "Pending")
+                                            {
+                                                using (Html.BeginForm("Approve", "PaymentManage", new { paymentId = item.payment_id }, FormMethod.Post, null))
+                                                {
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-outline-success"
+                                                            title="Duyệt thanh toán"
+                                                            onclick="return confirm('Xác nhận đã nhận đủ tiền cho hóa đơn này?');">
+                                                        <i class="bi bi-check-lg" aria-hidden="true"></i>
+                                                    </button>
+                                                }
+                                            }
+
+                                            <!-- Nút Xóa vĩnh viễn -->
+                                            @using (Html.BeginForm("Delete", "PaymentManage", new { paymentId = item.payment_id }, FormMethod.Post, null))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        title="Xóa hóa đơn"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa hoàn toàn hóa đơn này không? Dữ liệu sẽ mất vĩnh viễn!');">
+                                                    <i class="bi bi-trash" aria-hidden="true"></i>
+                                                </button>
+                                            }
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Phân trang -->
+            @if (totalPages > 1)
+            {
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 p-3">
+                    <span class="text-muted">
+                        Trang @currentPage / @totalPages
+                    </span>
+
+                    <nav aria-label="Phân trang hóa đơn">
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", new {
+                                       search = ViewBag.Search,
+                                       statusFilter = ViewBag.StatusFilter,
+                                       page = currentPage - 1
+                                   })">
+                                    Trước
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= totalPages; i++)
+                            {
+                                <li class="page-item @(i == currentPage ? "active" : "")">
+                                    <a class="page-link"
+                                       href="@Url.Action("Index", new {
+                                           search = ViewBag.Search,
+                                           statusFilter = ViewBag.StatusFilter,
+                                           page = i
+                                       })">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", new {
+                                       search = ViewBag.Search,
+                                       statusFilter = ViewBag.StatusFilter,
+                                       page = currentPage + 1
+                                   })">
+                                    Sau
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </section>
+
+    </div>
+</main>

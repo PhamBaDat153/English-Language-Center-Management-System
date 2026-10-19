@@ -385,3 +385,14 @@ D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Sourc
 D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\obj\Debug\Source.csproj.Up2Date
 D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\obj\Debug\Source.dll
 D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\obj\Debug\Source.pdb
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.dll
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.Host.SystemWeb.dll
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.Security.Cookies.dll
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.Security.dll
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.Security.Google.dll
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Owin.dll
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.xml
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.Host.SystemWeb.xml
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.Security.xml
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.Security.Cookies.xml
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.Security.Google.xml

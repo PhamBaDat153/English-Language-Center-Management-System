@@ -50,8 +50,20 @@
                     <h4>Học phí - @Model.tuition_fee.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) ₫</h4>
                 </div>
                 <div class="event_info_register">
-                    <a class="btn_one" href="#">Đăng ký ngay</a>
+                    @using (Html.BeginForm("DangKy", "Enrollment", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <!-- Truyền ngầm course_id kiểu Guid của khóa học hiện tại -->
+                        <input type="hidden" name="courseId" value="@Model.course_id" />
+
+                        <!-- Giữ nguyên class "btn_one" để không bị mất giao diện/CSS cũ -->
+                        <button type="submit" class="btn_one" style="border: none; cursor: pointer;">
+                            Đăng ký ngay
+                        </button>
+                    }
                 </div>
+
                 <div class="related_course">
                     <h3>Khóa học liên quan</h3>
                     @foreach (var item in Model.RelatedCourses)

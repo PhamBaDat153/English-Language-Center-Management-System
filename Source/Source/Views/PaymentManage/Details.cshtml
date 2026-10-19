@@ -1,0 +1,196 @@
+﻿@model Source.Models.Payment
+@using System.Globalization
+
+@{
+    ViewBag.Title = "Chi tiết hóa đơn thanh toán";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    string studentName = Model.Enrollment?.Student_Profile?.User?.full_name ?? "N/A";
+    string studentEmail = Model.Enrollment?.Student_Profile?.User?.email ?? "N/A";
+    string studentPhone = Model.Enrollment?.Student_Profile?.User?.phone_number ?? "N/A";
+    string courseName = Model.Enrollment?.Class?.Course?.course_name ?? "N/A";
+    string classCode = Model.Enrollment?.Class?.class_code ?? "N/A";
+}
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <!-- Tiêu đề trang -->
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-receipt" aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">Chi tiết giao dịch</p>
+                    <h1 class="h3 mb-1">Hóa đơn #@Model.payment_id.ToString().Substring(0, 8).ToUpper()</h1>
+                    <p class="text-muted mb-0">
+                        Thông tin chi tiết học viên, khóa học và trạng thái thanh toán.
+                    </p>
+                </div>
+            </div>
+
+            <div class="heading-actions">
+                <a class="btn btn-outline-secondary btn-sm"
+                   href="@Url.Action("Index", "PaymentManage")">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                    Quay lại danh sách
+                </a>
+            </div>
+        </div>
+
+        <!-- Thông báo -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- PHẦN 1: THÔNG TIN HỌC VIÊN & ĐĂNG KÝ KHÓA HỌC -->
+        <div class="panel mt-4">
+            <div class="panel-header p-3">
+                <h2 class="h5 mb-0 section-title">
+                    <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
+                    Thông tin học viên & Đăng ký
+                </h2>
+            </div>
+
+            <div class="p-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Họ và tên học viên</label>
+                        <input type="text" class="form-control bg-light" value="@studentName" readonly />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Email liên hệ</label>
+                        <input type="text" class="form-control bg-light" value="@studentEmail" readonly />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Số điện thoại</label>
+                        <input type="text" class="form-control bg-light" value="@studentPhone" readonly />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Khóa học đăng ký</label>
+                        <input type="text" class="form-control bg-light fw-bold" value="@courseName" readonly />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Mã lớp học</label>
+                        <input type="text" class="form-control bg-light" value="@classCode" readonly />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Trạng thái đăng ký lớp (Enrollment)</label>
+                        <input type="text" class="form-control bg-light" value="@(Model.Enrollment?.enrollment_status)" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHẦN 2: CHI TIẾT THANH TOÁN & THAO TÁC -->
+        <div class="panel mt-4">
+            <div class="panel-header p-3">
+                <h2 class="h5 mb-0 section-title">
+                    <i class="bi bi-cash-stack" aria-hidden="true"></i>
+                    Chi tiết hóa đơn thanh toán
+                </h2>
+            </div>
+
+            <div class="p-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Số tiền thanh toán</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light text-danger fw-bold fs-5"
+                                   value="@Model.amount.ToString("N0", CultureInfo.GetCultureInfo("vi-VN"))" readonly />
+                            <span class="input-group-text bg-light fw-bold">VNĐ</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Phương thức thanh toán</label>
+                        <input type="text" class="form-control bg-light" value="@Model.payment_method" readonly />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Trạng thái hóa đơn</label>
+                        <div>
+                            @if (Model.payment_status == "Pending")
+                            {
+                                <span class="badge bg-warning text-dark fs-6 px-3 py-2">Chờ duyệt (Pending)</span>
+                            }
+                            else if (Model.payment_status == "Completed")
+                            {
+                                <span class="badge bg-success fs-6 px-3 py-2">Đã hoàn thành (Completed)</span>
+                            }
+                            else if (Model.payment_status == "Cancelled")
+                            {
+                                <span class="badge bg-secondary fs-6 px-3 py-2">Đã hủy (Cancelled)</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary fs-6 px-3 py-2">@Model.payment_status</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Ngày tạo hóa đơn</label>
+                        <input type="text" class="form-control bg-light" value="@Model.created_at.ToString("dd/MM/yyyy HH:mm:ss")" readonly />
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label text-muted">Ghi chú</label>
+                        <textarea class="form-control bg-light" rows="3" readonly>@(string.IsNullOrEmpty(Model.notes) ? "Không có ghi chú" : Model.notes)</textarea>
+                    </div>
+
+                    <!-- NÚT THAO TÁC DUYỆT / HỦY HÓA ĐƠN -->
+                    <div class="col-12 d-flex flex-wrap gap-2 mt-4 pt-2 border-top">
+                        @if (Model.payment_status == "Pending")
+                        {
+                            using (Html.BeginForm("Approve", "PaymentManage", new { paymentId = Model.payment_id }, FormMethod.Post, null))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-success" onclick="return confirm('Xác nhận đã nhận đủ tiền cho hóa đơn này?');">
+                                    <i class="bi bi-check2-circle me-1"></i>
+                                    Duyệt thanh toán
+                                </button>
+                            }
+
+                            using (Html.BeginForm("Cancel", "PaymentManage", new { paymentId = Model.payment_id }, FormMethod.Post, null))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Bạn có chắc muốn hủy hóa đơn này không?');">
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    Hủy hóa đơn
+                                </button>
+                            }
+                        }
+
+                        <a href="@Url.Action("Index", "PaymentManage")" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Quay lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>

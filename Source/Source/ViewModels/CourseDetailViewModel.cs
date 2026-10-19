@@ -8,6 +8,7 @@ namespace Source.ViewModels
 {
     public class CourseDetailViewModel
     {
+        public System.Guid course_id { get; set; }
         public string course_code { get; set; }
         public string course_name { get; set; }
         public string level { get; set; }

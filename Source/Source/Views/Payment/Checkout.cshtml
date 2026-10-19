@@ -1,0 +1,201 @@
+@model Source.Models.Payment
+@using System.Globalization
+@{
+    ViewBag.Title = "Thanh toán qua Ví MoMo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // =========================================================
+    // THÔNG TIN CẤU HÌNH VÍ MOMO CỦA TRUNG TÂM (SỬA LẠI THEO Ý BẠN)
+    // =========================================================
+    string momoPhone = "0987654321";              // Số điện thoại nhận MoMo
+    string momoName = "TRUNG TÂM ANH NGỮ NEWGEN";  // Tên chủ tài khoản MoMo
+
+    // Tạo nội dung chuyển khoản ngắn gọn (Ví dụ: NGEN 12345678)
+    string paymentCode = "NGEN " + Model.payment_id.ToString().Substring(0, 8).ToUpper();
+
+    // Tên khóa học
+    string courseName = Model.Enrollment?.Class?.Course?.course_name ?? "Khóa học Anh ngữ";
+
+    // Chuỗi định dạng QR Code MoMo chuẩn
+    // Cú pháp MoMo: 2|99|SỐ_ĐIỆN_THOẠI|TÊN_CHỦ_TK|EMAIL|0|0|SỐ_TIỀN|NỘI_DUNG|transfer_myqr
+    string rawMomoData = $"2|99|{momoPhone}|{momoName}||0|0|{(long)Model.amount}|{paymentCode}|transfer_myqr";
+    string qrCodeUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={Url.Encode(rawMomoData)}";
+}
+
+<style>
+    .momo-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(165, 0, 100, 0.15);
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .momo-header {
+        background: linear-gradient(135deg, #a50064, #d82d8b);
+        color: white;
+        padding: 25px 20px;
+        text-align: center;
+    }
+
+        .momo-header img {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: white;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+    .momo-qr-box {
+        background: #fff5f8;
+        border: 2px dashed #d82d8b;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .momo-qr-img {
+        max-width: 230px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .info-label {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+    }
+
+    .info-value {
+        font-weight: bold;
+        color: #222;
+        font-size: 1.05rem;
+    }
+
+    .btn-copy {
+        background-color: #fce4ec;
+        color: #a50064;
+        border: none;
+        padding: 2px 10px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .btn-copy:hover {
+            background-color: #a50064;
+            color: white;
+        }
+
+    .btn-momo-done {
+        background: linear-gradient(135deg, #a50064, #d82d8b);
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 30px;
+        padding: 12px 30px;
+        width: 100%;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+    }
+
+        .btn-momo-done:hover {
+            opacity: 0.95;
+            color: white;
+            transform: translateY(-2px);
+        }
+</style>
+
+<section class="section-padding py-5" style="background-color: #f8f9fa;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 col-12">
+                <div class="card momo-card">
+                    <!-- HEADER MOMO -->
+                    <div class="momo-header">
+                        <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo Logo" />
+                        <h3 class="m-0 font-weight-bold" style="font-size: 1.5rem;">Thanh toán qua Ví MoMo</h3>
+                        <p class="m-0 mt-1" style="opacity: 0.9; font-size: 0.95rem;">Quét mã QR để hoàn tất đăng ký khóa học</p>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- MÃ QR CODE -->
+                        <div class="momo-qr-box">
+                            <img src="@qrCodeUrl" alt="Mã QR Thanh Toán MoMo" class="momo-qr-img img-fluid" />
+                            <p class="mt-3 mb-0 text-muted" style="font-size: 0.85rem;">
+                                <i class="fa fa-camera mr-1"></i> Mở ứng dụng <b>MoMo</b> và chọn <b>Quét Mã</b>
+                            </p>
+                        </div>
+
+                        <!-- THÔNG TIN CHUYỂN KHOẢN -->
+                        <div class="payment-details">
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                <div>
+                                    <div class="info-label">Số tiền cần thanh toán</div>
+                                    <div class="info-value text-danger" style="font-size: 1.3rem;">
+                                        @Model.amount.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) ₫
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-copy" onclick="copyText('@((long)Model.amount)')">
+                                    <i class="fa fa-copy"></i> Copy tiền
+                                </button>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                <div>
+                                    <div class="info-label">Nội dung chuyển khoản</div>
+                                    <div class="info-value text-primary" id="paymentCode">@paymentCode</div>
+                                </div>
+                                <button type="button" class="btn-copy" onclick="copyText('@paymentCode')">
+                                    <i class="fa fa-copy"></i> Copy nội dung
+                                </button>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                <div>
+                                    <div class="info-label">Số điện thoại nhận</div>
+                                    <div class="info-value">@momoPhone</div>
+                                </div>
+                                <button type="button" class="btn-copy" onclick="copyText('@momoPhone')">
+                                    <i class="fa fa-copy"></i> Copy SĐT
+                                </button>
+                            </div>
+
+                            <div class="mb-3 pb-2 border-bottom">
+                                <div class="info-label">Tên tài khoản nhận</div>
+                                <div class="info-value">@momoName</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="info-label">Khóa học đăng ký</div>
+                                <div class="info-value" style="color: #444;">@courseName</div>
+                            </div>
+                        </div>
+
+                        <!-- LƯU Ý & NÚT XÁC NHẬN -->
+                        <div class="alert alert-warning border-0 small text-center mb-4" style="border-radius: 10px; background-color: #fff8e1;">
+                            <b>Lưu ý:</b> Vui lòng nhập chính xác <b>Nội dung chuyển khoản</b> để hệ thống đối soát tự động nhanh chóng.
+                        </div>
+
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-momo-done text-center d-block text-decoration-none">
+                            <i class="fa fa-check-circle mr-2"></i> Tôi đã hoàn thành chuyển khoản
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function copyText(text) {
+        navigator.clipboard.writeText(text).then(function () {
+            alert("Đã sao chép: " + text);
+        }, function (err) {
+            console.error('Lỗi khi sao chép: ', err);
+        });
+    }
+</script>
