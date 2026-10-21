@@ -101,6 +101,16 @@ namespace Source.Controllers
                     .Take(pageSize)
                     .ToList();
 
+                // Tính sĩ số trên các trạng thái đang giữ chỗ/đang học để danh sách phản ánh sức chứa thực.
+                var classIds = classes.Select(c => c.class_id).ToList();
+                ViewBag.ActiveEnrollmentCounts = db.Enrollments
+                    .Where(e => classIds.Contains(e.class_id) &&
+                                (e.enrollment_status == "Pending" ||
+                                 e.enrollment_status == "Confirmed" ||
+                                 e.enrollment_status == "Studying"))
+                    .GroupBy(e => e.class_id)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
                 ViewBag.TotalItems = totalItems;
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages =
@@ -140,6 +150,7 @@ namespace Source.Controllers
                     class_id = Guid.NewGuid(),
                     start_date = DateTime.Today,
                     end_date = DateTime.Today,
+                    class_capacity = 20,
                     created_at = DateTime.Now,
                     updated_at = DateTime.Now,
                     class_status = "Planned"
@@ -194,6 +205,14 @@ namespace Source.Controllers
                         "Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu.");
                 }
 
+                // Kiểm tra sức chứa lớp trước khi ghi, đồng thời bảo đảm lớp vừa được sức chứa phòng.
+                if (model.class_capacity <= 0)
+                {
+                    ModelState.AddModelError(
+                        "class_capacity",
+                        "Sĩ số tối đa phải lớn hơn 0.");
+                }
+
                 // Kiểm tra trạng thái thuộc enum ClassStatus.
                 if (!ClassStatuses.Contains(model.class_status))
                 {
@@ -230,14 +249,20 @@ namespace Source.Controllers
                 // Phòng học cũng là tùy chọn.
                 if (model.room_id.HasValue)
                 {
-                    bool roomExists = db.Set<Room>().Any(r =>
+                    var selectedRoom = db.Set<Room>().SingleOrDefault(r =>
                         r.room_id == model.room_id.Value);
 
-                    if (!roomExists)
+                    if (selectedRoom == null)
                     {
                         ModelState.AddModelError(
                             "room_id",
                             "Phòng học được chọn không tồn tại.");
+                    }
+                    else if (model.class_capacity > selectedRoom.max_capacity)
+                    {
+                        ModelState.AddModelError(
+                            "class_capacity",
+                            "Sĩ số lớp không được vượt quá sức chứa của phòng.");
                     }
                 }
 
@@ -318,6 +343,12 @@ namespace Source.Controllers
                     return HttpNotFound();
                 }
 
+                ViewBag.ActiveEnrollmentCount = db.Enrollments.Count(e =>
+                    e.class_id == classItem.class_id &&
+                    (e.enrollment_status == "Pending" ||
+                     e.enrollment_status == "Confirmed" ||
+                     e.enrollment_status == "Studying"));
+
                 LoadDropdowns(
                     classItem.course_id,
                     classItem.teacher_id,
@@ -396,6 +427,34 @@ namespace Source.Controllers
                         "Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu.");
                 }
 
+                // Không cho giảm sĩ số xuống thấp hơn lượng chỗ đã giữ hoặc học viên đang học.
+                int activeEnrollmentCount = db.Enrollments.Count(e =>
+                    e.class_id == classItem.class_id &&
+                    (e.enrollment_status == "Pending" ||
+                     e.enrollment_status == "Confirmed" ||
+                     e.enrollment_status == "Studying"));
+
+                if (model.class_capacity <= 0)
+                {
+                    ModelState.AddModelError(
+                        "class_capacity",
+                        "Sĩ số tối đa phải lớn hơn 0.");
+                }
+                else if (model.class_capacity < activeEnrollmentCount)
+                {
+                    ModelState.AddModelError(
+                        "class_capacity",
+                        "Sĩ số tối đa không thể nhỏ hơn số học viên đang giữ chỗ hoặc đang học.");
+                }
+
+                if (model.course_id != classItem.course_id &&
+                    db.Enrollments.Any(e => e.class_id == classItem.class_id))
+                {
+                    ModelState.AddModelError(
+                        "course_id",
+                        "Không thể đổi khóa học của lớp đã có học viên đăng ký.");
+                }
+
                 if (!ClassStatuses.Contains(model.class_status))
                 {
                     ModelState.AddModelError(
@@ -428,6 +487,17 @@ namespace Source.Controllers
                         "room_id",
                         "Phòng học được chọn không tồn tại.");
                 }
+                else if (model.room_id.HasValue)
+                {
+                    var selectedRoom = db.Set<Room>().Single(r =>
+                        r.room_id == model.room_id.Value);
+                    if (model.class_capacity > selectedRoom.max_capacity)
+                    {
+                        ModelState.AddModelError(
+                            "class_capacity",
+                            "Sĩ số lớp không được vượt quá sức chứa của phòng.");
+                    }
+                }
 
                 if (!ModelState.IsValid)
                 {
@@ -435,6 +505,7 @@ namespace Source.Controllers
                         model.course_id,
                         model.teacher_id,
                         model.room_id);
+                    ViewBag.ActiveEnrollmentCount = activeEnrollmentCount;
 
                     return View(model);
                 }
@@ -444,6 +515,7 @@ namespace Source.Controllers
                 classItem.course_id = model.course_id;
                 classItem.teacher_id = model.teacher_id;
                 classItem.room_id = model.room_id;
+                classItem.class_capacity = model.class_capacity;
                 classItem.start_date = model.start_date;
                 classItem.end_date = model.end_date;
                 classItem.class_status = model.class_status;

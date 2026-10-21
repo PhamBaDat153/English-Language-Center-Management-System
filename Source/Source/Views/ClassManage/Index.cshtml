@@ -9,6 +9,8 @@
     int totalPages = ViewBag.TotalPages ?? 0;
     int totalItems = ViewBag.TotalItems ?? 0;
     int pageSize = ViewBag.PageSize ?? 15;
+    var activeEnrollmentCounts = ViewBag.ActiveEnrollmentCounts as System.Collections.Generic.Dictionary<System.Guid, int>
+        ?? new System.Collections.Generic.Dictionary<System.Guid, int>();
 
     int firstItem = totalItems == 0
         ? 0
@@ -224,6 +226,7 @@
                             <th>Phòng học</th>
                             <th>Ngày bắt đầu</th>
                             <th>Ngày kết thúc</th>
+                            <th class="text-center">Sĩ số</th>
                             <th class="text-center">Trạng thái</th>
                             <th class="text-end">Thao tác</th>
                         </tr>
@@ -232,7 +235,7 @@
                         @if (Model == null || !Model.Any())
                         {
                             <tr>
-                                <td class="text-center text-muted py-5" colspan="8">
+                                <td class="text-center text-muted py-5" colspan="9">
                                     <i class="bi bi-easel d-block fs-2 mb-2"
                                        aria-hidden="true"></i>
                                     Không tìm thấy lớp học phù hợp.
@@ -243,6 +246,9 @@
                         {
                             foreach (var item in Model)
                             {
+                                int activeCount = activeEnrollmentCounts.ContainsKey(item.class_id)
+                                    ? activeEnrollmentCounts[item.class_id]
+                                    : 0;
                     <tr>
                         <td>
                             <strong>@item.class_code</strong>
@@ -268,6 +274,7 @@
                         </td>
                         <td>@item.start_date.ToString("dd/MM/yyyy")</td>
                         <td>@item.end_date.ToString("dd/MM/yyyy")</td>
+                        <td class="text-center">@activeCount / @item.class_capacity</td>
                         <td class="text-center">
                             @switch (item.class_status)
                             {

@@ -129,6 +129,68 @@ namespace Source.Controllers
             try
             {
                 Course course = await db.Courses.FirstOrDefaultAsync(c => c.course_id == id && c.available_status == "Available");
+                if (course == null)
+                {
+                    return HttpNotFound();
+                }
+
+                // Chỉ đưa ra lớp đang mở, sắp khai giảng, có lịch cụ thể và phòng còn sử dụng được.
+                var classes = await db.Classes
+                    .Include(c => c.Room)
+                    .Include(c => c.ClassSchedules.Select(s => s.TimeSlot))
+                    .Where(c => c.course_id == id &&
+                                c.class_status == "Open" &&
+                                c.start_date >= DateTime.Today &&
+                                c.end_date >= DateTime.Today &&
+                                c.ClassSchedules.Any() &&
+                                (c.Room == null || c.Room.available_status == "Available"))
+                    .OrderBy(c => c.start_date)
+                    .ThenBy(c => c.class_code)
+                    .ToListAsync();
+
+                var classIds = classes.Select(c => c.class_id).ToList();
+                // Pending cũng giữ chỗ trong lúc thanh toán; chỉ trạng thái kết thúc mới nhả chỗ.
+                var activeEnrollmentCounts = await db.Enrollments
+                    .Where(e => classIds.Contains(e.class_id) &&
+                                (e.enrollment_status == "Pending" ||
+                                 e.enrollment_status == "Confirmed" ||
+                                 e.enrollment_status == "Studying"))
+                    .GroupBy(e => e.class_id)
+                    .Select(g => new { ClassId = g.Key, Count = g.Count() })
+                    .ToListAsync();
+                var countByClassId = activeEnrollmentCounts.ToDictionary(x => x.ClassId, x => x.Count);
+
+                var classOptions = classes.Select(classItem =>
+                {
+                    int enrolledCount = countByClassId.ContainsKey(classItem.class_id)
+                        ? countByClassId[classItem.class_id]
+                        : 0;
+                    // Sĩ số thực tế không được vượt quá giới hạn lớp hoặc giới hạn phòng.
+                    int capacity = classItem.Room == null
+                        ? classItem.class_capacity
+                        : Math.Min(classItem.class_capacity, classItem.Room.max_capacity);
+                    string scheduleText = string.Join(", ", classItem.ClassSchedules
+                        .OrderBy(s => s.week_day)
+                        .ThenBy(s => s.TimeSlot.start_time)
+                        .Select(s => TranslateWeekDay(s.week_day) + " " + s.TimeSlot.slot_name + " (" +
+                                     s.TimeSlot.start_time.ToString(@"hh\:mm") + "–" +
+                                     s.TimeSlot.end_time.ToString(@"hh\:mm") + ")"));
+
+                    return new ClassOptionViewModel
+                    {
+                        ClassId = classItem.class_id,
+                        ClassCode = classItem.class_code,
+                        StartDate = classItem.start_date,
+                        EndDate = classItem.end_date,
+                        Capacity = capacity,
+                        EnrolledCount = enrolledCount,
+                        ScheduleText = string.IsNullOrWhiteSpace(scheduleText)
+                            ? "Chưa xếp lịch học"
+                            : scheduleText,
+                        RoomName = classItem.Room == null ? "Chưa xếp phòng" : classItem.Room.room_name,
+                        IsFull = enrolledCount >= capacity
+                    };
+                }).ToList();
 
                 CourseDetailViewModel detailViewModel = new CourseDetailViewModel
                 {
@@ -139,6 +201,7 @@ namespace Source.Controllers
                     duration_weeks = course.duration_weeks,
                     level = course.level,
                     tuition_fee = course.tuition_fee,
+                    AvailableClasses = classOptions,
                     RelatedCourses = await db.Courses
                                     .Where(c => c.level == course.level
                                              && c.course_id != course.course_id
@@ -148,9 +211,28 @@ namespace Source.Controllers
 
                 return View(detailViewModel);
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.TraceError(
+                    "HomeController.Details failed for course {0}: {1}",
+                    id,
+                    ex);
                 return RedirectToAction("ServerError", "Error");
+            }
+        }
+
+        private static string TranslateWeekDay(string weekDay)
+        {
+            switch (weekDay)
+            {
+                case "Monday": return "Thứ hai";
+                case "Tuesday": return "Thứ ba";
+                case "Wednesday": return "Thứ tư";
+                case "Thursday": return "Thứ năm";
+                case "Friday": return "Thứ sáu";
+                case "Saturday": return "Thứ bảy";
+                case "Sunday": return "Chủ nhật";
+                default: return weekDay;
             }
         }
 

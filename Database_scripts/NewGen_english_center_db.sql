@@ -197,6 +197,7 @@ CREATE TABLE dbo.[Class] (
     class_code varchar(50) NOT NULL,
     start_date date NOT NULL,
     end_date date NOT NULL,
+    class_capacity int NOT NULL CONSTRAINT DF_Classes_ClassCapacity DEFAULT (20),
     created_at datetime2(3) NOT NULL,
     updated_at datetime2(3) NOT NULL,
     class_status varchar(20) NOT NULL,
@@ -206,6 +207,7 @@ CREATE TABLE dbo.[Class] (
     CONSTRAINT FK_Classes_Course FOREIGN KEY (course_id) REFERENCES dbo.[Course](course_id),
     CONSTRAINT FK_Classes_Room FOREIGN KEY (room_id) REFERENCES dbo.[Room](room_id),
     CONSTRAINT CK_Classes_Dates CHECK (end_date >= start_date),
+    CONSTRAINT CK_Classes_Capacity CHECK (class_capacity > 0),
     CONSTRAINT CK_Classes_Status CHECK (class_status IN ('Planned','Open','InProgress','Completed','Cancelled'))
 );
 GO

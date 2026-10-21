@@ -30,6 +30,7 @@ namespace Source.Models
         public string class_code { get; set; }
         public System.DateTime start_date { get; set; }
         public System.DateTime end_date { get; set; }
+        public int class_capacity { get; set; }
         public System.DateTime created_at { get; set; }
         public System.DateTime updated_at { get; set; }
         public string class_status { get; set; }

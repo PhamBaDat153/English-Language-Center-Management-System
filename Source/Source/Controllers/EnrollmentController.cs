@@ -1,5 +1,6 @@
 ﻿using Source.Models;
 using System;
+using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -67,130 +68,155 @@ namespace Source.Controllers
                     return RedirectToAction("Login", "Authentication");
                 }
 
-                // =========================================================
-                // 2. KẾT NỐI / TỰ ĐỘNG TẠO HỒ SƠ HỌC VIÊN (STUDENT_PROFILE)
-                // =========================================================
+                // Tìm hồ sơ học viên; chỉ tạo hồ sơ sau khi xác nhận lớp còn chỗ.
                 var studentProfile = await db.Student_Profile
                     .FirstOrDefaultAsync(s => s.user_id == currentUser.user_id);
 
-                if (studentProfile == null)
-                {
-                    studentProfile = new Student_Profile
-                    {
-                        student_id = Guid.NewGuid(),
-                        user_id = currentUser.user_id,
-                        student_code = "STD-" + DateTime.Now.ToString("yyMMddHHmmss"),
-                        student_status = "Active",       // Khớp CK_Students_Status ('Active')
-                        available_status = "Available",  // Khớp CK_Students_Available ('Available')
-                        created_at = DateTime.Now,
-                        updated_at = DateTime.Now
-                    };
-                    db.Student_Profile.Add(studentProfile);
-                    await db.SaveChangesAsync();
-                }
-
-                // =========================================================
-                // 3. TÌM KHÓA HỌC & LỚP HỌC (CHUẨN CHECK CONSTRAINT 'Open')
-                // =========================================================
-                var course = await db.Courses.Include(c => c.Classes).FirstOrDefaultAsync(c => c.course_id == courseId);
+                var course = await db.Courses.FirstOrDefaultAsync(c =>
+                    c.course_id == courseId && c.available_status == "Available");
                 if (course == null)
                 {
-                    return HttpNotFound("Không tìm thấy thông tin khóa học!");
+                    return HttpNotFound("Không tìm thấy khóa học hoặc khóa học đã đóng.");
                 }
 
-                Guid targetClassId;
-                if (classId.HasValue)
+                if (!classId.HasValue || classId.Value == Guid.Empty)
                 {
-                    targetClassId = classId.Value;
+                    TempData["ErrorMessage"] = "Vui lòng chọn lớp học trước khi đăng ký.";
+                    return RedirectToAction("Details", "Home", new { id = courseId });
                 }
-                else
+
+                using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
                 {
-                    var firstClass = course.Classes.FirstOrDefault();
-                    if (firstClass == null)
+                    // Giữ khóa trên dòng lớp trong suốt giao dịch để hai lượt đăng ký
+                    // đồng thời không thể cùng nhận chỗ cuối cùng.
+                    Guid lockedClassId = await db.Database.SqlQuery<Guid>(
+                        "SELECT class_id FROM dbo.[Class] WITH (UPDLOCK, HOLDLOCK) WHERE class_id = @p0",
+                        classId.Value).SingleOrDefaultAsync();
+
+                    if (lockedClassId == Guid.Empty)
                     {
-                        var newClass = new Class
+                        TempData["ErrorMessage"] = "Không tìm thấy lớp đã chọn.";
+                        return RedirectToAction("Details", "Home", new { id = courseId });
+                    }
+
+                    var targetClass = await db.Classes
+                        .Include(c => c.Room)
+                        .FirstOrDefaultAsync(c =>
+                            c.class_id == lockedClassId &&
+                            c.course_id == courseId);
+
+                    if (targetClass == null)
+                    {
+                        TempData["ErrorMessage"] = "Lớp đã chọn không thuộc khóa học này.";
+                        return RedirectToAction("Details", "Home", new { id = courseId });
+                    }
+
+                    if (targetClass.class_status != "Open" ||
+                        targetClass.start_date.Date < DateTime.Today ||
+                        targetClass.end_date.Date < DateTime.Today ||
+                        !await db.ClassSchedules.AnyAsync(s => s.class_id == targetClass.class_id) ||
+                        (targetClass.Room != null && targetClass.Room.available_status != "Available"))
+                    {
+                        TempData["ErrorMessage"] = "Lớp đã chọn hiện không mở đăng ký.";
+                        return RedirectToAction("Details", "Home", new { id = courseId });
+                    }
+
+                    // Room có thể giới hạn thêm sĩ số; khi không có phòng, dùng giới hạn riêng của lớp.
+                    int capacity = targetClass.Room == null
+                        ? targetClass.class_capacity
+                        : Math.Min(targetClass.class_capacity, targetClass.Room.max_capacity);
+
+                    var existingEnrollment = studentProfile == null
+                        ? null
+                        : await db.Enrollments.FirstOrDefaultAsync(e =>
+                            e.student_id == studentProfile.student_id &&
+                            e.class_id == targetClass.class_id);
+
+                    if (existingEnrollment != null)
+                    {
+                        if (existingEnrollment.enrollment_status == "Pending")
                         {
-                            class_id = Guid.NewGuid(),
-                            course_id = course.course_id,
-                            class_code = course.course_code + "-C" + DateTime.Now.ToString("yyMMddHHmmss"),
-                            start_date = DateTime.Now.AddDays(7),
-                            end_date = DateTime.Now.AddMonths(3),
+                            var existingPayment = await db.Payments.FirstOrDefaultAsync(p =>
+                                p.enrollment_id == existingEnrollment.enrollment_id);
+                            if (existingPayment != null)
+                            {
+                                return RedirectToAction("Checkout", "Payment", new { id = existingPayment.payment_id });
+                            }
+                        }
+
+                        TempData["ErrorMessage"] = "Bạn đã có đăng ký cho lớp này.";
+                        return RedirectToAction("Details", "Home", new { id = courseId });
+                    }
+
+                    // Đếm trong giao dịch đang khóa dòng lớp, để không thể vượt sức chứa do đăng ký đồng thời.
+                    int activeEnrollmentCount = await db.Enrollments.CountAsync(e =>
+                        e.class_id == targetClass.class_id &&
+                        (e.enrollment_status == "Pending" ||
+                         e.enrollment_status == "Confirmed" ||
+                         e.enrollment_status == "Studying"));
+
+                    if (activeEnrollmentCount >= capacity)
+                    {
+                        TempData["ErrorMessage"] = "Lớp vừa đủ sĩ số. Vui lòng chọn lớp khác.";
+                        return RedirectToAction("Details", "Home", new { id = courseId });
+                    }
+
+                    if (studentProfile == null)
+                    {
+                        studentProfile = new Student_Profile
+                        {
+                            student_id = Guid.NewGuid(),
+                            user_id = currentUser.user_id,
+                            student_code = "STD-" + DateTime.Now.ToString("yyMMddHHmmss"),
+                            student_status = "Active",
+                            available_status = "Available",
                             created_at = DateTime.Now,
-                            updated_at = DateTime.Now,
-                            class_status = "Open" // Khớp CK_Classes_Status ('Open')
+                            updated_at = DateTime.Now
                         };
-                        db.Classes.Add(newClass);
-                        await db.SaveChangesAsync();
-                        targetClassId = newClass.class_id;
+                        db.Student_Profile.Add(studentProfile);
                     }
-                    else
+
+                    var enrollment = new Enrollment
                     {
-                        targetClassId = firstClass.class_id;
-                    }
-                }
+                        enrollment_id = Guid.NewGuid(),
+                        class_id = targetClass.class_id,
+                        student_id = studentProfile.student_id,
+                        enrollment_date = DateTime.Now,
+                        tuition_amount = course.tuition_fee,
+                        created_at = DateTime.Now,
+                        updated_at = DateTime.Now,
+                        enrollment_status = "Pending"
+                    };
+                    db.Enrollments.Add(enrollment);
 
-                // Nếu đã từng đăng ký trước đó -> Chuyển thẳng tới đơn thanh toán cũ
-                var existingEnrollment = await db.Enrollments
-                    .FirstOrDefaultAsync(e => e.student_id == studentProfile.student_id && e.class_id == targetClassId);
+                    string uniqueReceipt = "REC-" + DateTime.Now.ToString("yyMMddHHmmss") + "-" + new Random().Next(100, 999);
 
-                if (existingEnrollment != null)
-                {
-                    var existingPayment = await db.Payments
-                        .FirstOrDefaultAsync(p => p.enrollment_id == existingEnrollment.enrollment_id);
-
-                    if (existingPayment != null)
+                    var payment = new Payment
                     {
-                        return RedirectToAction("Checkout", "Payment", new { id = existingPayment.payment_id });
-                    }
+                        payment_id = Guid.NewGuid(),
+                        enrollment_id = enrollment.enrollment_id,
+                        recorded_by = currentUser.user_id,
+                        amount = course.tuition_fee,
+                        receipt_number = uniqueReceipt,
+                        payment_date = DateTime.Now,
+                        created_at = DateTime.Now,
+                        payment_status = "Pending",
+                        payment_method = "BankTransfer"
+                    };
+                    db.Payments.Add(payment);
+
+                    // Lưu enrollment và payment cùng nhau; nếu một bước lỗi, giao dịch sẽ rollback.
+                    await db.SaveChangesAsync();
+                    transaction.Commit();
+
+                    return RedirectToAction("Checkout", "Payment", new { id = payment.payment_id });
                 }
-
-                // =========================================================
-                // 4. TẠO BẢN GHI ENROLLMENT VÀ PAYMENT
-                // =========================================================
-                var enrollment = new Enrollment
-                {
-                    enrollment_id = Guid.NewGuid(),
-                    class_id = targetClassId,
-                    student_id = studentProfile.student_id,
-                    enrollment_date = DateTime.Now,
-                    tuition_amount = course.tuition_fee,
-                    created_at = DateTime.Now,
-                    updated_at = DateTime.Now,
-                    enrollment_status = "Pending" // Khớp CK_Enrollments_Status ('Pending')
-                };
-                db.Enrollments.Add(enrollment);
-
-                // Tạo mã biên lai tự động không trùng lặp (Khắc phục lỗi UQ_Payments_Receipt)
-                string uniqueReceipt = "REC-" + DateTime.Now.ToString("yyMMddHHmmss") + "-" + new Random().Next(100, 999);
-
-                var payment = new Payment
-                {
-                    payment_id = Guid.NewGuid(),
-                    enrollment_id = enrollment.enrollment_id,
-                    recorded_by = currentUser.user_id,
-                    amount = course.tuition_fee,
-                    receipt_number = uniqueReceipt,   // Gán giá trị biên lai duy nhất
-                    payment_date = DateTime.Now,
-                    created_at = DateTime.Now,
-                    payment_status = "Pending",       // Khớp CK_Payments_Status ('Pending')
-                    payment_method = "BankTransfer"  // Khớp CK_Payments_Method ('BankTransfer')
-                };
-                db.Payments.Add(payment);
-
-                // Lưu dữ liệu vào SQL Server
-                await db.SaveChangesAsync();
-
-                // =========================================================
-                // 5. CHUYỂN HƯỚNG TỚI TRANG THANH TOÁN (PAYMENT/CHECKOUT)
-                // =========================================================
-                return RedirectToAction("Checkout", "Payment", new { id = payment.payment_id });
             }
             catch (Exception ex)
             {
-                string sqlError = ex.GetBaseException().Message;
-                return Content("<div style='color:red; padding: 30px; font-family: sans-serif;'>" +
-                               "<h2>Lỗi SQL Server:</h2>" +
-                               "<p><b>Chi tiết:</b> " + sqlError + "</p></div>");
+                System.Diagnostics.Trace.TraceError("Enrollment.DangKy failed: {0}", ex);
+                TempData["ErrorMessage"] = "Không thể hoàn tất đăng ký. Vui lòng thử lại.";
+                return RedirectToAction("Details", "Home", new { id = courseId });
             }
         }
 

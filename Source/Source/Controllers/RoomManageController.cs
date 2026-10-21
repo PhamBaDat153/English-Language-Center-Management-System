@@ -262,6 +262,16 @@ namespace Source.Controllers
                         "Sức chứa phải lớn hơn 0.");
                 }
 
+                // Không để thay đổi sức chứa phòng làm lớp đang dùng phòng vượt giới hạn.
+                if (db.Classes.Any(c =>
+                    c.room_id == existingRoom.room_id &&
+                    c.class_capacity > room.max_capacity))
+                {
+                    ModelState.AddModelError(
+                        "max_capacity",
+                        "Sức chứa phòng không thể nhỏ hơn sĩ số tối đa của lớp đang sử dụng phòng này.");
+                }
+
                 if (room.available_status != "Available" &&
                     room.available_status != "Unavailable")
                 {

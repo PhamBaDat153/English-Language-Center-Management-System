@@ -16,5 +16,19 @@ namespace Source.ViewModels
         public int duration_weeks { get; set; }
         public decimal tuition_fee { get; set; }
         public List<Course> RelatedCourses { get; set; } = new List<Course>();
+        public List<ClassOptionViewModel> AvailableClasses { get; set; } = new List<ClassOptionViewModel>();
+    }
+
+    public class ClassOptionViewModel
+    {
+        public Guid ClassId { get; set; }
+        public string ClassCode { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int Capacity { get; set; }
+        public int EnrolledCount { get; set; }
+        public string ScheduleText { get; set; }
+        public string RoomName { get; set; }
+        public bool IsFull { get; set; }
     }
 }

@@ -83,6 +83,19 @@
                     </div>
 
                     <div class="col-12 col-md-6">
+                        @Html.LabelFor(m => m.class_capacity, "Sĩ số tối đa",
+                            new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.class_capacity,
+                            new { @class = "form-control", type = "number", min = "1" })
+                        <div class="form-text">
+                            Đang giữ chỗ/đang học: @ViewBag.ActiveEnrollmentCount học viên.
+                            Không được vượt quá sức chứa phòng.
+                        </div>
+                        @Html.ValidationMessageFor(m => m.class_capacity, "",
+                            new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="col-12 col-md-6">
                         @Html.LabelFor(m => m.teacher_id, "Giáo viên",
                             new { @class = "form-label fw-semibold" })
                         @Html.DropDownListFor(m => m.teacher_id,

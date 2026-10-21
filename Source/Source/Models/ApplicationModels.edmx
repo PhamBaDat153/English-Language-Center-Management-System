@@ -55,6 +55,7 @@
           <Property Name="class_code" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="start_date" Type="date" Nullable="false" />
           <Property Name="end_date" Type="date" Nullable="false" />
+          <Property Name="class_capacity" Type="int" Nullable="false" />
           <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
           <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
           <Property Name="class_status" Type="varchar" MaxLength="20" Nullable="false" />
@@ -777,6 +778,7 @@
           <Property Name="class_code" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="start_date" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="end_date" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="class_capacity" Type="Int32" Nullable="false" />
           <Property Name="created_at" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="updated_at" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="class_status" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
@@ -1503,6 +1505,7 @@
                 <ScalarProperty Name="class_code" ColumnName="class_code" />
                 <ScalarProperty Name="start_date" ColumnName="start_date" />
                 <ScalarProperty Name="end_date" ColumnName="end_date" />
+                <ScalarProperty Name="class_capacity" ColumnName="class_capacity" />
                 <ScalarProperty Name="created_at" ColumnName="created_at" />
                 <ScalarProperty Name="updated_at" ColumnName="updated_at" />
                 <ScalarProperty Name="class_status" ColumnName="class_status" />

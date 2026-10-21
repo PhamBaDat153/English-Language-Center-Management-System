@@ -50,17 +50,68 @@
                     <h4>Học phí - @Model.tuition_fee.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) ₫</h4>
                 </div>
                 <div class="event_info_register">
-                    @using (Html.BeginForm("DangKy", "Enrollment", FormMethod.Post))
+                    <h3>Chọn lớp học</h3>
+                    @if (TempData["ErrorMessage"] != null)
                     {
-                        @Html.AntiForgeryToken()
+                        <div class="alert alert-danger" role="alert">@TempData["ErrorMessage"]</div>
+                    }
+                    @if (Model.AvailableClasses == null || !Model.AvailableClasses.Any())
+                    {
+                        <div class="alert alert-info">
+                            Hiện chưa có lớp nào mở đăng ký cho khóa học này.
+                        </div>
+                    }
+                    else
+                    {
+                        using (Html.BeginForm("DangKy", "Enrollment", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="courseId" value="@Model.course_id" />
 
-                        <!-- Truyền ngầm course_id kiểu Guid của khóa học hiện tại -->
-                        <input type="hidden" name="courseId" value="@Model.course_id" />
+                            foreach (var classOption in Model.AvailableClasses)
+                            {
+                                <label class="d-block border rounded p-3 mb-2 @(classOption.IsFull ? "text-muted bg-light" : "")"
+                                       style="cursor: @(classOption.IsFull ? "not-allowed" : "pointer")">
+                                    <span class="d-flex align-items-start gap-2">
+                                        <input type="radio" name="classId" value="@classOption.ClassId"
+                                               required @(classOption.IsFull ? "disabled" : "") />
+                                        <span>
+                                            <strong>@classOption.ClassCode</strong>
+                                            <br />
+                                            <small>@classOption.ScheduleText</small>
+                                            <br />
+                                            <small>@classOption.StartDate.ToString("dd/MM/yyyy") – @classOption.EndDate.ToString("dd/MM/yyyy")</small>
+                                            <br />
+                                            <small>@classOption.RoomName</small>
+                                            <br />
+                                            @if (classOption.IsFull)
+                                            {
+                                                <span class="badge bg-secondary">Đã đủ sĩ số</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success">
+                                                    Còn @(classOption.Capacity - classOption.EnrolledCount) / @classOption.Capacity chỗ
+                                                </span>
+                                            }
+                                        </span>
+                                    </span>
+                                </label>
+                            }
 
-                        <!-- Giữ nguyên class "btn_one" để không bị mất giao diện/CSS cũ -->
-                        <button type="submit" class="btn_one" style="border: none; cursor: pointer;">
-                            Đăng ký ngay
-                        </button>
+                            if (Model.AvailableClasses.Any(c => !c.IsFull))
+                            {
+                                <button type="submit" class="btn_one" style="border: none; cursor: pointer;">
+                                    Đăng ký lớp đã chọn
+                                </button>
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning mb-0">
+                                    Tất cả lớp hiện đã đủ sĩ số.
+                                </div>
+                            }
+                        }
                     }
                 </div>
 
