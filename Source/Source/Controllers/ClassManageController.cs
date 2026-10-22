@@ -355,6 +355,7 @@ namespace Source.Controllers
                 var classItem = db.Classes
                     .Include(c => c.ClassSchedules.Select(s => s.TimeSlot))
                     .Include(c => c.ClassSessions.Select(s => s.TimeSlot))
+                    .Include(c => c.Assessments)
                     .Include(c => c.Room)
                     .SingleOrDefault(c => c.class_id == id.Value);
 
@@ -871,7 +872,104 @@ namespace Source.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreateAssessment(Assessment model)
+        {
+            var classItem = db.Classes.SingleOrDefault(c => c.class_id == model.class_id);
+            if (classItem == null) return HttpNotFound();
+
+            var validTypes = new[] { "Quiz", "Assignment", "Midterm", "Final", "Speaking", "Listening", "Reading", "Writing", "Project" };
+            model.assessment_name = (model.assessment_name ?? string.Empty).Trim();
+            model.assessment_type = (model.assessment_type ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(model.assessment_name) || model.assessment_name.Length > 200)
+                TempData["ErrorMessage"] = "Tên bài tập không hợp lệ.";
+            else if (!validTypes.Contains(model.assessment_type) || model.max_score <= 0)
+                TempData["ErrorMessage"] = "Loại bài hoặc điểm tối đa không hợp lệ.";
+            else
+            {
+                var now = DateTime.Now;
+                db.Assessments.Add(new Assessment
+                {
+                    assessment_id = Guid.NewGuid(), class_id = model.class_id,
+                    assessment_type = model.assessment_type, assessment_name = model.assessment_name,
+                    max_score = model.max_score, assessment_date = model.assessment_date,
+                    description = model.description, created_at = now, updated_at = now
+                });
+                db.SaveChanges();
+                TempData["SuccessMessage"] = "Đã thêm bài tập.";
+            }
+            return RedirectToAction("Details", new { id = model.class_id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteAssessment(Guid assessmentId, Guid classId)
+        {
+            var assessment = db.Assessments.SingleOrDefault(a => a.assessment_id == assessmentId && a.class_id == classId);
+            if (assessment == null) return HttpNotFound();
+            if (db.AssessmentScores.Any(s => s.assessment_id == assessmentId))
+                TempData["ErrorMessage"] = "Không thể xóa bài đã có điểm.";
+            else
+            {
+                db.Assessments.Remove(assessment);
+                db.SaveChanges();
+                TempData["SuccessMessage"] = "Đã xóa bài tập.";
+            }
+            return RedirectToAction("Details", new { id = classId });
+        }
+
+        [HttpGet]
+        public ActionResult GradeAssessment(Guid? assessmentId)
+        {
+            if (!assessmentId.HasValue) return new HttpStatusCodeResult(400);
+            var assessment = db.Assessments.Include(a => a.Class).SingleOrDefault(a => a.assessment_id == assessmentId.Value);
+            if (assessment == null) return HttpNotFound();
+            var enrollments = db.Enrollments.Include(e => e.Student_Profile.User)
+                .Where(e => e.class_id == assessment.class_id && (e.enrollment_status == "Pending" || e.enrollment_status == "Confirmed" || e.enrollment_status == "Studying"))
+                .OrderBy(e => e.Student_Profile.User.full_name).ToList();
+            var scores = db.AssessmentScores.Where(s => s.assessment_id == assessment.assessment_id).ToDictionary(s => s.enrollment_id);
+            return View(new AssessmentGradeViewModel
+            {
+                assessment_id = assessment.assessment_id, class_id = assessment.class_id, class_code = assessment.Class.class_code,
+                assessment_name = assessment.assessment_name, assessment_type = assessment.assessment_type,
+                max_score = assessment.max_score, assessment_date = assessment.assessment_date,
+                Students = enrollments.Select(e => new AssessmentGradeStudentViewModel
+                {
+                    enrollment_id = e.enrollment_id, student_code = e.Student_Profile.student_code,
+                    student_name = e.Student_Profile.User.full_name,
+                    score = scores.ContainsKey(e.enrollment_id) ? (decimal?)scores[e.enrollment_id].score : null,
+                    feedback = scores.ContainsKey(e.enrollment_id) ? scores[e.enrollment_id].feedback : null
+                }).ToList()
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult GradeAssessment(AssessmentGradeViewModel model)
+        {
+            var assessment = db.Assessments.SingleOrDefault(a => a.assessment_id == model.assessment_id && a.class_id == model.class_id);
+            if (assessment == null) return HttpNotFound();
+            Guid enteredBy;
+            var userId = User.Identity is ClaimsIdentity identity ? identity.FindFirst(ClaimTypes.NameIdentifier)?.Value : null;
+            if (!Guid.TryParse(userId, out enteredBy)) return new HttpUnauthorizedResult();
+            var ids = (model.Students ?? new List<AssessmentGradeStudentViewModel>()).Select(s => s.enrollment_id).ToList();
+            var activeIds = db.Enrollments.Where(e => e.class_id == assessment.class_id && ids.Contains(e.enrollment_id) && (e.enrollment_status == "Pending" || e.enrollment_status == "Confirmed" || e.enrollment_status == "Studying")).Select(e => e.enrollment_id).ToList();
+            var scores = db.AssessmentScores.Where(s => s.assessment_id == assessment.assessment_id && activeIds.Contains(s.enrollment_id)).ToList();
+            foreach (var student in model.Students ?? new List<AssessmentGradeStudentViewModel>())
+            {
+                if (!activeIds.Contains(student.enrollment_id) || !student.score.HasValue || student.score < 0 || student.score > assessment.max_score) continue;
+                var score = scores.SingleOrDefault(s => s.enrollment_id == student.enrollment_id);
+                if (score == null) db.AssessmentScores.Add(new AssessmentScore { assessment_score_id = Guid.NewGuid(), entered_by = enteredBy, assessment_id = assessment.assessment_id, enrollment_id = student.enrollment_id, score = student.score.Value, feedback = student.feedback, created_at = DateTime.Now });
+                else { score.score = student.score.Value; score.feedback = student.feedback; score.entered_by = enteredBy; }
+            }
+            db.SaveChanges();
+            TempData["SuccessMessage"] = "Đã lưu điểm.";
+            return RedirectToAction("GradeAssessment", new { assessmentId = assessment.assessment_id });
+        }
+
         private static readonly string[] ScheduleWeekDays =
+
         {
             "Monday", "Tuesday", "Wednesday", "Thursday",
             "Friday", "Saturday", "Sunday"

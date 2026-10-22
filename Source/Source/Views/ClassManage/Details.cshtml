@@ -390,6 +390,63 @@
         <section class="panel mt-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
+                    <h2 class="h5 mb-1">Bài tập và đánh giá</h2>
+                    <p class="text-muted mb-0">Tạo bài tập và nhập điểm cho học sinh trong lớp.</p>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#assessmentModal">Thêm bài tập</button>
+            </div>
+            @if (Model.Assessments == null || !Model.Assessments.Any())
+            {
+                <div class="alert alert-light border mb-0">Chưa có bài tập nào.</div>
+            }
+            else
+            {
+                <div class="table-responsive"><table class="table table-hover align-middle mb-0">
+                    <thead><tr><th>Tên bài</th><th>Loại</th><th>Điểm tối đa</th><th>Ngày</th><th class="text-end">Thao tác</th></tr></thead>
+                    <tbody>
+                    @foreach (var assessment in Model.Assessments.OrderByDescending(a => a.assessment_date).ThenBy(a => a.assessment_name))
+                    {
+                        <tr>
+                            <td>@assessment.assessment_name</td><td>@assessment.assessment_type</td><td>@assessment.max_score</td>
+                            <td>@(assessment.assessment_date.HasValue ? assessment.assessment_date.Value.ToString("dd/MM/yyyy") : "-")</td>
+                            <td class="text-end">
+                                <a class="btn btn-outline-primary btn-sm" href="@Url.Action("GradeAssessment", "ClassManage", new { assessmentId = assessment.assessment_id })">Chấm điểm</a>
+                                @using (Html.BeginForm("DeleteAssessment", "ClassManage", FormMethod.Post, new { @class = "d-inline" }))
+                                {
+                                    @Html.AntiForgeryToken(); @Html.Hidden("assessmentId", assessment.assessment_id); @Html.Hidden("classId", Model.class_id)
+                                    <button class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa bài tập này không?');">Xóa</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table></div>
+            }
+        </section>
+
+        <div class="modal fade" id="assessmentModal" tabindex="-1">
+            <div class="modal-dialog"><div class="modal-content">
+                @using (Html.BeginForm("CreateAssessment", "ClassManage", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken(); @Html.Hidden("class_id", Model.class_id)
+                    <div class="modal-header"><h5 class="modal-title">Thêm bài tập</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                    <div class="modal-body">
+                        <input class="form-control mb-2" name="assessment_name" maxlength="200" placeholder="Tên bài tập" required />
+                        <select class="form-select mb-2" name="assessment_type" required>
+                            <option value="">-- Loại bài --</option><option>Quiz</option><option>Assignment</option><option>Midterm</option><option>Final</option><option>Speaking</option><option>Listening</option><option>Reading</option><option>Writing</option><option>Project</option>
+                        </select>
+                        <input class="form-control mb-2" name="max_score" type="number" min="0.01" step="0.01" placeholder="Điểm tối đa" required />
+                        <input class="form-control mb-2" name="assessment_date" type="date" />
+                        <textarea class="form-control" name="description" maxlength="1000" placeholder="Mô tả"></textarea>
+                    </div>
+                    <div class="modal-footer"><button type="submit" class="btn btn-primary">Lưu</button></div>
+                }
+            </div></div>
+        </div>
+
+        <section class="panel mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
                     <h2 class="h5 mb-1">Buổi học</h2>
                     <p class="text-muted mb-0">Tự sinh theo lịch tuần và khoảng ngày của lớp.</p>
                 </div>

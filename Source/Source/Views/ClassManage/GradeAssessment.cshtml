@@ -1,0 +1,20 @@
+@model Source.ViewModels.AssessmentGradeViewModel
+@using System.Linq
+@{
+    ViewBag.Title = "Chấm điểm";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+<main class="dashboard-content"><div class="container-fluid px-3 px-lg-4 py-4">
+    <div class="page-heading"><div><p class="eyebrow mb-1">Lớp @Model.class_code</p><h1 class="h3 mb-1">Chấm điểm</h1><p class="text-muted mb-0">@Model.assessment_name · Điểm tối đa: @Model.max_score</p></div><a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Details", "ClassManage", new { id = Model.class_id })">Quay lại</a></div>
+    @if (TempData["SuccessMessage"] != null) { <div class="alert alert-success mt-3">@TempData["SuccessMessage"]</div> }
+    @using (Html.BeginForm("GradeAssessment", "ClassManage", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken(); @Html.HiddenFor(m => m.assessment_id); @Html.HiddenFor(m => m.class_id)
+        <section class="panel mt-3"><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Mã học sinh</th><th>Họ tên</th><th>Điểm</th><th>Nhận xét</th></tr></thead><tbody>
+        @for (var i = 0; i < Model.Students.Count; i++)
+        {
+            <tr><td>@Model.Students[i].student_code</td><td>@Model.Students[i].student_name</td><td>@Html.HiddenFor(m => m.Students[i].enrollment_id)@Html.TextBoxFor(m => m.Students[i].score, new { @class = "form-control", type = "number", min = "0", max = Model.max_score, step = "0.01" })</td><td>@Html.TextBoxFor(m => m.Students[i].feedback, new { @class = "form-control", maxlength = "2000" })</td></tr>
+        }
+        </tbody></table></div><button type="submit" class="btn btn-primary mt-3">Lưu điểm</button></section>
+    }
+</div></main>

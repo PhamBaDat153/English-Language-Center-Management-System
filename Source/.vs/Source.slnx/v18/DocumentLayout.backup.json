@@ -1,12 +1,7 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
-    }
-  ],
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -14,7 +9,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 10,
+          "SelectedChildIndex": -1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -55,19 +50,6 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Web.config",
-              "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Web.config",
-              "RelativeDocumentMoniker": "Source\\Web.config",
-              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Web.config",
-              "RelativeToolTip": "Source\\Web.config",
-              "ViewState": "AgIAADMAAAAAAAAAAAAIwEAAAAAQAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
-              "WhenOpened": "2026-10-22T04:53:30.789Z",
-              "EditorCaption": ""
             },
             {
               "$type": "Bookmark",
