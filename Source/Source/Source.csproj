@@ -226,6 +226,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModels\AssessmentGradeViewModel.cs" />
     <Compile Include="ViewModels\ClassAttendanceViewModel.cs" />
+    <Compile Include="ViewModels\StudentClassDetailsViewModel.cs" />
 
     <Compile Include="ViewModels\ClassScheduleViewModel.cs" />
     <Compile Include="ViewModels\CourseDetailViewModel.cs" />

@@ -1,0 +1,28 @@
+@model Source.ViewModels.StudentClassDetailsViewModel
+@{
+    ViewBag.Title = "Chi tiết lớp học";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var attendanceText = new Dictionary<string, string> { { "Present", "Có mặt" }, { "Absent", "Vắng" }, { "Excused", "Có phép" } };
+}
+<style>
+    .profile-page { background: #f7f9fc; }
+    .class-hero { background: linear-gradient(135deg, #0f6bff, #6b4eff); color: #fff; border-radius: 16px; }
+    .detail-nav { position: sticky; top: 12px; z-index: 10; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center; width: 100%; overflow-x: auto; white-space: nowrap; gap: .25rem; }
+    .detail-nav a { display: inline-flex !important; flex: 0 0 auto !important; width: auto !important; min-width: max-content; white-space: nowrap; }
+    .detail-card { border: 0; border-radius: 14px; box-shadow: 0 8px 24px rgba(26,42,71,.08); }
+</style>
+<section class="section_padding profile-page"><div class="container">
+    <div class="mb-4"><a href="@Url.Action("MyClasses", "Profile")" class="btn btn-outline-secondary btn-sm">&larr; Lớp học của tôi</a></div>
+    <div class="class-hero p-4 mb-4"><div class="d-flex justify-content-between flex-wrap gap-3"><div><span class="opacity-75">Chi tiết lớp học</span><h2 class="text-white mb-1">@Model.ClassCode</h2><p class="mb-0">@Model.CourseName · @Model.TeacherName</p></div><span class="badge bg-light text-primary align-self-start">Trạng thái lớp: @Model.ClassStatus</span></div></div>
+    <nav class="detail-nav card border-0 shadow-sm mb-4 p-2"><a class="btn btn-sm btn-primary" href="#overview">Tổng quan</a><a class="btn btn-sm btn-light" href="#attendance">Điểm danh</a><a class="btn btn-sm btn-light" href="#assessments">Bài tập & điểm</a><a class="btn btn-sm btn-light" href="#course">Khóa học</a><a class="btn btn-sm btn-light" href="#materials">Tài liệu</a></nav>
+
+    <section id="course" class="card detail-card mb-4"><div class="card-body p-4"><h4>Thông tin khóa học</h4><p><strong>@Model.CourseCode - @Model.CourseName</strong></p><p>Trình độ: @Model.CourseLevel · Thời lượng: @Model.CourseDurationWeeks tuần</p><p class="mb-0">@Model.CourseDescription</p></div></section>
+
+    <section id="overview" class="card detail-card mb-4"><div class="card-body p-4"><h4>Thông tin lớp học</h4><div class="row g-3"><div class="col-md-4"><small class="text-muted">Thời gian</small><div>@Model.StartDate.ToString("dd/MM/yyyy") - @Model.EndDate.ToString("dd/MM/yyyy")</div></div><div class="col-md-4"><small class="text-muted">Giáo viên</small><div>@Model.TeacherName</div></div><div class="col-md-4"><small class="text-muted">Phòng học</small><div>@Model.RoomName</div></div></div><hr /><h5>Các buổi học</h5><div class="table-responsive"><table class="table"><thead><tr><th>Ngày</th><th>Ca học</th><th>Chủ đề</th></tr></thead><tbody>@foreach (var item in Model.Sessions) { <tr><td>@item.SessionDate.ToString("dd/MM/yyyy")</td><td>@item.TimeSlotName</td><td>@(string.IsNullOrWhiteSpace(item.Topic) ? "-" : item.Topic)</td></tr> }</tbody></table></div></div></section>
+
+    <section id="attendance" class="card detail-card mb-4"><div class="card-body p-4"><h4>Điểm danh</h4>@if (!Model.Attendance.Any()) { <div class="alert alert-light border">Chưa có dữ liệu điểm danh.</div> } else { <div class="table-responsive"><table class="table"><thead><tr><th>Ngày</th><th>Ca học</th><th>Trạng thái</th><th>Ghi chú</th></tr></thead><tbody>@foreach (var item in Model.Attendance) { <tr><td>@item.SessionDate.ToString("dd/MM/yyyy")</td><td>@item.TimeSlotName</td><td>@(attendanceText.ContainsKey(item.Status) ? attendanceText[item.Status] : item.Status)</td><td>@(item.Remarks ?? "-")</td></tr> }</tbody></table></div> }</div></section>
+
+    <section id="assessments" class="card detail-card mb-4"><div class="card-body p-4"><h4>Bài tập & điểm</h4>@if (!Model.Assessments.Any()) { <div class="alert alert-light border">Chưa có bài tập.</div> } else { <div class="table-responsive"><table class="table"><thead><tr><th>Bài tập</th><th>Loại</th><th>Điểm tối đa</th><th>Điểm</th><th>Nhận xét</th></tr></thead><tbody>@foreach (var item in Model.Assessments) { <tr><td>@item.Name</td><td>@item.Type</td><td>@item.MaxScore</td><td>@(item.Score.HasValue ? item.Score.Value.ToString() : "Chưa chấm")</td><td>@(item.Feedback ?? "-")</td></tr> }</tbody></table></div> }</div></section>
+
+    <section id="materials" class="card detail-card mb-4"><div class="card-body p-4"><h4>Tài liệu khóa học</h4>@if (!Model.Materials.Any()) { <div class="alert alert-light border">Chưa có tài liệu.</div> } else { <div class="list-group">@foreach (var item in Model.Materials) { <div class="list-group-item d-flex justify-content-between align-items-center gap-3"><div><strong>@item.Title</strong><div class="text-muted small">@item.Description</div></div>@if (!string.IsNullOrWhiteSpace(item.FileUrl)) { <a class="btn btn-outline-primary btn-sm" href="@item.FileUrl" target="_blank" rel="noopener">Mở tài liệu</a> }</div> }</div> }</div></section>
+</div></section>

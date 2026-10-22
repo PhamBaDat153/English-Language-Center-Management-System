@@ -57,6 +57,82 @@ namespace Source.Controllers
             return View(ToViewModel(user));
         }
 
+        [HttpGet]
+        public async Task<ActionResult> ClassDetails(Guid? classId)
+        {
+            var user = await CurrentUserAsync();
+            if (user == null) return RedirectToAction("Login", "Authentication");
+            if (!classId.HasValue) return new HttpStatusCodeResult(400);
+
+            var student = user.Student_Profile.FirstOrDefault(p => p.available_status == "Available");
+            if (student == null) return HttpNotFound();
+
+            var enrollment = await db.Enrollments
+                .Include(e => e.Class.Course.SyllabusMaterials)
+                .Include(e => e.Class.Room)
+                .Include(e => e.Class.Teacher_profile.Staff_Profile.User)
+                .Include(e => e.Class.ClassSessions.Select(s => s.TimeSlot))
+                .Include(e => e.AttendanceRecords.Select(a => a.ClassSession.TimeSlot))
+                .Include(e => e.AttendanceRecords.Select(a => a.ClassSession))
+                .Include(e => e.AssessmentScores.Select(s => s.Assessment))
+                .SingleOrDefaultAsync(e => e.class_id == classId.Value && e.student_id == student.student_id);
+
+            if (enrollment == null) return HttpNotFound();
+
+            var assessments = await db.Assessments
+                .Where(a => a.class_id == enrollment.class_id)
+                .ToListAsync();
+            var scoreByAssessment = enrollment.AssessmentScores.ToDictionary(s => s.assessment_id);
+
+            var model = new StudentClassDetailsViewModel
+            {
+                ClassId = enrollment.Class.class_id,
+                ClassCode = enrollment.Class.class_code,
+                CourseCode = enrollment.Class.Course.course_code,
+                CourseName = enrollment.Class.Course.course_name,
+                CourseLevel = enrollment.Class.Course.level,
+                CourseDescription = enrollment.Class.Course.description,
+                CourseDurationWeeks = enrollment.Class.Course.duration_weeks,
+                TeacherName = enrollment.Class.Teacher_profile == null || enrollment.Class.Teacher_profile.Staff_Profile == null
+                    ? "Chưa phân công" : enrollment.Class.Teacher_profile.Staff_Profile.User.full_name,
+                RoomName = enrollment.Class.Room == null ? "Chưa xếp phòng" : enrollment.Class.Room.room_name,
+                StartDate = enrollment.Class.start_date,
+                EndDate = enrollment.Class.end_date,
+                EnrollmentStatus = enrollment.enrollment_status,
+                ClassStatus = enrollment.Class.class_status,
+                TuitionAmount = enrollment.tuition_amount,
+                Sessions = enrollment.Class.ClassSessions.OrderBy(s => s.session_date).ThenBy(s => s.TimeSlot.start_time).Select(s => new StudentClassSessionViewModel
+                {
+                    SessionDate = s.session_date,
+                    TimeSlotName = s.TimeSlot == null ? "-" : s.TimeSlot.slot_name,
+                    Topic = s.topic
+                }).ToList(),
+                Attendance = enrollment.AttendanceRecords.OrderByDescending(a => a.ClassSession.session_date).Select(a => new StudentAttendanceViewModel
+                {
+                    SessionDate = a.ClassSession.session_date,
+                    TimeSlotName = a.ClassSession.TimeSlot == null ? "-" : a.ClassSession.TimeSlot.slot_name,
+                    Status = a.attendance_status,
+                    Remarks = a.remarks
+                }).ToList(),
+                Assessments = assessments.OrderByDescending(a => a.assessment_date).ThenBy(a => a.assessment_name).Select(a => new StudentAssessmentViewModel
+                {
+                    Name = a.assessment_name,
+                    Type = a.assessment_type,
+                    MaxScore = a.max_score,
+                    AssessmentDate = a.assessment_date,
+                    Score = scoreByAssessment.ContainsKey(a.assessment_id) ? (decimal?)scoreByAssessment[a.assessment_id].score : null,
+                    Feedback = scoreByAssessment.ContainsKey(a.assessment_id) ? scoreByAssessment[a.assessment_id].feedback : null
+                }).ToList(),
+                Materials = enrollment.Class.Course.SyllabusMaterials
+                    .Where(m => m.available_status == "Available")
+                    .OrderBy(m => m.title)
+                    .Select(m => new StudentMaterialViewModel { Title = m.title, Description = m.description, FileUrl = m.file_url })
+                    .ToList()
+            };
+
+            return View(model);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UploadAvatar(HttpPostedFileBase avatar)
@@ -229,7 +305,8 @@ namespace Source.Controllers
                     ? "Chưa phân công" : e.Class.Teacher_profile.Staff_Profile.User.full_name,
                 StartDate = e.Class.start_date,
                 EndDate = e.Class.end_date,
-                EnrollmentStatus = e.enrollment_status
+                EnrollmentStatus = e.enrollment_status,
+                ClassStatus = e.Class.class_status
             }).ToList();
 
             var timetableSessions = activeEnrollments
