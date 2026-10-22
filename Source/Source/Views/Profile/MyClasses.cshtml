@@ -1,0 +1,26 @@
+@model Source.ViewModels.ProfileViewModel
+@{
+    ViewBag.Title = "Lớp học của tôi";
+    ViewBag.ProfilePage = "MyClasses";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .profile-page { background: #f7f9fc; }
+    .profile-nav { position: sticky; top: 12px; z-index: 10; overflow-x: auto; white-space: nowrap; }
+    .profile-nav a { display: inline-block; margin-right: .25rem; }
+</style>
+<section class="section_padding profile-page"><div class="container">
+    <div class="section-title text-center mb-5"><span class="sub_title">Học tập</span><h2>Lớp học của tôi</h2><p>Danh sách các lớp bạn đang và đã tham gia.</p></div>
+    @Html.Partial("_ProfileNavigation")
+    <div class="card border-0 shadow-sm"><div class="card-body p-4">
+        @if (!Model.MyClasses.Any())
+        { <div class="alert alert-light border mb-0">Bạn chưa có lớp học nào.</div> }
+        else
+        {
+            <div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Mã lớp</th><th>Khóa học</th><th>Giáo viên</th><th>Thời gian</th><th>Trạng thái</th></tr></thead><tbody>
+            @foreach (var item in Model.MyClasses)
+            { <tr><td>@item.ClassCode</td><td>@item.CourseName</td><td>@item.TeacherName</td><td>@item.StartDate.ToString("dd/MM/yyyy") - @item.EndDate.ToString("dd/MM/yyyy")</td><td>@item.EnrollmentStatus</td></tr> }
+            </tbody></table></div>
+        }
+    </div></div>
+</div></section>

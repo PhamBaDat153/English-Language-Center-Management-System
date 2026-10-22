@@ -60,6 +60,13 @@ namespace Source.ViewModels
         public bool IsStudent { get; set; }
         public bool IsTeacher { get; set; }
         public bool IsAdministrator { get; set; }
+        public IList<StudentClassViewModel> MyClasses { get; set; } = new List<StudentClassViewModel>();
+        public IList<StudentTimetableItemViewModel> Timetable { get; set; } = new List<StudentTimetableItemViewModel>();
+        public IList<TimetableSlotViewModel> TimetableSlots { get; set; } = new List<TimetableSlotViewModel>();
+        public DateTime WeekStart { get; set; }
+        public DateTime WeekEnd { get; set; }
+        public DateTime PreviousWeek { get; set; }
+        public DateTime NextWeek { get; set; }
         public IList<StaffProfileViewModel> StaffProfiles { get; set; } = new List<StaffProfileViewModel>();
         public IList<TeacherProfileViewModel> TeacherProfiles { get; set; } = new List<TeacherProfileViewModel>();
         public IList<QualificationViewModel> Qualifications { get; set; } = new List<QualificationViewModel>();
@@ -73,5 +80,36 @@ namespace Source.ViewModels
         [Compare("NewPassword", ErrorMessage = "Mật khẩu xác nhận không khớp.")]
         [Display(Name = "Xác nhận mật khẩu mới")]
         public string ConfirmPassword { get; set; }
+    }
+
+    public class StudentClassViewModel
+    {
+        public Guid ClassId { get; set; }
+        public string ClassCode { get; set; }
+        public string CourseName { get; set; }
+        public string TeacherName { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string EnrollmentStatus { get; set; }
+    }
+
+    public class StudentTimetableItemViewModel
+    {
+        public string ClassCode { get; set; }
+        public string CourseName { get; set; }
+        public DateTime ScheduleDate { get; set; }
+        public string WeekDay { get; set; }
+        public string TimeSlotName { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public string RoomName { get; set; }
+        public string TeacherName { get; set; }
+    }
+
+    public class TimetableSlotViewModel
+    {
+        public string SlotName { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
     }
 }

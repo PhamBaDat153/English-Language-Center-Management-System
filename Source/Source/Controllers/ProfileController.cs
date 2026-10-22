@@ -33,6 +33,30 @@ namespace Source.Controllers
             return View(ToViewModel(user));
         }
 
+        [HttpGet]
+        public async Task<ActionResult> Timetable(DateTime? weekStart)
+        {
+            var user = await CurrentUserAsync();
+            if (user == null) return RedirectToAction("Login", "Authentication");
+            var model = ToViewModel(user, weekStart);
+            var selectedDate = (weekStart ?? DateTime.Today).Date;
+            var monday = selectedDate.AddDays(-(int)selectedDate.DayOfWeek + (int)DayOfWeek.Monday);
+            if (selectedDate.DayOfWeek == DayOfWeek.Sunday) monday = selectedDate.AddDays(-6);
+            model.WeekStart = monday;
+            model.WeekEnd = monday.AddDays(6);
+            model.PreviousWeek = monday.AddDays(-7);
+            model.NextWeek = monday.AddDays(7);
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> MyClasses()
+        {
+            var user = await CurrentUserAsync();
+            if (user == null) return RedirectToAction("Login", "Authentication");
+            return View(ToViewModel(user));
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UploadAvatar(HttpPostedFileBase avatar)
@@ -166,7 +190,7 @@ namespace Source.Controllers
                 .FirstOrDefaultAsync(u => u.user_id == id);
         }
 
-        private ProfileViewModel ToViewModel(User user)
+        private ProfileViewModel ToViewModel(User user, DateTime? timetableWeekStart = null)
         {
             Student_Profile student = user.Student_Profile
                 .FirstOrDefault(p => p.available_status == "Available");
@@ -179,6 +203,71 @@ namespace Source.Controllers
                 .Select(r => r.role_name)
                 .OrderByDescending(RolePriority)
                 .FirstOrDefault() ?? "Chưa phân quyền";
+
+            var activeEnrollments = student == null
+                ? new System.Collections.Generic.List<Enrollment>()
+                : db.Enrollments
+                    .Include(e => e.Class.Course)
+                    .Include(e => e.Class.ClassSessions.Select(s => s.TimeSlot))
+                    .Include(e => e.Class.Room)
+                    .Include(e => e.Class.Teacher_profile.Staff_Profile.User)
+                    .Where(e => e.student_id == student.student_id &&
+                        e.Class != null &&
+                        e.Class.class_status == "InProgress" &&
+                        e.Class.ClassSessions.Any() &&
+                        (e.enrollment_status == "Pending" ||
+                         e.enrollment_status == "Confirmed" ||
+                         e.enrollment_status == "Studying"))
+                    .ToList();
+
+            var myClasses = activeEnrollments.Select(e => new StudentClassViewModel
+            {
+                ClassId = e.Class.class_id,
+                ClassCode = e.Class.class_code,
+                CourseName = e.Class.Course == null ? "-" : e.Class.Course.course_name,
+                TeacherName = e.Class.Teacher_profile == null || e.Class.Teacher_profile.Staff_Profile == null
+                    ? "Chưa phân công" : e.Class.Teacher_profile.Staff_Profile.User.full_name,
+                StartDate = e.Class.start_date,
+                EndDate = e.Class.end_date,
+                EnrollmentStatus = e.enrollment_status
+            }).ToList();
+
+            var timetableSessions = activeEnrollments
+                .SelectMany(e => e.Class.ClassSessions
+                    .Where(s => s.Class != null && s.Class.class_id == e.class_id && s.TimeSlot != null)
+                    .Select(s => new { Enrollment = e, Session = s }))
+                .Where(x => !timetableWeekStart.HasValue ||
+                    (x.Session.session_date.Date >= timetableWeekStart.Value.Date &&
+                     x.Session.session_date.Date <= timetableWeekStart.Value.Date.AddDays(6)))
+                .ToList();
+
+            var timetable = timetableSessions.Select(x => new StudentTimetableItemViewModel
+                {
+                    ClassCode = x.Enrollment.Class.class_code,
+                    CourseName = x.Enrollment.Class.Course == null ? "-" : x.Enrollment.Class.Course.course_name,
+                    ScheduleDate = x.Session.session_date,
+                    WeekDay = x.Session.session_date.DayOfWeek.ToString(),
+                    TimeSlotName = x.Session.TimeSlot.slot_name,
+                    StartTime = x.Session.TimeSlot.start_time,
+                    EndTime = x.Session.TimeSlot.end_time,
+                    RoomName = x.Enrollment.Class.Room == null ? "Chưa xếp phòng" : x.Enrollment.Class.Room.room_name,
+                    TeacherName = x.Enrollment.Class.Teacher_profile == null || x.Enrollment.Class.Teacher_profile.Staff_Profile == null
+                        ? "Chưa phân công" : x.Enrollment.Class.Teacher_profile.Staff_Profile.User.full_name
+                })
+                .OrderBy(x => x.ScheduleDate)
+                .ThenBy(x => x.StartTime)
+                .ToList();
+
+            var timetableSlots = db.TimeSlots
+                .Where(t => t.available_status == "Available")
+                .OrderBy(t => t.start_time)
+                .Select(t => new TimetableSlotViewModel
+                {
+                    SlotName = t.slot_name,
+                    StartTime = t.start_time,
+                    EndTime = t.end_time
+                })
+                .ToList();
 
             return new ProfileViewModel
             {
@@ -210,6 +299,9 @@ namespace Source.Controllers
                 IsStudent = isStudent,
                 IsTeacher = isTeacher,
                 IsAdministrator = isAdministrator,
+                MyClasses = myClasses,
+                Timetable = timetable,
+                TimetableSlots = timetableSlots,
                 StaffProfiles = user.Staff_Profile
                     .Where(s => s.available_status == "Available")
                     .Select(s => new StaffProfileViewModel
@@ -263,6 +355,21 @@ namespace Source.Controllers
                         AvailableStatus = q.available_status
                     }).ToList()
             };
+        }
+
+        private static int WeekDayOrder(string weekDay)
+        {
+            switch (weekDay)
+            {
+                case "Monday": return 1;
+                case "Tuesday": return 2;
+                case "Wednesday": return 3;
+                case "Thursday": return 4;
+                case "Friday": return 5;
+                case "Saturday": return 6;
+                case "Sunday": return 7;
+                default: return 8;
+            }
         }
 
         private static int RolePriority(string role)

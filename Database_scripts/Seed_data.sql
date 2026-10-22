@@ -319,7 +319,6 @@ BEGIN CATCH
 END CATCH;
 
 
-DECLARE @Now DATETIME2(3) = SYSDATETIME();
 
 INSERT INTO dbo.[TimeSlot] (
     time_slot_id,

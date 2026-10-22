@@ -1,0 +1,46 @@
+@model Source.ViewModels.ProfileViewModel
+@{
+    ViewBag.Title = "Thời khóa biểu";
+    ViewBag.ProfilePage = "Timetable";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var days = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+    var dayNames = new[] { "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy", "Chủ nhật" };
+    var weekDays = Enumerable.Range(0, 7).Select(i => Model.WeekStart.AddDays(i)).ToArray();
+}
+@using System.Linq
+<style>
+    .profile-page { background: #f7f9fc; }
+    .profile-nav { position: sticky; top: 12px; z-index: 10; overflow-x: auto; white-space: nowrap; }
+    .profile-nav { flex-wrap: nowrap; }
+    .profile-nav a { flex: 0 0 auto; }
+    .timetable-wrap { overflow-x: auto; }
+    .timetable { min-width: 900px; table-layout: fixed; }
+    .timetable th { background: #f5f7fa; text-align: center; }
+    .timetable td { vertical-align: top; height: 125px; padding: .5rem; }
+    .timetable-time { width: 130px; white-space: nowrap; font-weight: 600; }
+    .timetable-card { background: #eaf2ff; border-left: 4px solid #0f6bff; border-radius: 8px; padding: .6rem; margin-bottom: .4rem; font-size: .85rem; }
+    .week-navigation { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: nowrap; }
+    .week-navigation .week-title { text-align: center; flex: 1; white-space: nowrap; }
+</style>
+<section class="section_padding profile-page"><div class="container">
+    <div class="section-title text-center mb-5"><span class="sub_title">Học tập</span><h2>Thời khóa biểu</h2><p>Lịch học các lớp bạn đang tham gia.</p></div>
+    @Html.Partial("_ProfileNavigation")
+    <div class="card border-0 shadow-sm"><div class="card-body p-4">
+        <div class="week-navigation mb-4">
+            <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Timetable", "Profile", new { weekStart = Model.PreviousWeek.ToString("yyyy-MM-dd") })">&lsaquo; Tuần trước</a>
+            <div class="week-title"><strong>@Model.WeekStart.ToString("dd/MM/yyyy") - @Model.WeekEnd.ToString("dd/MM/yyyy")</strong></div>
+            <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Timetable", "Profile", new { weekStart = Model.NextWeek.ToString("yyyy-MM-dd") })">Tuần sau &rsaquo;</a>
+        </div>
+        @if (!Model.Timetable.Any())
+        { <div class="alert alert-light border mb-0">Bạn chưa có lịch học.</div> }
+        else
+        {
+            <div class="timetable-wrap"><table class="table table-bordered timetable mb-0"><thead><tr><th class="timetable-time">Khung giờ</th>@for (var d = 0; d < days.Length; d++) { <th>@dayNames[d]<br /><small>@weekDays[d].ToString("dd/MM")</small></th> }</tr></thead><tbody>
+            @foreach (var slot in Model.TimetableSlots)
+            {
+                <tr><td class="timetable-time">@slot.SlotName<br /><small>@slot.StartTime.ToString(@"hh\:mm") - @slot.EndTime.ToString(@"hh\:mm")</small></td>@for (var d = 0; d < days.Length; d++) { <td>@foreach (var item in Model.Timetable.Where(x => x.ScheduleDate.Date == weekDays[d].Date && x.StartTime == slot.StartTime && x.EndTime == slot.EndTime)) { <div class="timetable-card"><strong>@item.ClassCode</strong><br />@item.CourseName<br /><small>@item.TimeSlotName · @item.RoomName</small></div> }</td> }</tr>
+            }
+            </tbody></table></div>
+        }
+    </div></div>
+</div></section>

@@ -1,0 +1,5 @@
+<nav class="profile-nav card border-0 shadow-sm mb-4 p-2 d-flex flex-row flex-nowrap gap-2">
+    <a class="btn btn-sm text-nowrap @(ViewBag.ProfilePage == "Profile" ? "btn-primary" : "btn-light")" href="@Url.Action("Index", "Profile")">Hồ sơ</a>
+    <a class="btn btn-sm text-nowrap @(ViewBag.ProfilePage == "Timetable" ? "btn-primary" : "btn-light")" href="@Url.Action("Timetable", "Profile")">Thời khóa biểu</a>
+    <a class="btn btn-sm text-nowrap @(ViewBag.ProfilePage == "MyClasses" ? "btn-primary" : "btn-light")" href="@Url.Action("MyClasses", "Profile")">Lớp học của tôi</a>
+</nav>
