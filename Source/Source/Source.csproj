@@ -224,6 +224,7 @@
     <Compile Include="Controllers\UserManageController.cs" />
     <Compile Include="Service\CloudinaryService.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\ClassAttendanceViewModel.cs" />
     <Compile Include="ViewModels\ClassScheduleViewModel.cs" />
     <Compile Include="ViewModels\CourseDetailViewModel.cs" />
     <Compile Include="ViewModels\HomePageViewModel.cs" />

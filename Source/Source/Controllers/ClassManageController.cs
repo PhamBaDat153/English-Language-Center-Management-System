@@ -7,6 +7,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
+using System.Security.Claims;
 
 namespace Source.Controllers
 {
@@ -766,6 +767,94 @@ namespace Source.Controllers
             db.SaveChanges();
             TempData["SuccessMessage"] = "Đã xóa buổi học.";
             return RedirectToAction("Details", new { id = classId });
+        }
+
+        [HttpGet]
+        public ActionResult Attendance(Guid? sessionId)
+        {
+            if (!sessionId.HasValue) return new HttpStatusCodeResult(400);
+
+            var session = db.ClassSessions
+                .Include(s => s.Class)
+                .Include(s => s.TimeSlot)
+                .SingleOrDefault(s => s.session_id == sessionId.Value);
+            if (session == null) return HttpNotFound();
+
+            var students = db.Enrollments
+                .Include(e => e.Student_Profile.User)
+                .Where(e => e.class_id == session.class_id &&
+                    (e.enrollment_status == "Pending" ||
+                     e.enrollment_status == "Confirmed" ||
+                     e.enrollment_status == "Studying"))
+                .OrderBy(e => e.Student_Profile.User.full_name)
+                .ToList();
+
+            var records = db.AttendanceRecords
+                .Where(a => a.session_id == session.session_id)
+                .ToDictionary(a => a.enrollment_id);
+
+            var model = new ClassAttendanceViewModel
+            {
+                session_id = session.session_id,
+                class_id = session.class_id,
+                class_code = session.Class.class_code,
+                session_date = session.session_date,
+                time_slot_name = session.TimeSlot == null ? null : session.TimeSlot.slot_name,
+                topic = session.topic,
+                Students = students.Select(e => new ClassAttendanceStudentViewModel
+                {
+                    enrollment_id = e.enrollment_id,
+                    student_code = e.Student_Profile.student_code,
+                    student_name = e.Student_Profile.User.full_name,
+                    attendance_status = records.ContainsKey(e.enrollment_id)
+                        ? records[e.enrollment_id].attendance_status : null,
+                    remarks = records.ContainsKey(e.enrollment_id)
+                        ? records[e.enrollment_id].remarks : null
+                }).ToList()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Attendance(ClassAttendanceViewModel model)
+        {
+            var session = db.ClassSessions.SingleOrDefault(s => s.session_id == model.session_id);
+            if (session == null) return HttpNotFound();
+
+            var userId = User.Identity is ClaimsIdentity identity
+                ? identity.FindFirst(ClaimTypes.NameIdentifier)?.Value : null;
+            Guid recordedBy;
+            if (!Guid.TryParse(userId, out recordedBy)) return new HttpUnauthorizedResult();
+
+            var enrollmentIds = model.Students == null
+                ? new List<Guid>() : model.Students.Select(s => s.enrollment_id).ToList();
+            var activeIds = db.Enrollments.Where(e => e.class_id == session.class_id &&
+                enrollmentIds.Contains(e.enrollment_id) &&
+                (e.enrollment_status == "Pending" || e.enrollment_status == "Confirmed" || e.enrollment_status == "Studying"))
+                .Select(e => e.enrollment_id).ToList();
+            var records = db.AttendanceRecords.Where(a => a.session_id == session.session_id && activeIds.Contains(a.enrollment_id)).ToList();
+
+            foreach (var student in model.Students ?? new List<ClassAttendanceStudentViewModel>())
+            {
+                if (!activeIds.Contains(student.enrollment_id) || !new[] { "Present", "Absent", "Excused" }.Contains(student.attendance_status)) continue;
+                var record = records.SingleOrDefault(a => a.enrollment_id == student.enrollment_id);
+                if (record == null)
+                {
+                    db.AttendanceRecords.Add(new AttendanceRecord { attendance_id = Guid.NewGuid(), enrollment_id = student.enrollment_id, session_id = session.session_id, recorded_by = recordedBy, attendance_status = student.attendance_status, remarks = student.remarks, created_at = DateTime.Now, updated_at = DateTime.Now });
+                }
+                else
+                {
+                    record.attendance_status = student.attendance_status;
+                    record.remarks = student.remarks;
+                    record.recorded_by = recordedBy;
+                    record.updated_at = DateTime.Now;
+                }
+            }
+            db.SaveChanges();
+            TempData["SuccessMessage"] = "Đã lưu điểm danh.";
+            return RedirectToAction("Attendance", new { sessionId = session.session_id });
         }
 
         private static string GetScheduleWeekDay(DayOfWeek dayOfWeek)
