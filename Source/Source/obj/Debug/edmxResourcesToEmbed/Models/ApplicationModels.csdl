@@ -58,6 +58,7 @@
     <Property Name="class_code" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
     <Property Name="start_date" Type="DateTime" Nullable="false" Precision="0" />
     <Property Name="end_date" Type="DateTime" Nullable="false" Precision="0" />
+    <Property Name="class_capacity" Type="Int32" Nullable="false" />
     <Property Name="created_at" Type="DateTime" Nullable="false" Precision="3" />
     <Property Name="updated_at" Type="DateTime" Nullable="false" Precision="3" />
     <Property Name="class_status" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />

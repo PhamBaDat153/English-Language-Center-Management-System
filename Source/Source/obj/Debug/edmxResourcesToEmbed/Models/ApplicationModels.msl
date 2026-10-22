@@ -53,6 +53,7 @@
           <ScalarProperty Name="class_code" ColumnName="class_code" />
           <ScalarProperty Name="start_date" ColumnName="start_date" />
           <ScalarProperty Name="end_date" ColumnName="end_date" />
+          <ScalarProperty Name="class_capacity" ColumnName="class_capacity" />
           <ScalarProperty Name="created_at" ColumnName="created_at" />
           <ScalarProperty Name="updated_at" ColumnName="updated_at" />
           <ScalarProperty Name="class_status" ColumnName="class_status" />

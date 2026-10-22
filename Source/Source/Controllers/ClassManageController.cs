@@ -143,6 +143,8 @@ namespace Source.Controllers
             try
             {
                 LoadDropdowns();
+                ViewBag.CourseDurations = db.Set<Course>()
+                    .ToDictionary(c => c.course_id.ToString(), c => c.duration_weeks);
 
                 // Giá trị mặc định khi mở form thêm lớp.
                 var model = new Class
@@ -177,6 +179,15 @@ namespace Source.Controllers
         {
             try
             {
+                var selectedCourse = db.Set<Course>()
+                    .SingleOrDefault(c => c.course_id == model.course_id);
+
+                if (selectedCourse != null && model.start_date != default(DateTime))
+                {
+                    model.end_date = model.start_date.Date
+                        .AddDays(selectedCourse.duration_weeks * 7 - 1);
+                }
+
                 // Kiểm tra mã lớp bắt buộc và không được trùng.
                 if (string.IsNullOrWhiteSpace(model.class_code))
                 {
@@ -222,8 +233,7 @@ namespace Source.Controllers
                 }
 
                 // Kiểm tra khóa học có tồn tại.
-                bool courseExists = db.Set<Course>()
-                    .Any(c => c.course_id == model.course_id);
+                bool courseExists = selectedCourse != null;
 
                 if (!courseExists)
                 {
@@ -273,12 +283,16 @@ namespace Source.Controllers
                         model.course_id,
                         model.teacher_id,
                         model.room_id);
+                    ViewBag.CourseDurations = db.Set<Course>()
+                        .ToDictionary(c => c.course_id.ToString(), c => c.duration_weeks);
 
                     return View(model);
                 }
 
                 // Không tin class_id/timestamps do form gửi lên.
                 model.class_id = Guid.NewGuid();
+                model.start_date = model.start_date.Date;
+                model.end_date = model.end_date.Date;
                 model.created_at = DateTime.Now;
                 model.updated_at = DateTime.Now;
 
@@ -323,7 +337,11 @@ namespace Source.Controllers
         /// Hiển thị thông tin chi tiết của lớp học.
         /// </summary>
         [HttpGet]
-        public ActionResult Details(Guid? id)
+        public ActionResult Details(
+            Guid? id,
+            string studentName,
+            string studentEmail,
+            string studentStatus)
         {
             try
             {
@@ -335,6 +353,7 @@ namespace Source.Controllers
 
                 var classItem = db.Classes
                     .Include(c => c.ClassSchedules.Select(s => s.TimeSlot))
+                    .Include(c => c.ClassSessions.Select(s => s.TimeSlot))
                     .Include(c => c.Room)
                     .SingleOrDefault(c => c.class_id == id.Value);
 
@@ -348,6 +367,37 @@ namespace Source.Controllers
                     (e.enrollment_status == "Pending" ||
                      e.enrollment_status == "Confirmed" ||
                      e.enrollment_status == "Studying"));
+
+                var studentsQuery = db.Enrollments
+                    .Include(e => e.Student_Profile.User)
+                    .Where(e => e.class_id == classItem.class_id);
+
+                if (!string.IsNullOrWhiteSpace(studentName))
+                {
+                    studentName = studentName.Trim();
+                    studentsQuery = studentsQuery.Where(e =>
+                        e.Student_Profile.User.full_name.Contains(studentName));
+                }
+
+                if (!string.IsNullOrWhiteSpace(studentEmail))
+                {
+                    studentEmail = studentEmail.Trim();
+                    studentsQuery = studentsQuery.Where(e =>
+                        e.Student_Profile.User.email.Contains(studentEmail));
+                }
+
+                if (!string.IsNullOrWhiteSpace(studentStatus))
+                {
+                    studentsQuery = studentsQuery.Where(e =>
+                        e.enrollment_status == studentStatus);
+                }
+
+                ViewBag.ClassStudents = studentsQuery
+                    .OrderBy(e => e.Student_Profile.User.full_name)
+                    .ToList();
+                ViewBag.StudentName = studentName;
+                ViewBag.StudentEmail = studentEmail;
+                ViewBag.StudentStatus = studentStatus;
 
                 LoadDropdowns(
                     classItem.course_id,
@@ -539,6 +589,196 @@ namespace Source.Controllers
                     ex);
 
                 return View("~/Views/Shared/Error_500.cshtml");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult RemoveStudent(Guid enrollmentId, Guid classId)
+        {
+            var enrollment = db.Enrollments.SingleOrDefault(e =>
+                e.enrollment_id == enrollmentId && e.class_id == classId);
+
+            if (enrollment == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy học sinh trong lớp.";
+                return RedirectToAction("Details", new { id = classId });
+            }
+
+            db.Enrollments.Remove(enrollment);
+
+            try
+            {
+                db.SaveChanges();
+                TempData["SuccessMessage"] = "Đã xóa học sinh khỏi lớp.";
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("ClassManageController.RemoveStudent: {0}", ex);
+                TempData["ErrorMessage"] = "Không thể xóa enrollment. Dữ liệu liên quan vẫn đang sử dụng enrollment này.";
+            }
+
+            return RedirectToAction("Details", new { id = classId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult WithdrawStudent(Guid enrollmentId, Guid classId)
+        {
+            var enrollment = db.Enrollments.SingleOrDefault(e =>
+                e.enrollment_id == enrollmentId && e.class_id == classId);
+
+            if (enrollment == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy học sinh trong lớp.";
+                return RedirectToAction("Details", new { id = classId });
+            }
+
+            enrollment.enrollment_status = "Withdrawn";
+            enrollment.withdrawn_at = DateTime.Now;
+            enrollment.updated_at = DateTime.Now;
+
+            try
+            {
+                db.SaveChanges();
+                TempData["SuccessMessage"] = "Đã vô hiệu hóa học sinh trong lớp.";
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("ClassManageController.WithdrawStudent: {0}", ex);
+                TempData["ErrorMessage"] = "Không thể vô hiệu hóa học sinh.";
+            }
+
+            return RedirectToAction("Details", new { id = classId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ReactivateStudent(Guid enrollmentId, Guid classId)
+        {
+            var enrollment = db.Enrollments.SingleOrDefault(e =>
+                e.enrollment_id == enrollmentId && e.class_id == classId);
+
+            if (enrollment == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy học sinh trong lớp.";
+                return RedirectToAction("Details", new { id = classId });
+            }
+
+            enrollment.enrollment_status = "Confirmed";
+            enrollment.withdrawn_at = null;
+            enrollment.updated_at = DateTime.Now;
+
+            try
+            {
+                db.SaveChanges();
+                TempData["SuccessMessage"] = "Đã kích hoạt lại học sinh trong lớp.";
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("ClassManageController.ReactivateStudent: {0}", ex);
+                TempData["ErrorMessage"] = "Không thể kích hoạt lại học sinh.";
+            }
+
+            return RedirectToAction("Details", new { id = classId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult GenerateSessions(Guid classId)
+        {
+            var classItem = db.Classes.Include(c => c.ClassSchedules)
+                .SingleOrDefault(c => c.class_id == classId);
+            if (classItem == null) return HttpNotFound();
+
+            var schedules = classItem.ClassSchedules.ToList();
+            if (!schedules.Any())
+            {
+                TempData["ErrorMessage"] = "Lớp chưa có lịch học hàng tuần.";
+                return RedirectToAction("Details", new { id = classId });
+            }
+
+            if (classItem.start_date.Date > classItem.end_date.Date)
+            {
+                TempData["ErrorMessage"] = "Ngày bắt đầu của lớp phải nhỏ hơn hoặc bằng ngày kết thúc.";
+                return RedirectToAction("Details", new { id = classId });
+            }
+
+            var existing = db.ClassSessions.Where(s => s.class_id == classId)
+                .Select(s => new { s.session_date, s.time_slot_id }).ToList();
+            var added = 0;
+            for (var date = classItem.start_date.Date; date <= classItem.end_date.Date; date = date.AddDays(1))
+            {
+                var weekDay = GetScheduleWeekDay(date.DayOfWeek);
+                foreach (var schedule in schedules.Where(s =>
+                    string.Equals(s.week_day, weekDay, StringComparison.OrdinalIgnoreCase)))
+                {
+                    if (existing.Any(s => s.session_date == date && s.time_slot_id == schedule.time_slot_id)) continue;
+                    db.ClassSessions.Add(new ClassSession
+                    {
+                        session_id = Guid.NewGuid(), class_id = classId,
+                        time_slot_id = schedule.time_slot_id, session_date = date
+                    });
+                    existing.Add(new { session_date = date, time_slot_id = schedule.time_slot_id });
+                    added++;
+                }
+            }
+            db.SaveChanges();
+            TempData["SuccessMessage"] = "Đã tạo thêm " + added + " buổi học từ lịch tuần.";
+            return RedirectToAction("Details", new { id = classId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateSessionTopic(Guid sessionId, Guid classId, string topic)
+        {
+            var session = db.ClassSessions.SingleOrDefault(s =>
+                s.session_id == sessionId && s.class_id == classId);
+            if (session == null) return HttpNotFound();
+
+            session.topic = string.IsNullOrWhiteSpace(topic) ? null : topic.Trim();
+            if (session.topic != null && session.topic.Length > 300)
+            {
+                TempData["ErrorMessage"] = "Chủ đề không được vượt quá 300 ký tự.";
+                return RedirectToAction("Details", new { id = classId });
+            }
+
+            db.SaveChanges();
+            TempData["SuccessMessage"] = "Đã cập nhật chủ đề buổi học.";
+            return RedirectToAction("Details", new { id = classId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteSession(Guid sessionId, Guid classId)
+        {
+            var session = db.ClassSessions.SingleOrDefault(s =>
+                s.session_id == sessionId && s.class_id == classId);
+            if (session == null) return HttpNotFound();
+
+            if (db.AttendanceRecords.Any(a => a.session_id == sessionId))
+            {
+                TempData["ErrorMessage"] = "Không thể xóa buổi học đã có dữ liệu điểm danh.";
+                return RedirectToAction("Details", new { id = classId });
+            }
+
+            db.ClassSessions.Remove(session);
+            db.SaveChanges();
+            TempData["SuccessMessage"] = "Đã xóa buổi học.";
+            return RedirectToAction("Details", new { id = classId });
+        }
+
+        private static string GetScheduleWeekDay(DayOfWeek dayOfWeek)
+        {
+            switch (dayOfWeek)
+            {
+                case DayOfWeek.Monday: return "Monday";
+                case DayOfWeek.Tuesday: return "Tuesday";
+                case DayOfWeek.Wednesday: return "Wednesday";
+                case DayOfWeek.Thursday: return "Thursday";
+                case DayOfWeek.Friday: return "Friday";
+                case DayOfWeek.Saturday: return "Saturday";
+                default: return "Sunday";
             }
         }
 

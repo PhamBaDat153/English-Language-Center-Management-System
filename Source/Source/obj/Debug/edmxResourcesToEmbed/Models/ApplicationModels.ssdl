@@ -50,6 +50,7 @@
     <Property Name="class_code" Type="varchar" MaxLength="50" Nullable="false" />
     <Property Name="start_date" Type="date" Nullable="false" />
     <Property Name="end_date" Type="date" Nullable="false" />
+    <Property Name="class_capacity" Type="int" Nullable="false" />
     <Property Name="created_at" Type="datetime2" Precision="3" Nullable="false" />
     <Property Name="updated_at" Type="datetime2" Precision="3" Nullable="false" />
     <Property Name="class_status" Type="varchar" MaxLength="20" Nullable="false" />

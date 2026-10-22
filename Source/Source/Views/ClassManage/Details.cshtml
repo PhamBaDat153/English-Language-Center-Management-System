@@ -182,6 +182,134 @@
         </section>
 
         <section class="panel mt-4">
+            <div class="mb-3">
+                <h2 class="h5 mb-1">Danh sách học sinh</h2>
+                <p class="text-muted mb-0">Các học sinh đã đăng ký lớp @Model.class_code.</p>
+            </div>
+
+            @using (Html.BeginForm("Details", "ClassManage", FormMethod.Get, new { @class = "row g-2 mb-3" }))
+            {
+                <input type="hidden" name="id" value="@Model.class_id" />
+                <div class="col-12 col-md-4">
+                    <label for="studentName" class="form-label visually-hidden">Tên học sinh</label>
+                    <input type="text" id="studentName" name="studentName"
+                           class="form-control" placeholder="Tên học sinh"
+                           value="@(ViewBag.StudentName ?? "")" />
+                </div>
+                <div class="col-12 col-md-4">
+                    <label for="studentEmail" class="form-label visually-hidden">Gmail/email</label>
+                    <input type="text" id="studentEmail" name="studentEmail"
+                           class="form-control" placeholder="Gmail/email"
+                           value="@(ViewBag.StudentEmail ?? "")" />
+                </div>
+                <div class="col-12 col-md-2">
+                    <label for="studentStatus" class="form-label visually-hidden">Trạng thái</label>
+                    <select id="studentStatus" name="studentStatus" class="form-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="Pending" @(ViewBag.StudentStatus == "Pending" ? "selected" : "")>Đang chờ</option>
+                        <option value="Confirmed" @(ViewBag.StudentStatus == "Confirmed" ? "selected" : "")>Đã xác nhận</option>
+                        <option value="Studying" @(ViewBag.StudentStatus == "Studying" ? "selected" : "")>Đang học</option>
+                        <option value="Completed" @(ViewBag.StudentStatus == "Completed" ? "selected" : "")>Hoàn thành</option>
+                        <option value="Withdrawn" @(ViewBag.StudentStatus == "Withdrawn" ? "selected" : "")>Đã vô hiệu hóa</option>
+                        <option value="Cancelled" @(ViewBag.StudentStatus == "Cancelled" ? "selected" : "")>Đã hủy</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        <i class="bi bi-search" aria-hidden="true"></i> Lọc
+                    </button>
+                    <a class="btn btn-outline-secondary"
+                       href="@Url.Action("Details", "ClassManage", new { id = Model.class_id })"
+                       title="Xóa bộ lọc" aria-label="Xóa bộ lọc">
+                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                    </a>
+                </div>
+            }
+
+            @{
+                var classStudents = ViewBag.ClassStudents as IEnumerable<Source.Models.Enrollment>;
+            }
+
+            @if (classStudents == null || !classStudents.Any())
+            {
+                <div class="alert alert-light border mb-0">
+                    Lớp chưa có học sinh đăng ký.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Mã học sinh</th>
+                                <th>Họ và tên</th>
+                                <th>Email</th>
+                                <th>Số điện thoại</th>
+                                <th>Ngày đăng ký</th>
+                                <th>Trạng thái</th>
+                                <th class="text-end">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var enrollment in classStudents)
+                            {
+                                var student = enrollment.Student_Profile;
+                                var user = student == null ? null : student.User;
+                                <tr>
+                                    <td>@(student == null ? "-" : student.student_code)</td>
+                                    <td>@(user == null ? "-" : user.full_name)</td>
+                                    <td>@(user == null || string.IsNullOrWhiteSpace(user.email) ? "-" : user.email)</td>
+                                    <td>@(user == null || string.IsNullOrWhiteSpace(user.phone_number) ? "-" : user.phone_number)</td>
+                                    <td>@enrollment.enrollment_date.ToString("dd/MM/yyyy")</td>
+                                    <td>@enrollment.enrollment_status</td>
+                                    <td class="text-end">
+                                        @if (enrollment.enrollment_status == "Withdrawn")
+                                        {
+                                            using (Html.BeginForm("ReactivateStudent", "ClassManage", FormMethod.Post, new { @class = "d-inline" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                @Html.Hidden("enrollmentId", enrollment.enrollment_id)
+                                                @Html.Hidden("classId", Model.class_id)
+                                                <button type="submit" class="btn btn-outline-success btn-sm"
+                                                        onclick="return confirm('Bạn có chắc muốn kích hoạt lại học sinh này không?');">
+                                                    Kích hoạt lại
+                                                </button>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (Html.BeginForm("WithdrawStudent", "ClassManage", FormMethod.Post, new { @class = "d-inline" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                @Html.Hidden("enrollmentId", enrollment.enrollment_id)
+                                                @Html.Hidden("classId", Model.class_id)
+                                                <button type="submit" class="btn btn-outline-warning btn-sm"
+                                                        onclick="return confirm('Bạn có chắc muốn vô hiệu hóa học sinh này không?');">
+                                                    Vô hiệu hóa
+                                                </button>
+                                            }
+                                        }
+                                        @using (Html.BeginForm("RemoveStudent", "ClassManage", FormMethod.Post, new { @class = "d-inline" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            @Html.Hidden("enrollmentId", enrollment.enrollment_id)
+                                            @Html.Hidden("classId", Model.class_id)
+                                            <button type="submit" class="btn btn-outline-danger btn-sm"
+                                                    onclick="return confirm('Xóa enrollment sẽ xóa học sinh khỏi lớp. Bạn có chắc không?');">
+                                                Xóa khỏi lớp
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+
+        <section class="panel mt-4">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                 <div>
                     <h2 class="h5 mb-1">Lịch học hàng tuần</h2>
@@ -256,6 +384,63 @@
                         </tbody>
                     </table>
                 </div>
+            }
+        </section>
+
+        <section class="panel mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="h5 mb-1">Buổi học</h2>
+                    <p class="text-muted mb-0">Tự sinh theo lịch tuần và khoảng ngày của lớp.</p>
+                </div>
+                @using (Html.BeginForm("GenerateSessions", "ClassManage", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("classId", Model.class_id)
+                    <button class="btn btn-primary btn-sm">Tạo/cập nhật buổi học</button>
+                }
+            </div>
+            @if (Model.ClassSessions == null || !Model.ClassSessions.Any())
+            {
+                <div class="alert alert-light border mb-0">Chưa có buổi học nào.</div>
+            }
+            else
+            {
+                <div class="table-responsive"><table class="table table-hover align-middle mb-0">
+                    <thead><tr><th>Ngày học</th><th>Khung giờ</th><th>Chủ đề</th><th class="text-end">Thao tác</th></tr></thead>
+                    <tbody>
+                    @foreach (var session in Model.ClassSessions.OrderBy(s => s.session_date).ThenBy(s => s.TimeSlot.start_time))
+                    {
+                        <tr>
+                            <td>@session.session_date.ToString("dd/MM/yyyy")</td>
+                            <td>@(session.TimeSlot == null ? "-" : session.TimeSlot.slot_name)</td>
+                            <td>
+                                @using (Html.BeginForm("UpdateSessionTopic", "ClassManage", FormMethod.Post, new { @class = "d-flex gap-2" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("sessionId", session.session_id)
+                                    @Html.Hidden("classId", Model.class_id)
+                                    <input type="text" name="topic" class="form-control form-control-sm"
+                                           maxlength="300" value="@session.topic" placeholder="Nhập chủ đề" />
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">Lưu</button>
+                                }
+                            </td>
+                            <td class="text-end">
+                                @using (Html.BeginForm("DeleteSession", "ClassManage", FormMethod.Post, new { @class = "d-inline" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("sessionId", session.session_id)
+                                    @Html.Hidden("classId", Model.class_id)
+                                    <button type="submit" class="btn btn-outline-danger btn-sm"
+                                            onclick="return confirm('Bạn có chắc muốn xóa buổi học này không?');">
+                                        Xóa
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table></div>
             }
         </section>
 

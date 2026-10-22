@@ -101,7 +101,8 @@
                         @Html.LabelFor(m => m.end_date, "Ngày kết thúc",
                             new { @class = "form-label fw-semibold" })
                         @Html.TextBoxFor(m => m.end_date, "{0:yyyy-MM-dd}",
-                            new { @class = "form-control", type = "date" })
+                            new { @class = "form-control", type = "date", @readonly = "readonly", id = "endDate" })
+                        <div class="form-text">Tự động tính theo ngày bắt đầu và thời lượng khóa học.</div>
                         @Html.ValidationMessageFor(m => m.end_date, "",
                             new { @class = "text-danger small" })
                     </div>
@@ -133,3 +134,23 @@
         </section>
     </div>
 </main>
+
+<script>
+    (function () {
+        var start = document.getElementById("start_date");
+        var end = document.getElementById("endDate");
+        var course = document.getElementById("course_id");
+        var durations = @Html.Raw(Json.Encode(ViewBag.CourseDurations ?? new Dictionary<string, int>()));
+
+        function updateEndDate() {
+            if (!start.value || !durations[course.value]) return;
+            var date = new Date(start.value + "T00:00:00");
+            date.setDate(date.getDate() + durations[course.value] * 7 - 1);
+            end.value = date.toISOString().slice(0, 10);
+        }
+
+        start.addEventListener("change", updateEndDate);
+        course.addEventListener("change", updateEndDate);
+        updateEndDate();
+    })();
+</script>
