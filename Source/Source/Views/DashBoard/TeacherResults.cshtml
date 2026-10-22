@@ -1,0 +1,35 @@
+﻿@model Source.ViewModels.TeacherResultsViewModel
+@using System.Linq
+@{
+    ViewBag.Title = "Kết quả học tập";
+    Layout = "~/Views/Shared/_TeacherDashboardLayout.cshtml";
+}
+<main class="dashboard-content"><div class="container-fluid px-3 px-lg-4">
+    <div class="page-heading"><div class="page-heading-copy"><span class="page-icon"><i class="bi bi-journal-check" aria-hidden="true"></i></span><div><p class="eyebrow mb-1">Không gian giáo viên</p><h1 class="h3 mb-1">Kết quả học tập</h1><p class="text-muted mb-0">Xem điểm đã nhập và cập nhật điểm theo từng bài đánh giá.</p></div></div><a class="btn btn-outline-secondary" href="@Url.Action("TeacherHome", "Dashboard")">Về trang chủ</a></div>
+    @if (TempData["SuccessMessage"] != null) { <div class="alert alert-success mt-3">@TempData["SuccessMessage"]</div> }
+    @if (TempData["ErrorMessage"] != null) { <div class="alert alert-danger mt-3">@TempData["ErrorMessage"]</div> }
+    <section class="panel mt-3"><div class="panel-header"><div><p class="eyebrow mb-1">Bảng điểm</p><h2 class="h5 mb-0">Bài đánh giá của các lớp</h2></div></div>
+        @if (Model.Assessments == null || !Model.Assessments.Any()) { <div class="alert alert-light border mb-0">Chưa có bài đánh giá trong các lớp bạn phụ trách.</div> }
+        else { <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Lớp</th><th>Bài đánh giá</th><th>Loại</th><th>Ngày</th><th>Số học viên có điểm</th><th></th></tr></thead><tbody>@foreach (var item in Model.Assessments) { <tr class="@(Model.SelectedAssessment != null && Model.SelectedAssessment.assessment_id == item.AssessmentId ? "table-primary" : "")"><td><strong>@item.ClassCode</strong><div class="text-muted small">@item.CourseName</div></td><td>@item.AssessmentName<div class="text-muted small">Tối đa @item.MaxScore điểm</div></td><td>@item.AssessmentType</td><td>@(item.AssessmentDate.HasValue ? item.AssessmentDate.Value.ToString("dd/MM/yyyy") : "-")</td><td>@item.ScoredCount / @item.StudentCount</td><td><a class="btn btn-outline-primary btn-sm" href="@Url.Action("Results", "Dashboard", new { assessmentId = item.AssessmentId })">Xem / sửa điểm</a></td></tr> }</tbody></table></div> }
+    </section>
+
+    @if (Model.SelectedAssessment != null)
+    {
+        <section class="panel mt-4"><div class="panel-header"><div><p class="eyebrow mb-1">Lớp @Model.SelectedAssessment.class_code · @Model.SelectedAssessment.assessment_type</p><h2 class="h5 mb-0">@Model.SelectedAssessment.assessment_name</h2><p class="text-muted mb-0">Điểm tối đa: @Model.SelectedAssessment.max_score · @(Model.SelectedAssessment.assessment_date.HasValue ? Model.SelectedAssessment.assessment_date.Value.ToString("dd/MM/yyyy") : "Chưa có ngày")</p></div></div>
+            @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+            @using (Html.BeginForm("SaveResults", "Dashboard", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("assessment_id", Model.SelectedAssessment.assessment_id)
+                @Html.Hidden("class_id", Model.SelectedAssessment.class_id)
+                <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Mã học viên</th><th>Họ tên</th><th>Điểm / @Model.SelectedAssessment.max_score</th><th>Nhận xét</th></tr></thead><tbody>
+                    @for (var i = 0; i < Model.SelectedAssessment.Students.Count; i++)
+                    {
+                        <tr><td>@Model.SelectedAssessment.Students[i].student_code</td><td><strong>@Model.SelectedAssessment.Students[i].student_name</strong></td><td><input type="hidden" name="Students[@i].enrollment_id" value="@Model.SelectedAssessment.Students[i].enrollment_id" /><input class="form-control" type="number" name="Students[@i].score" min="0" max="@Model.SelectedAssessment.max_score" step="0.01" value="@(Model.SelectedAssessment.Students[i].score.HasValue ? Model.SelectedAssessment.Students[i].score.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "")" /></td><td><input class="form-control" type="text" name="Students[@i].feedback" maxlength="2000" value="@Model.SelectedAssessment.Students[i].feedback" /></td></tr>
+                    }
+                </tbody></table></div>
+                <div class="d-flex gap-2 mt-3"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1" aria-hidden="true"></i>Lưu kết quả</button><a class="btn btn-outline-secondary" href="@Url.Action("Results", "Dashboard")">Đóng bảng điểm</a></div>
+            }
+        </section>
+    }
+</div></main>

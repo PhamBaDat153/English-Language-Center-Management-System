@@ -1,9 +1,11 @@
-﻿@{
+﻿@model Source.ViewModels.TeacherDashboardViewModel
+@using System.Linq
+@{
     ViewBag.Title = "Trang chủ giáo viên";
+    ViewBag.TeacherName = Model.TeacherName;
     Layout = "~/Views/Shared/_TeacherDashboardLayout.cshtml";
 }
 
-@* Nội dung bên dưới là dữ liệu mẫu tĩnh để dựng giao diện, chưa nối với chức năng nghiệp vụ. *@
 <main class="dashboard-content">
     <div class="container-fluid px-3 px-lg-4">
         <section class="page-heading">
@@ -11,148 +13,64 @@
                 <span class="page-icon"><i class="bi bi-mortarboard" aria-hidden="true"></i></span>
                 <div>
                     <p class="eyebrow mb-1">Teacher workspace</p>
-                    <h1 class="h3 mb-1">Chào mừng trở lại, Giáo viên</h1>
+                    <h1 class="h3 mb-1">Chào mừng trở lại, @Model.TeacherName</h1>
                     <p class="text-muted mb-0">Theo dõi lớp học, lịch giảng dạy và hoạt động trong tuần của bạn.</p>
                 </div>
             </div>
             <div class="heading-actions">
-                <a class="btn btn-primary" href="#teacher-schedule">
-                    <i class="bi bi-calendar3 me-1" aria-hidden="true"></i> Xem lịch giảng dạy
-                </a>
+                <a class="btn btn-primary" href="@Url.Action("Schedule", "Dashboard")"><i class="bi bi-calendar3 me-1" aria-hidden="true"></i>Xem lịch giảng dạy</a>
             </div>
         </section>
 
         <section class="row g-3" aria-label="Tổng quan giảng dạy">
-            <div class="col-12 col-sm-6 col-xl-3">
-                <article class="metric-card metric-primary">
-                    <div class="metric-top"><span class="metric-label">Lớp đang phụ trách</span><span class="metric-icon"><i class="bi bi-easel2" aria-hidden="true"></i></span></div>
-                    <div class="metric-value">04</div>
-                    <div class="metric-meta"><span>Trong học kỳ hiện tại</span></div>
-                </article>
-            </div>
-            <div class="col-12 col-sm-6 col-xl-3">
-                <article class="metric-card metric-success">
-                    <div class="metric-top"><span class="metric-label">Học viên</span><span class="metric-icon"><i class="bi bi-people" aria-hidden="true"></i></span></div>
-                    <div class="metric-value">86</div>
-                    <div class="metric-meta"><span>Đang theo học các lớp của bạn</span></div>
-                </article>
-            </div>
-            <div class="col-12 col-sm-6 col-xl-3">
-                <article class="metric-card metric-warning">
-                    <div class="metric-top"><span class="metric-label">Buổi dạy tuần này</span><span class="metric-icon"><i class="bi bi-calendar2-week" aria-hidden="true"></i></span></div>
-                    <div class="metric-value">12</div>
-                    <div class="metric-meta"><span>Trên tổng số 15 buổi</span></div>
-                </article>
-            </div>
-            <div class="col-12 col-sm-6 col-xl-3">
-                <article class="metric-card metric-danger">
-                    <div class="metric-top"><span class="metric-label">Việc cần hoàn tất</span><span class="metric-icon"><i class="bi bi-check2-square" aria-hidden="true"></i></span></div>
-                    <div class="metric-value">03</div>
-                    <div class="metric-meta"><span>Điểm danh và cập nhật kết quả</span></div>
-                </article>
-            </div>
+            <div class="col-12 col-sm-6 col-xl-3"><article class="metric-card metric-primary"><div class="metric-top"><span class="metric-label">Lớp đang phụ trách</span><span class="metric-icon"><i class="bi bi-easel2" aria-hidden="true"></i></span></div><div class="metric-value">@Model.ClassCount.ToString("00")</div><div class="metric-meta"><span>Lớp được phân công</span></div></article></div>
+            <div class="col-12 col-sm-6 col-xl-3"><article class="metric-card metric-success"><div class="metric-top"><span class="metric-label">Học viên</span><span class="metric-icon"><i class="bi bi-people" aria-hidden="true"></i></span></div><div class="metric-value">@Model.StudentCount</div><div class="metric-meta"><span>Trong các lớp đang dạy</span></div></article></div>
+            <div class="col-12 col-sm-6 col-xl-3"><article class="metric-card metric-warning"><div class="metric-top"><span class="metric-label">Buổi dạy tuần này</span><span class="metric-icon"><i class="bi bi-calendar2-week" aria-hidden="true"></i></span></div><div class="metric-value">@Model.SessionsThisWeek</div><div class="metric-meta"><span>Theo lịch các lớp đã phân công</span></div></article></div>
+            <div class="col-12 col-sm-6 col-xl-3"><article class="metric-card metric-danger"><div class="metric-top"><span class="metric-label">Buổi cần điểm danh</span><span class="metric-icon"><i class="bi bi-check2-square" aria-hidden="true"></i></span></div><div class="metric-value">@Model.AttendanceToComplete.ToString("00")</div><div class="metric-meta"><span>Buổi đã diễn ra chưa đủ điểm danh</span></div></article></div>
         </section>
 
         <section class="row g-3 mt-1">
             <div class="col-12 col-xl-8">
                 <article class="panel h-100">
-                    <div class="panel-header">
-                        <div><p class="eyebrow mb-1">Buổi học tiếp theo</p><h2 class="h5 mb-0">Lớp ENG-A2-02</h2></div>
-                        <span class="badge text-bg-primary">Sắp diễn ra</span>
+                    <div class="panel-header"><div><p class="eyebrow mb-1">Buổi học tiếp theo</p><h2 class="h5 mb-0">@(Model.NextSession == null ? "Chưa có buổi học sắp tới" : "Lớp " + Model.NextSession.ClassCode)</h2></div>
+                        @if (Model.NextSession != null) { <span class="badge text-bg-primary">@Model.NextSession.SessionDate.ToString("dd/MM/yyyy")</span> }
                     </div>
-                    <div class="d-flex align-items-start gap-3 mb-4">
-                        <span class="page-icon"><i class="bi bi-chat-square-text" aria-hidden="true"></i></span>
-                        <div>
-                            <h3 class="h4 mb-1">English Communication A2</h3>
-                            <p class="text-muted mb-3">Khóa giao tiếp sơ cấp · 22 học viên</p>
-                            <div class="d-flex flex-wrap gap-3 text-muted">
-                                <span><i class="bi bi-clock me-1" aria-hidden="true"></i>09:00 – 10:30</span>
-                                <span><i class="bi bi-geo-alt me-1" aria-hidden="true"></i>Phòng A203</span>
-                                <span><i class="bi bi-calendar3 me-1" aria-hidden="true"></i>Thứ Hai</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 border-top pt-3">
-                        <span class="text-muted"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Chuẩn bị tài liệu cho buổi học</span>
-                        <a href="#teacher-classes" class="link-primary fw-semibold">Xem lớp học <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-                    </div>
+                    @if (Model.NextSession == null)
+                    {
+                        <div class="alert alert-light border mb-0">Hiện chưa có buổi học được tạo cho các lớp bạn phụ trách.</div>
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-start gap-3 mb-4"><span class="page-icon"><i class="bi bi-chat-square-text" aria-hidden="true"></i></span><div><h3 class="h4 mb-1">@Model.NextSession.CourseName</h3><p class="text-muted mb-3">@Model.NextSession.StudentCount học viên · @(Model.NextSession.Topic ?? "Chưa cập nhật chủ đề")</p><div class="d-flex flex-wrap gap-3 text-muted"><span><i class="bi bi-clock me-1" aria-hidden="true"></i>@Model.NextSession.StartTime.ToString(@"hh\:mm") – @Model.NextSession.EndTime.ToString(@"hh\:mm")</span><span><i class="bi bi-geo-alt me-1" aria-hidden="true"></i>@Model.NextSession.RoomName</span><span><i class="bi bi-calendar3 me-1" aria-hidden="true"></i>@Model.NextSession.SessionDate.ToString("dddd", new System.Globalization.CultureInfo("vi-VN"))</span></div></div></div>
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 border-top pt-3"><span class="text-muted"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Lịch buổi học đã được cập nhật</span><a class="btn btn-outline-primary btn-sm" href="@Url.Action("TakeAttendance", "Dashboard", new { sessionId = Model.NextSession.SessionId })">Điểm danh <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
+                    }
                 </article>
             </div>
-
             <div class="col-12 col-xl-4">
-                <article class="panel h-100">
-                    <div class="panel-header">
-                        <div><p class="eyebrow mb-1">Tiến độ tuần</p><h2 class="h5 mb-0">Lịch giảng dạy</h2></div>
-                        <strong class="text-primary">12 <small class="text-muted">/ 15 buổi</small></strong>
-                    </div>
-                    <p class="text-muted small mb-4">Bạn đã hoàn thành phần lớn lịch dạy trong tuần.</p>
-                    <div class="activity-list">
-                        <div class="activity-item"><span class="activity-dot bg-primary"></span><div class="d-flex justify-content-between gap-3"><span>Đã hoàn thành</span><strong>09</strong></div></div>
-                        <div class="activity-item"><span class="activity-dot bg-success"></span><div class="d-flex justify-content-between gap-3"><span>Sắp diễn ra</span><strong>03</strong></div></div>
-                        <div class="activity-item"><span class="activity-dot bg-secondary"></span><div class="d-flex justify-content-between gap-3"><span>Còn lại</span><strong>03</strong></div></div>
-                    </div>
+                <article class="panel h-100"><div class="panel-header"><div><p class="eyebrow mb-1">Truy cập nhanh</p><h2 class="h5 mb-0">Công việc giảng dạy</h2></div></div>
+                    <div class="d-grid gap-2"><a class="btn btn-outline-primary text-start" href="@Url.Action("Classes", "Dashboard")"><i class="bi bi-easel2 me-2" aria-hidden="true"></i>Xem lớp và học viên</a><a class="btn btn-outline-primary text-start" href="@Url.Action("Schedule", "Dashboard")"><i class="bi bi-calendar-week me-2" aria-hidden="true"></i>Xem lịch dạy</a><a class="btn btn-outline-primary text-start" href="@Url.Action("Results", "Dashboard")"><i class="bi bi-journal-check me-2" aria-hidden="true"></i>Xem và cập nhật điểm</a><a class="btn btn-outline-primary text-start" href="@Url.Action("Attendance", "Dashboard")"><i class="bi bi-person-check me-2" aria-hidden="true"></i>Điểm danh</a></div>
                 </article>
             </div>
         </section>
 
         <section class="row g-3 mt-1">
-            <div class="col-12 col-xl-8" id="teacher-schedule">
-                <article class="panel h-100">
-                    <div class="panel-header">
-                        <div><p class="eyebrow mb-1">Thời khóa biểu</p><h2 class="h5 mb-0">Lịch dạy sắp tới</h2></div>
-                        <a href="#teacher-schedule" class="link-primary fw-semibold">Tuần này <i class="bi bi-chevron-down" aria-hidden="true"></i></a>
-                    </div>
-                    <div class="activity-list">
-                        <div class="activity-item"><span class="activity-dot bg-primary"></span><div class="d-flex flex-wrap align-items-center justify-content-between gap-2 w-100"><div><strong>09:00 – 10:30 · Thứ Hai, 26/10</strong><div>English Communication A2 <span class="text-muted">· ENG-A2-02 · Phòng A203</span></div></div><span class="badge text-bg-light">22 học viên</span></div></div>
-                        <div class="activity-item"><span class="activity-dot bg-info"></span><div class="d-flex flex-wrap align-items-center justify-content-between gap-2 w-100"><div><strong>13:30 – 15:00 · Thứ Ba, 27/10</strong><div>IELTS Writing Foundation <span class="text-muted">· IELTS-W01 · Phòng B105</span></div></div><span class="badge text-bg-light">18 học viên</span></div></div>
-                        <div class="activity-item"><span class="activity-dot bg-primary"></span><div class="d-flex flex-wrap align-items-center justify-content-between gap-2 w-100"><div><strong>18:00 – 19:30 · Thứ Năm, 29/10</strong><div>English Communication A2 <span class="text-muted">· ENG-A2-03 · Phòng A201</span></div></div><span class="badge text-bg-light">20 học viên</span></div></div>
-                        <div class="activity-item"><span class="activity-dot bg-warning"></span><div class="d-flex flex-wrap align-items-center justify-content-between gap-2 w-100"><div><strong>08:00 – 09:30 · Thứ Sáu, 30/10</strong><div>TOEIC Listening Practice <span class="text-muted">· TOEIC-L02 · Phòng C302</span></div></div><span class="badge text-bg-light">26 học viên</span></div></div>
-                    </div>
-                </article>
-            </div>
+            <div class="col-12 col-xl-8"><article class="panel"><div class="panel-header"><div><p class="eyebrow mb-1">Lịch sắp tới</p><h2 class="h5 mb-0">Các buổi dạy gần nhất</h2></div><a class="link-primary fw-semibold" href="@Url.Action("Schedule", "Dashboard")">Toàn bộ lịch <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
+                @if (Model.UpcomingSessions != null && Model.UpcomingSessions.Any()) { <div class="activity-list">@foreach (var session in Model.UpcomingSessions) { <div class="activity-item"><span class="activity-dot bg-primary"></span><div class="d-flex flex-wrap align-items-center justify-content-between gap-2 w-100"><div><strong>@session.SessionDate.ToString("dd/MM/yyyy") · @session.StartTime.ToString(@"hh\:mm") – @session.EndTime.ToString(@"hh\:mm") · @session.ClassCode</strong><div>@session.CourseName <span class="text-muted">· @session.RoomName · @session.StudentCount học viên</span></div></div><a class="btn btn-outline-secondary btn-sm" href="@Url.Action("TakeAttendance", "Dashboard", new { sessionId = session.SessionId })">Điểm danh</a></div></div> }</div> }
+                else if (Model.WeeklySchedules != null && Model.WeeklySchedules.Any()) { <div class="activity-list">@foreach (var schedule in Model.WeeklySchedules) { <div class="activity-item"><span class="activity-dot bg-primary"></span><div><strong>@schedule.WeekDay · @schedule.StartTime.ToString(@"hh\:mm") – @schedule.EndTime.ToString(@"hh\:mm") · @schedule.ClassCode</strong><div>@schedule.CourseName <span class="text-muted">· @schedule.RoomName</span></div></div></div> }</div><p class="text-muted small mb-0">Lịch buổi cụ thể chưa được tạo.</p> }
+                else { <div class="alert alert-light border mb-0">Chưa có buổi dạy hoặc lịch tuần được khai báo.</div> }
+            </article></div>
 
-            <div class="col-12 col-xl-4" id="teacher-notices">
-                <article class="panel h-100">
-                    <div class="panel-header">
-                        <div><p class="eyebrow mb-1">Cập nhật mới</p><h2 class="h5 mb-0">Thông báo</h2></div>
-                        <span class="badge text-bg-danger">2</span>
-                    </div>
-                    <div class="activity-list">
-                        <div class="activity-item"><span class="activity-dot bg-primary"></span><div><strong>Lịch họp chuyên môn</strong><p class="mb-1">Thứ Sáu · 16:00 · Phòng họp tầng 2</p><small class="text-muted">Hôm qua</small></div></div>
-                        <div class="activity-item"><span class="activity-dot bg-warning"></span><div><strong>Cập nhật giáo trình</strong><p class="mb-1">Tài liệu học kỳ mới đã sẵn sàng.</p><small class="text-muted">2 ngày trước</small></div></div>
-                    </div>
-                    <a href="#teacher-notices" class="link-primary fw-semibold">Xem tất cả thông báo <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-                </article>
-            </div>
+            <div class="col-12 col-xl-4" id="teacher-notices"><article class="panel h-100"><div class="panel-header"><div><p class="eyebrow mb-1">Cập nhật mới</p><h2 class="h5 mb-0">Thông báo</h2></div><span class="badge text-bg-danger">2</span></div><div class="activity-list"><div class="activity-item"><span class="activity-dot bg-primary"></span><div><strong>Lịch họp chuyên môn</strong><p class="mb-1">Thứ Sáu · 16:00 · Phòng họp tầng 2</p><small class="text-muted">Hôm qua</small></div></div><div class="activity-item"><span class="activity-dot bg-warning"></span><div><strong>Cập nhật giáo trình</strong><p class="mb-1">Tài liệu học kỳ mới đã sẵn sàng.</p><small class="text-muted">2 ngày trước</small></div></div></div><span class="text-muted small">Thông báo hiện là dữ liệu mẫu.</span></article></div>
         </section>
 
-        <section class="panel mt-4" id="teacher-classes">
-            <div class="panel-header">
-                <div><p class="eyebrow mb-1">Tổng quan lớp</p><h2 class="h5 mb-0">Các lớp đang giảng dạy</h2></div>
-                <a href="#teacher-classes" class="link-primary fw-semibold">Tất cả lớp <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-            </div>
-            <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead><tr><th>Lớp học</th><th>Khóa học</th><th>Lịch học</th><th>Học viên</th><th>Trạng thái</th></tr></thead>
-                    <tbody>
-                        <tr><td><strong>ENG-A2-02</strong><div class="text-muted small">NewGen · Cơ sở 1</div></td><td>Communication A2</td><td>Thứ 2 · 09:00</td><td>22</td><td><span class="badge text-bg-success">Đang học</span></td></tr>
-                        <tr><td><strong>IELTS-W01</strong><div class="text-muted small">NewGen · Cơ sở 1</div></td><td>IELTS Writing Foundation</td><td>Thứ 3 · 13:30</td><td>18</td><td><span class="badge text-bg-success">Đang học</span></td></tr>
-                        <tr><td><strong>ENG-A2-03</strong><div class="text-muted small">NewGen · Cơ sở 2</div></td><td>Communication A2</td><td>Thứ 5 · 18:00</td><td>20</td><td><span class="badge text-bg-success">Đang học</span></td></tr>
-                        <tr><td><strong>TOEIC-L02</strong><div class="text-muted small">NewGen · Cơ sở 1</div></td><td>TOEIC Listening Practice</td><td>Thứ 6 · 08:00</td><td>26</td><td><span class="badge text-bg-warning">Sắp khai giảng</span></td></tr>
-                    </tbody>
-                </table>
-            </div>
+        <section class="panel mt-4" id="teacher-classes"><div class="panel-header"><div><p class="eyebrow mb-1">Tổng quan lớp</p><h2 class="h5 mb-0">Các lớp đang giảng dạy</h2></div><a class="link-primary fw-semibold" href="@Url.Action("Classes", "Dashboard")">Tất cả lớp <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
+            @if (Model.Classes == null || !Model.Classes.Any()) { <div class="alert alert-light border mb-0">Bạn chưa được phân công lớp học nào.</div> }
+            else { <div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Lớp</th><th>Khóa học</th><th>Thời gian</th><th>Học viên</th><th>Trạng thái</th><th></th></tr></thead><tbody>@foreach (var item in Model.Classes) { <tr><td><strong>@item.ClassCode</strong></td><td>@item.CourseName</td><td>@item.StartDate.ToString("dd/MM/yyyy") – @item.EndDate.ToString("dd/MM/yyyy")</td><td>@item.StudentCount</td><td><span class="badge text-bg-primary">@item.ClassStatusLabel</span></td><td><a class="btn btn-outline-primary btn-sm" href="@Url.Action("ClassDetails", "Dashboard", new { id = item.ClassId })">Chi tiết</a></td></tr> }</tbody></table></div> }
         </section>
 
-        <section class="panel mt-4" id="teacher-actions" aria-label="Thao tác nhanh">
-            <div class="panel-header mb-0">
-                <div><p class="eyebrow mb-1">Lối tắt</p><h2 class="h5 mb-0">Công việc giảng dạy</h2></div>
-                <div class="d-flex flex-wrap gap-2">
-                    <a class="btn btn-outline-primary" href="#teacher-actions"><i class="bi bi-person-check me-1" aria-hidden="true"></i>Điểm danh lớp</a>
-                    <a class="btn btn-outline-primary" href="#teacher-actions"><i class="bi bi-pencil-square me-1" aria-hidden="true"></i>Cập nhật kết quả</a>
-                    <a class="btn btn-outline-primary" href="#teacher-actions"><i class="bi bi-journal-text me-1" aria-hidden="true"></i>Chuẩn bị bài dạy</a>
-                </div>
-            </div>
+        <section class="panel mt-4"><div class="panel-header"><div><p class="eyebrow mb-1">Theo dõi học tập</p><h2 class="h5 mb-0">Kết quả cần cập nhật</h2></div><a class="link-primary fw-semibold" href="@Url.Action("Results", "Dashboard")">Tất cả bài đánh giá <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
+            @if (Model.LatestAssessments == null || !Model.LatestAssessments.Any()) { <div class="alert alert-light border mb-0">Các lớp của bạn chưa có bài đánh giá.</div> }
+            else { <div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Lớp</th><th>Bài đánh giá</th><th>Ngày</th><th>Đã có điểm</th><th></th></tr></thead><tbody>@foreach (var assessment in Model.LatestAssessments) { <tr><td><strong>@assessment.ClassCode</strong><div class="text-muted small">@assessment.CourseName</div></td><td>@assessment.AssessmentName<div class="text-muted small">Tối đa @assessment.MaxScore điểm</div></td><td>@(assessment.AssessmentDate.HasValue ? assessment.AssessmentDate.Value.ToString("dd/MM/yyyy") : "-")</td><td><span class="badge @(assessment.ScoredCount >= assessment.StudentCount ? "text-bg-success" : "text-bg-warning")">@assessment.ScoredCount / @assessment.StudentCount</span></td><td><a class="btn btn-outline-primary btn-sm" href="@Url.Action("Results", "Dashboard", new { assessmentId = assessment.AssessmentId })">Xem / cập nhật</a></td></tr> }</tbody></table></div> }
         </section>
     </div>
 </main>

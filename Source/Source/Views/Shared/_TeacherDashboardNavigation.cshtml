@@ -1,4 +1,5 @@
-﻿<div class="sidebar-backdrop" data-sidebar-close></div>
+﻿@{ var currentTeacherAction = ViewContext.RouteData.Values["action"] as string; }
+<div class="sidebar-backdrop" data-sidebar-close></div>
 
 <aside class="admin-sidebar" id="adminSidebar" aria-label="Điều hướng giáo viên">
     <div class="sidebar-header">
@@ -12,27 +13,27 @@
     </div>
 
     <nav class="sidebar-nav">
-        <a class="nav-link active" href="@Url.Action("TeacherHome", "Dashboard")" aria-current="page">
+        <a class="@(currentTeacherAction == "TeacherHome" ? "nav-link active" : "nav-link")" href="@Url.Action("TeacherHome", "Dashboard")">
             <span class="nav-icon"><i class="bi bi-house-door" aria-hidden="true"></i></span>
             <span class="nav-text">Trang chủ</span>
         </a>
-        <a class="nav-link" href="#teacher-classes">
+        <a class="@(currentTeacherAction == "Classes" || currentTeacherAction == "ClassDetails" ? "nav-link active" : "nav-link")" href="@Url.Action("Classes", "Dashboard")">
             <span class="nav-icon"><i class="bi bi-easel2" aria-hidden="true"></i></span>
             <span class="nav-text">Lớp giảng dạy</span>
         </a>
-        <a class="nav-link" href="#teacher-schedule">
+        <a class="@(currentTeacherAction == "Schedule" ? "nav-link active" : "nav-link")" href="@Url.Action("Schedule", "Dashboard")">
             <span class="nav-icon"><i class="bi bi-calendar-week" aria-hidden="true"></i></span>
             <span class="nav-text">Lịch giảng dạy</span>
         </a>
-        <a class="nav-link" href="#teacher-actions">
+        <a class="@(currentTeacherAction == "Attendance" || currentTeacherAction == "TakeAttendance" ? "nav-link active" : "nav-link")" href="@Url.Action("Attendance", "Dashboard")">
             <span class="nav-icon"><i class="bi bi-card-checklist" aria-hidden="true"></i></span>
             <span class="nav-text">Điểm danh</span>
         </a>
-        <a class="nav-link" href="#teacher-actions">
+        <a class="@(currentTeacherAction == "Results" || currentTeacherAction == "SaveResults" ? "nav-link active" : "nav-link")" href="@Url.Action("Results", "Dashboard")">
             <span class="nav-icon"><i class="bi bi-journal-check" aria-hidden="true"></i></span>
             <span class="nav-text">Kết quả học tập</span>
         </a>
-        <a class="nav-link" href="#teacher-notices">
+        <a class="nav-link" href="@Url.Action("TeacherHome", "Dashboard")#teacher-notices">
             <span class="nav-icon"><i class="bi bi-megaphone" aria-hidden="true"></i></span>
             <span class="nav-text">Thông báo</span>
         </a>
@@ -46,7 +47,7 @@
         <img class="avatar-img avatar-md sidebar-user-avatar"
              src="/Resources/adminhmd-1.0.0/assets/images/avatar/avatar-fallback.jpg"
              alt="Ảnh đại diện giáo viên">
-        <strong>Giáo viên</strong>
+        <strong>@(ViewBag.TeacherName ?? "Giáo viên")</strong>
         <small>NewGen English Center</small>
     </div>
 
@@ -81,7 +82,7 @@
                         <img class="avatar-img avatar-sm"
                              src="/Resources/adminhmd-1.0.0/assets/images/avatar/avatar-fallback.jpg"
                              alt="Ảnh đại diện giáo viên">
-                        <span class="profile-name d-none d-sm-inline">Giáo viên</span>
+                        <span class="profile-name d-none d-sm-inline">@(ViewBag.TeacherName ?? "Giáo viên")</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="@Url.Action("Index", "Profile")">Hồ sơ cá nhân</a></li>
