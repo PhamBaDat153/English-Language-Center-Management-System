@@ -643,7 +643,10 @@
     <Content Include="Views\Shared\_Header.cshtml" />
     <Content Include="Views\Shared\_DashboardLayout.cshtml" />
     <Content Include="Views\Shared\_DashboardNavigation.cshtml" />
+    <Content Include="Views\Shared\_TeacherDashboardLayout.cshtml" />
+    <Content Include="Views\Shared\_TeacherDashboardNavigation.cshtml" />
     <Content Include="Views\Dashboard\Index.cshtml" />
+    <Content Include="Views\DashBoard\TeacherHome.cshtml" />
     <Content Include="Views\UserManage\Index.cshtml" />
     <Content Include="Views\UserManage\Create.cshtml" />
     <Content Include="Views\UserManage\Details.cshtml" />

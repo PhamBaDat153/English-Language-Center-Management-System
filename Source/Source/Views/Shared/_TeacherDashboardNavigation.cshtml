@@ -1,0 +1,94 @@
+﻿<div class="sidebar-backdrop" data-sidebar-close></div>
+
+<aside class="admin-sidebar" id="adminSidebar" aria-label="Điều hướng giáo viên">
+    <div class="sidebar-header">
+        <a class="brand-mark" href="@Url.Action("TeacherHome", "Dashboard")" aria-label="NewGen Teacher">
+            <span class="brand-icon"><i class="bi bi-mortarboard-fill" aria-hidden="true"></i></span>
+            <span class="brand-copy">
+                <span class="brand-title">NewGen</span>
+                <span class="brand-subtitle">Cổng giáo viên</span>
+            </span>
+        </a>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a class="nav-link active" href="@Url.Action("TeacherHome", "Dashboard")" aria-current="page">
+            <span class="nav-icon"><i class="bi bi-house-door" aria-hidden="true"></i></span>
+            <span class="nav-text">Trang chủ</span>
+        </a>
+        <a class="nav-link" href="#teacher-classes">
+            <span class="nav-icon"><i class="bi bi-easel2" aria-hidden="true"></i></span>
+            <span class="nav-text">Lớp giảng dạy</span>
+        </a>
+        <a class="nav-link" href="#teacher-schedule">
+            <span class="nav-icon"><i class="bi bi-calendar-week" aria-hidden="true"></i></span>
+            <span class="nav-text">Lịch giảng dạy</span>
+        </a>
+        <a class="nav-link" href="#teacher-actions">
+            <span class="nav-icon"><i class="bi bi-card-checklist" aria-hidden="true"></i></span>
+            <span class="nav-text">Điểm danh</span>
+        </a>
+        <a class="nav-link" href="#teacher-actions">
+            <span class="nav-icon"><i class="bi bi-journal-check" aria-hidden="true"></i></span>
+            <span class="nav-text">Kết quả học tập</span>
+        </a>
+        <a class="nav-link" href="#teacher-notices">
+            <span class="nav-icon"><i class="bi bi-megaphone" aria-hidden="true"></i></span>
+            <span class="nav-text">Thông báo</span>
+        </a>
+        <a class="nav-link" href="@Url.Action("Index", "Home")">
+            <span class="nav-icon"><i class="bi bi-arrow-left-circle" aria-hidden="true"></i></span>
+            <span class="nav-text">Về trang chính</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-user">
+        <img class="avatar-img avatar-md sidebar-user-avatar"
+             src="/Resources/adminhmd-1.0.0/assets/images/avatar/avatar-fallback.jpg"
+             alt="Ảnh đại diện giáo viên">
+        <strong>Giáo viên</strong>
+        <small>NewGen English Center</small>
+    </div>
+
+    <div class="sidebar-footer">
+        <span class="status-dot"></span>
+        <span class="sidebar-footer-text">Không gian giảng dạy</span>
+    </div>
+</aside>
+
+<div class="admin-main">
+    <nav class="navbar admin-navbar navbar-expand bg-white">
+        <div class="container-fluid px-3 px-lg-4">
+            <button class="sidebar-toggle" type="button" data-sidebar-toggle
+                    aria-controls="adminSidebar" aria-expanded="true" aria-label="Thu gọn menu">
+                <span></span><span></span><span></span>
+            </button>
+
+            <div class="d-none d-md-flex align-items-center ms-3 fw-bold text-secondary">
+                <i class="bi bi-mortarboard me-2 text-primary" aria-hidden="true"></i>
+                <span>Teacher workspace</span>
+            </div>
+
+            <div class="navbar-actions ms-auto">
+                <button class="icon-button theme-toggle" type="button" data-theme-toggle
+                        aria-label="Đổi giao diện sáng tối" title="Đổi giao diện sáng tối">
+                    <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
+                </button>
+
+                <div class="dropdown">
+                    <button class="profile-button dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <img class="avatar-img avatar-sm"
+                             src="/Resources/adminhmd-1.0.0/assets/images/avatar/avatar-fallback.jpg"
+                             alt="Ảnh đại diện giáo viên">
+                        <span class="profile-name d-none d-sm-inline">Giáo viên</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="@Url.Action("Index", "Profile")">Hồ sơ cá nhân</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Đăng xuất</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
