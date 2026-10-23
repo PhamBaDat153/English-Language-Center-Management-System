@@ -1,0 +1,267 @@
+﻿@model IEnumerable<Source.Models.Notification>
+
+@{
+    ViewBag.Title = "Quản lý thông báo";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 0;
+    int filteredCount = ViewBag.FilteredCount ?? 0;
+}
+
+<style>
+    /* Styling chữ màu trắng nổi bật, rõ nét */
+    .notif-title-white {
+        color: #ffffff !important; /* Màu trắng pure */
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .notif-user-name-white {
+        color: #ffffff !important; /* Màu trắng pure */
+        font-weight: 600;
+    }
+
+    .notif-user-email-white {
+        color: #f8fafc !important; /* Màu trắng sáng dịu cho email */
+        font-weight: 400;
+    }
+
+    .notif-time-white {
+        color: #f8fafc !important; /* Màu trắng sáng dịu cho ngày gửi */
+        font-weight: 500;
+    }
+</style>
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <!-- Tiêu đề trang -->
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-bell" aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <p class="eyebrow mb-1">Trang quản lý</p>
+                    <h1 class="h3 mb-1">Quản lý thông báo</h1>
+                    <p class="text-muted mb-0">
+                        Theo dõi, tìm kiếm và quản lý danh sách thông báo trong hệ thống.
+                    </p>
+                </div>
+            </div>
+
+            <div class="heading-actions">
+                <a class="btn btn-primary btn-sm" href="@Url.Action("Create", "NotificationManage")">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                    Tạo thông báo
+                </a>
+            </div>
+        </div>
+
+        <!-- Thông báo Alert kết quả xóa/thao tác -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mt-3 shadow-sm" role="alert">
+                <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mt-3 shadow-sm" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>@TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Tìm kiếm -->
+        <section class="panel mt-4">
+            <div class="panel-header p-3">
+                <h2 class="h5 mb-0 section-title">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    Tìm kiếm thông báo
+                </h2>
+            </div>
+
+            <div class="p-3">
+                @using (Html.BeginForm("Index", "NotificationManage", FormMethod.Get))
+                {
+                    <div class="row g-3">
+                        <div class="col-12 col-md-9 col-lg-10">
+                            <label for="search" class="form-label fw-semibold">Từ khóa tìm kiếm</label>
+                            <input type="text"
+                                   id="search"
+                                   name="search"
+                                   class="form-control"
+                                   value="@ViewBag.Search"
+                                   placeholder="Nhập tiêu đề, nội dung, tên người nhận hoặc email..." />
+                        </div>
+
+                        <div class="col-12 col-md-3 col-lg-2 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search" aria-hidden="true"></i>
+                                Tìm kiếm
+                            </button>
+
+                            <a href="@Url.Action("Index", "NotificationManage")" class="btn btn-outline-secondary" title="Xóa tìm kiếm">
+                                Xóa
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <!-- Bảng danh sách thông báo -->
+        <section class="panel mt-4">
+            <div class="panel-header p-3">
+                <h2 class="h5 mb-1 section-title">
+                    <i class="bi bi-table" aria-hidden="true"></i>
+                    Danh sách thông báo
+                </h2>
+                <p class="text-muted mb-0 mt-1 small">
+                    Tìm thấy <strong class="text-white">@filteredCount</strong> thông báo.
+                </p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Tiêu đề thông báo</th>
+                            <th>Người nhận</th>
+                            <th class="text-center">Ngày gửi</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model == null || !Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-5">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                                    Không tìm thấy thông báo nào.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                string userName = item.User != null ? item.User.full_name : "N/A";
+                                string userEmail = item.User != null ? item.User.email : "";
+
+                                <tr>
+                                    <!-- Tiêu đề chữ màu trắng -->
+                                    <td>
+                                        <span class="notif-title-white">@item.title</span>
+                                    </td>
+
+                                    <!-- Tên & Email người nhận chữ màu trắng -->
+                                    <td>
+                                        <div class="notif-user-name-white">@userName</div>
+                                        <small class="notif-user-email-white">@userEmail</small>
+                                    </td>
+
+                                    <!-- Ngày gửi chữ màu trắng -->
+                                    <td class="text-center text-nowrap">
+                                        <small class="notif-time-white">@item.created_at.ToString("dd/MM/yyyy HH:mm")</small>
+                                    </td>
+
+                                    <!-- Trạng thái -->
+                                    <td class="text-center text-nowrap">
+                                        @if (item.read_status == "Read")
+                                        {
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Đã đọc</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1">Chưa đọc</span>
+                                        }
+                                    </td>
+
+                                    <!-- Thao tác xem & xóa -->
+                                    <td class="text-center text-nowrap">
+                                        <div class="d-inline-flex align-items-center gap-2">
+                                            <!-- Xem chi tiết -->
+                                            <a class="btn btn-sm btn-outline-primary"
+                                               href="@Url.Action("Details", "NotificationManage", new { id = item.notification_id })"
+                                               title="Xem chi tiết nội dung">
+                                                <i class="bi bi-eye" aria-hidden="true"></i>
+                                            </a>
+
+                                            <!-- Nút Thùng rác xóa khỏi CSDL -->
+                                            @using (Html.BeginForm("Delete", "NotificationManage", new { id = item.notification_id }, FormMethod.Post, new { style = "display:inline;" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        title="Xóa thông báo khỏi CSDL"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa vĩnh viễn thông báo này khỏi hệ thống không?');">
+                                                    <i class="bi bi-trash" aria-hidden="true"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Phân trang -->
+            @if (totalPages > 1)
+            {
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 p-3 border-top">
+                    <span class="text-muted small">
+                        Trang <strong>@currentPage</strong> / <strong>@totalPages</strong>
+                    </span>
+
+                    <nav aria-label="Phân trang thông báo">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", new {
+                                       search = ViewBag.Search,
+                                       page = currentPage - 1
+                                   })">
+                                    Trước
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= totalPages; i++)
+                            {
+                                <li class="page-item @(i == currentPage ? "active" : "")">
+                                    <a class="page-link"
+                                       href="@Url.Action("Index", new {
+                                           search = ViewBag.Search,
+                                           page = i
+                                       })">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                                <a class="page-link"
+                                   href="@Url.Action("Index", new {
+                                       search = ViewBag.Search,
+                                       page = currentPage + 1
+                                   })">
+                                    Sau
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </section>
+
+    </div>
+</main>

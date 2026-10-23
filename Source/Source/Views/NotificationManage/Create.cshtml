@@ -1,0 +1,290 @@
+﻿@{
+    ViewBag.Title = "Tạo thông báo mới";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<style>
+    /* Styling khung chọn người dùng dịu mắt */
+    .user-selection-card {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+    }
+
+    .user-list-container {
+        max-height: 250px;
+        overflow-y: auto;
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+    }
+
+    .user-item {
+        border: 1px solid transparent;
+        border-radius: 6px;
+        transition: all 0.15s ease-in-out;
+        padding: 6px 10px;
+    }
+
+        .user-item:hover {
+            background-color: #f1f3f5;
+        }
+
+        .user-item.has-selected {
+            background-color: #e7f5ff;
+            border-color: #a5d8ff;
+        }
+
+    .user-avatar {
+        width: 34px;
+        height: 34px;
+        background-color: #e9ecef;
+        color: #495057;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+
+        <!-- Tiêu đề trang & Nút Quay lại 1 -->
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon">
+                    <i class="bi bi-send-plus" aria-hidden="true"></i>
+                </span>
+                <div>
+                    <p class="eyebrow mb-1">Quản lý thông báo</p>
+                    <h1 class="h3 mb-1">Tạo thông báo mới</h1>
+                    <p class="text-muted mb-0">Soạn thông báo và gửi đến tất cả người dùng hoặc người dùng được chọn.</p>
+                </div>
+            </div>
+
+            <!-- Nút Quay Lại (Top Header) -->
+            <div class="heading-actions">
+                <a href="~/NotificationManage" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
+        </div>
+
+        <!-- Thông báo lỗi (Nếu có) -->
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Form soạn thông báo -->
+        <section class="panel mt-4">
+            <div class="panel-header p-3">
+                <h2 class="h5 mb-0 section-title">Thông tin thông báo</h2>
+            </div>
+
+            <div class="p-3 p-md-4">
+                @using (Html.BeginForm("Create", "NotificationManage", FormMethod.Post, new { id = "createNotificationForm" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="row g-3">
+                        <!-- Chọn chế độ gửi -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Chế độ gửi thông báo <span class="text-danger">*</span></label>
+                            <div class="d-flex flex-wrap gap-4 pt-1">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="sendTarget" id="targetAll" value="All" checked>
+                                    <label class="form-check-label fw-semibold cursor-pointer" for="targetAll">
+                                        <i class="bi bi-people-fill text-primary me-1"></i> Gửi tất cả người dùng
+                                    </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="sendTarget" id="targetSpecific" value="Specific">
+                                    <label class="form-check-label fw-semibold cursor-pointer" for="targetSpecific">
+                                        <i class="bi bi-person-check-fill text-success me-1"></i> Gửi chọn lọc (1 hoặc nhiều người)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Khung chọn người dùng -->
+                        <div class="col-12 d-none" id="userSelectionBox">
+                            <div class="user-selection-card p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                                    <label class="form-label fw-bold mb-0 text-dark">
+                                        <i class="bi bi-person-gear me-1 text-primary"></i> Danh sách người nhận
+                                    </label>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 fw-semibold" id="selectAllUsersBtn">
+                                            <i class="bi bi-check2-square me-1"></i>Chọn tất cả
+                                        </button>
+                                        <span class="text-muted opacity-50">|</span>
+                                        <button type="button" class="btn btn-sm btn-link text-decoration-none text-secondary p-0 fw-semibold" id="deselectAllUsersBtn">
+                                            Bỏ chọn
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text bg-white border-end-0 text-muted">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text" id="userSearchInput" class="form-control border-start-0 ps-0" placeholder="Nhập tên hoặc email người dùng..." />
+                                </div>
+
+                                <div class="user-list-container p-2">
+                                    <div id="userListItems" class="d-flex flex-column gap-1">
+                                        <div class="text-muted small p-3 text-center">
+                                            Đang tải danh sách người dùng...
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-2 text-end">
+                                    <small class="text-muted">
+                                        Đã chọn: <span id="selectedUserCount" class="badge bg-primary px-2 py-1 fs-6">0</span> người dùng
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tiêu đề thông báo -->
+                        <div class="col-12">
+                            <label for="title" class="form-label fw-bold">Tiêu đề thông báo <span class="text-danger">*</span></label>
+                            <input type="text" id="title" name="title" class="form-control" placeholder="Nhập tiêu đề thông báo..." required />
+                        </div>
+
+                        <!-- Nội dung thông báo -->
+                        <div class="col-12">
+                            <label for="message" class="form-label fw-bold">Nội dung thông báo <span class="text-danger">*</span></label>
+                            <textarea id="message" name="message" class="form-control" rows="5" placeholder="Nhập nội dung chi tiết thông báo..." required></textarea>
+                        </div>
+
+                        <!-- Nút thao tác ở cuối Form -->
+                        <div class="col-12 d-flex justify-content-end gap-2 pt-3 border-top">
+                            <!-- Nút Hủy 2 -->
+                            <a href="~/NotificationManage" id="btnCancel" class="btn btn-outline-secondary px-4">
+                                Hủy
+                            </a>
+
+                            <!-- Nút Gửi thông báo -->
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-send me-1"></i> Gửi thông báo
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Chuyển chế độ radio
+        $('input[name="sendTarget"]').change(function () {
+            if ($(this).val() === 'Specific') {
+                $('#userSelectionBox').removeClass('d-none');
+                loadUsers('');
+            } else {
+                $('#userSelectionBox').addClass('d-none');
+            }
+        });
+
+        // Tìm kiếm người dùng
+        let searchTimeout;
+        $('#userSearchInput').on('keyup', function () {
+            clearTimeout(searchTimeout);
+            let term = $(this).val();
+            searchTimeout = setTimeout(function () {
+                loadUsers(term);
+            }, 300);
+        });
+
+        // Tải danh sách người dùng qua AJAX
+        function loadUsers(term) {
+            $.ajax({
+                url: '@Url.Action("SearchUsers", "NotificationManage")',
+                type: 'GET',
+                data: { term: term },
+                success: function (data) {
+                    let html = '';
+                    if (!data || data.length === 0) {
+                        html = '<div class="text-muted small p-3 text-center">Không tìm thấy người dùng phù hợp.</div>';
+                    } else {
+                        $.each(data, function (i, user) {
+                            let firstLetter = user.name ? user.name.trim().charAt(0).toUpperCase() : 'U';
+                            html += `
+                                <div class="user-item">
+                                    <div class="form-check m-0 d-flex align-items-center gap-2">
+                                        <input class="form-check-input user-checkbox cursor-pointer my-0" type="checkbox" name="selectedUserIds" value="${user.id}" id="user_${user.id}">
+                                        <label class="form-check-label w-100 cursor-pointer d-flex align-items-center gap-2" for="user_${user.id}">
+                                            <div class="user-avatar">${firstLetter}</div>
+                                            <div>
+                                                <div class="fw-bold text-dark lh-sm">${user.name}</div>
+                                                <small class="text-muted" style="font-size: 0.8rem;">${user.email}</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                    $('#userListItems').html(html);
+                    updateSelectedCount();
+                }
+            });
+        }
+
+        // Đổi màu nền dịu nhẹ khi tích chọn
+        $(document).on('change', '.user-checkbox', function () {
+            let userItem = $(this).closest('.user-item');
+            if ($(this).is(':checked')) {
+                userItem.addClass('has-selected');
+            } else {
+                userItem.removeClass('has-selected');
+            }
+            updateSelectedCount();
+        });
+
+        function updateSelectedCount() {
+            let count = $('.user-checkbox:checked').length;
+            $('#selectedUserCount').text(count);
+        }
+
+        $('#selectAllUsersBtn').click(function () {
+            $('.user-checkbox').prop('checked', true).trigger('change');
+        });
+
+        $('#deselectAllUsersBtn').click(function () {
+            $('.user-checkbox').prop('checked', false).trigger('change');
+        });
+
+        // Xử lý xác nhận cho nút Hủy
+        $('#btnCancel').on('click', function (e) {
+            let titleVal = $('#title').val().trim();
+            let messageVal = $('#message').val().trim();
+
+            if (titleVal !== '' || messageVal !== '') {
+                let isConfirm = confirm('Bạn có chắc chắn muốn hủy? Nội dung thông báo đang soạn sẽ không được lưu.');
+                if (!isConfirm) {
+                    e.preventDefault();
+                }
+            }
+        });
+    });
+</script>

@@ -1,4 +1,4 @@
-﻿ <!-- START NAVBAR -->
+﻿<!-- START NAVBAR -->
 <div id="navigation" class="navbar-light bg-faded site-navigation navigation2">
     <div class="container-fluid">
         <div class="row">
@@ -23,14 +23,23 @@
                         <li>
                             <a href="@Url.Action("Contact", "Home")">Liên hệ</a>
                         </li>
+
                         @if (Request.IsAuthenticated)
                         {
                             <li>
                                 <a href="@Url.Action("Index", "Dashboard")">
-                         Trang quản lý
-                    </a>
+                                    Trang quản lý
+                                </a>
+                            </li>
+                            <!-- MỤC THÔNG BÁO CHO USER ĐÃ ĐĂNG NHẬP -->
+                            <li>
+                                <a href="@Url.Action("Index", "Notification")" class="position-relative">
+                                    Thông báo
+                                    <span id="mainMenuNotifBadge" class="badge rounded-pill bg-danger ms-1 d-none" style="font-size: 0.7rem;">0</span>
+                                </a>
                             </li>
                         }
+
                         <li class="menu-item-has-children">
                             <a href="blog.html">Blog</a>
                             <ul>
@@ -61,7 +70,7 @@
 
                         <button type="submit"
                                 class="btn_one border-0">
-                             Đăng xuất
+                            Đăng xuất
                         </button>
                     }
                 }
@@ -69,7 +78,7 @@
                 {
                     <a href="@Url.Action("Login", "Authentication")"
                        class="header-btn">
-                         Đăng nhập
+                        Đăng nhập
                     </a>
 
                     <a href="@Url.Action("Register", "Authentication")"
@@ -113,8 +122,12 @@
                     </ul>
                 </li>
                 <li><a href="contact.html">Contact</a></li>
+
+                @if (Request.IsAuthenticated)
+                {
+                    <li><a href="@Url.Action("Index", "Notification")">Thông báo</a></li>
+                }
             </ul>
         </div><!--- END ROW -->
     </div><!--- END CONTAINER -->
-</div>
-<!-- END NAVBAR -->
+</div><!-- END NAVBAR -->

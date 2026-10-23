@@ -1,0 +1,236 @@
+﻿@model IEnumerable<Source.Models.Notification>
+
+@{
+    ViewBag.Title = "Thông báo của tôi";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Layout chung của trang Client
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 0;
+    string currentFilter = ViewBag.Filter ?? "all";
+    int unreadCount = ViewBag.UnreadCount ?? 0;
+}
+
+<style>
+    /* Style tùy chỉnh nhẹ nhàng cho danh sách thông báo người dùng */
+    .notif-card {
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .notif-card.unread {
+            background-color: #f0f7ff !important;
+            border-left: 4px solid #0d6efd;
+        }
+
+        .notif-card.read {
+            background-color: #ffffff;
+            border-left: 4px solid #dee2e6;
+        }
+
+        .notif-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+    .notif-header-clickable {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .notif-body-message {
+        white-space: pre-line;
+        line-height: 1.6;
+        color: #333333;
+        font-size: 0.95rem;
+    }
+</style>
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <!-- Tiêu đề & Nút thao tác -->
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">
+                        <i class="bi bi-bell-fill text-primary me-2"></i>Thông báo của tôi
+                    </h2>
+                    <p class="text-muted mb-0">Cập nhật tin tức, thông tin lớp học và thông báo từ trung tâm.</p>
+                </div>
+
+                @if (unreadCount > 0)
+                {
+                    <button id="btnMarkAllReadPage" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm">
+                        <i class="bi bi-check2-all me-1"></i> Đánh dấu tất cả là đã đọc
+                    </button>
+                }
+            </div>
+
+            <!-- Bộ lọc Tabs (Tất cả / Chưa đọc) -->
+            <ul class="nav nav-tabs mb-4">
+                <li class="nav-item">
+                    <a class="nav-link @(currentFilter == "all" ? "active fw-bold text-primary" : "text-muted")"
+                       href="@Url.Action("Index", "Notification", new { filter = "all" })">
+                        Tất cả thông báo
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentFilter == "unread" ? "active fw-bold text-primary" : "text-muted")"
+                       href="@Url.Action("Index", "Notification", new { filter = "unread" })">
+                        Chưa đọc
+                        @if (unreadCount > 0)
+                        {
+                            <span class="badge bg-danger ms-1" id="unreadTabBadge">@unreadCount</span>
+                        }
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Danh sách thông báo -->
+            <div class="d-flex flex-column gap-3 mb-4">
+                @if (Model == null || !Model.Any())
+                {
+                    <div class="card border-0 shadow-sm p-5 text-center text-muted rounded-3">
+                        <i class="bi bi-inbox fs-1 d-block mb-3 text-secondary"></i>
+                        <h5 class="fw-normal">Bạn chưa có thông báo nào.</h5>
+                        <p class="small text-muted mb-0">Các thông báo mới từ hệ thống sẽ xuất hiện tại đây.</p>
+                    </div>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        bool isRead = item.read_status == "Read";
+                        string cardStatusClass = isRead ? "read" : "unread";
+
+                        <div class="card notif-card @cardStatusClass p-3 p-md-4 shadow-sm" id="notif-card-@item.notification_id">
+
+                            <!-- Header Dòng thông báo (Click vào để mở rộng) -->
+                            <div class="d-flex justify-content-between align-items-start notif-header-clickable"
+                                 data-id="@item.notification_id"
+                                 data-bs-toggle="collapse"
+                                 data-bs-target="#msg-@item.notification_id"
+                                 aria-expanded="false">
+
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="notif-icon-box">
+                                        <i class="bi @(isRead ? "bi-envelope-open text-muted" : "bi-envelope-fill text-primary") notif-icon fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 fw-bold text-dark notif-title">@item.title</h6>
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock me-1"></i>@item.created_at.ToString("dd/MM/yyyy HH:mm")
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge @(isRead ? "bg-secondary-subtle text-secondary" : "bg-warning-subtle text-dark") status-badge px-2 py-1">
+                                        @(isRead ? "Đã đọc" : "Chưa đọc")
+                                    </span>
+                                    <i class="bi bi-chevron-down text-muted small"></i>
+                                </div>
+                            </div>
+
+                            <!-- Nội dung chi tiết thông báo (Xổ xuống khi click) -->
+                            <div class="collapse mt-3 pt-3 border-top notif-body-message" id="msg-@item.notification_id">
+                                @item.message
+                            </div>
+
+                        </div>
+                    }
+                }
+            </div>
+
+            <!-- Phân trang -->
+            @if (totalPages > 1)
+            {
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2 border-top">
+                    <span class="text-muted small">
+                        Trang <strong>@currentPage</strong> / <strong>@totalPages</strong>
+                    </span>
+
+                    <nav aria-label="Phân trang thông báo">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("Index", "Notification", new { filter = currentFilter, page = currentPage - 1 })">
+                                    Trước
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= totalPages; i++)
+                            {
+                                <li class="page-item @(i == currentPage ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", "Notification", new { filter = currentFilter, page = i })">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("Index", "Notification", new { filter = currentFilter, page = currentPage + 1 })">
+                                    Sau
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Tự động đánh dấu là Đã đọc khi người dùng bấm mở xem chi tiết
+        $('.notif-header-clickable').click(function () {
+            let id = $(this).data('id');
+            let card = $('#notif-card-' + id);
+
+            // Nếu thông báo chưa đọc -> Gọi AJAX để cập nhật
+            if (card.hasClass('unread')) {
+                $.ajax({
+                    url: '@Url.Action("MarkAsRead", "Notification")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (res) {
+                        if (res && res.success) {
+                            // Cập nhật giao diện thẻ
+                            card.removeClass('unread').addClass('read');
+                            card.find('.notif-icon').removeClass('bi-envelope-fill text-primary').addClass('bi-envelope-open text-muted');
+                            card.find('.status-badge')
+                                .removeClass('bg-warning-subtle text-dark')
+                                .addClass('bg-secondary-subtle text-secondary')
+                                .text('Đã đọc');
+
+                            // Cập nhật lại badge trên Tab Chưa đọc & Badge trên Header
+                            if (res.unreadCount > 0) {
+                                $('#unreadTabBadge').text(res.unreadCount);
+                                $('#mainMenuNotifBadge').text(res.unreadCount).removeClass('d-none');
+                            } else {
+                                $('#unreadTabBadge').remove();
+                                $('#mainMenuNotifBadge').addClass('d-none');
+                                $('#btnMarkAllReadPage').fadeOut();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        // Đánh dấu tất cả là đã đọc
+        $('#btnMarkAllReadPage').click(function () {
+            $.ajax({
+                url: '@Url.Action("MarkAllAsRead", "Notification")',
+                type: 'POST',
+                success: function (res) {
+                    if (res && res.success) {
+                        location.reload();
+                    }
+                }
+            });
+        });
+    });
+</script>
