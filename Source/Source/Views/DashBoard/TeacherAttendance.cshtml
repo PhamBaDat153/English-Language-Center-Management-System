@@ -1,0 +1,15 @@
+﻿@model System.Collections.Generic.IList<Source.ViewModels.TeacherSessionItemViewModel>
+@using System.Linq
+@{
+    ViewBag.Title = "Điểm danh";
+    Layout = "~/Views/Shared/_TeacherDashboardLayout.cshtml";
+}
+<main class="dashboard-content"><div class="container-fluid px-3 px-lg-4">
+    <div class="page-heading"><div class="page-heading-copy"><span class="page-icon"><i class="bi bi-person-check" aria-hidden="true"></i></span><div><p class="eyebrow mb-1">Không gian giáo viên</p><h1 class="h3 mb-1">Điểm danh</h1><p class="text-muted mb-0">Chọn buổi học của lớp bạn phụ trách để nhập hoặc cập nhật điểm danh.</p></div></div><a class="btn btn-outline-secondary" href="@Url.Action("TeacherHome", "Dashboard")">Về trang chủ</a></div>
+    @if (TempData["SuccessMessage"] != null) { <div class="alert alert-success mt-3">@TempData["SuccessMessage"]</div> }
+    @if (TempData["ErrorMessage"] != null) { <div class="alert alert-danger mt-3">@TempData["ErrorMessage"]</div> }
+    <section class="panel mt-3">
+        @if (Model == null || !Model.Any()) { <div class="alert alert-light border mb-0">Chưa có buổi học cụ thể. Các buổi học cần được tạo từ lịch của lớp trước khi điểm danh.</div> }
+        else { <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Ngày / giờ</th><th>Lớp / khóa học</th><th>Phòng</th><th>Đã điểm danh</th><th>Thao tác</th></tr></thead><tbody>@foreach (var session in Model) { <tr><td><strong>@session.SessionDate.ToString("dd/MM/yyyy")</strong><div class="text-muted small">@session.StartTime.ToString(@"hh\:mm") – @session.EndTime.ToString(@"hh\:mm")</div></td><td><strong>@session.ClassCode</strong><div class="text-muted small">@session.CourseName</div></td><td>@session.RoomName</td><td><span class="badge @(session.AttendanceCount >= session.StudentCount ? "text-bg-success" : "text-bg-warning")">@session.AttendanceCount / @session.StudentCount</span></td><td><a class="btn btn-primary btn-sm" href="@Url.Action("TakeAttendance", "Dashboard", new { sessionId = session.SessionId })">@(session.AttendanceCount > 0 ? "Xem / sửa" : "Điểm danh")</a></td></tr> }</tbody></table></div> }
+    </section>
+</div></main>

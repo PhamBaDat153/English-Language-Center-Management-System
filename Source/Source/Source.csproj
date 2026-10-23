@@ -228,6 +228,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModels\AssessmentGradeViewModel.cs" />
     <Compile Include="ViewModels\ClassAttendanceViewModel.cs" />
+    <Compile Include="ViewModels\TeacherDashboardViewModels.cs" />
     <Compile Include="ViewModels\StudentClassDetailsViewModel.cs" />
     <Compile Include="ViewModels\ClassScheduleViewModel.cs" />
     <Compile Include="ViewModels\CourseDetailViewModel.cs" />
@@ -644,7 +645,16 @@
     <Content Include="Views\Shared\_Header.cshtml" />
     <Content Include="Views\Shared\_DashboardLayout.cshtml" />
     <Content Include="Views\Shared\_DashboardNavigation.cshtml" />
+    <Content Include="Views\Shared\_TeacherDashboardLayout.cshtml" />
+    <Content Include="Views\Shared\_TeacherDashboardNavigation.cshtml" />
     <Content Include="Views\Dashboard\Index.cshtml" />
+    <Content Include="Views\DashBoard\TeacherHome.cshtml" />
+    <Content Include="Views\DashBoard\TeacherClasses.cshtml" />
+    <Content Include="Views\DashBoard\TeacherClassDetails.cshtml" />
+    <Content Include="Views\DashBoard\TeacherSchedule.cshtml" />
+    <Content Include="Views\DashBoard\TeacherResults.cshtml" />
+    <Content Include="Views\DashBoard\TeacherAttendance.cshtml" />
+    <Content Include="Views\DashBoard\TeacherTakeAttendance.cshtml" />
     <Content Include="Views\UserManage\Index.cshtml" />
     <Content Include="Views\UserManage\Create.cshtml" />
     <Content Include="Views\UserManage\Details.cshtml" />

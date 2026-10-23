@@ -1,0 +1,17 @@
+﻿@model Source.ViewModels.TeacherScheduleViewModel
+@using System.Linq
+@{
+    ViewBag.Title = "Lịch giảng dạy";
+    Layout = "~/Views/Shared/_TeacherDashboardLayout.cshtml";
+}
+<main class="dashboard-content"><div class="container-fluid px-3 px-lg-4">
+    <div class="page-heading"><div class="page-heading-copy"><span class="page-icon"><i class="bi bi-calendar-week" aria-hidden="true"></i></span><div><p class="eyebrow mb-1">Không gian giáo viên</p><h1 class="h3 mb-1">Lịch giảng dạy</h1><p class="text-muted mb-0">Buổi học cụ thể và lịch lặp của các lớp bạn phụ trách.</p></div></div><a class="btn btn-outline-secondary" href="@Url.Action("TeacherHome", "Dashboard")">Về trang chủ</a></div>
+    <section class="panel mt-3"><div class="panel-header"><div><p class="eyebrow mb-1">Lịch đã tạo</p><h2 class="h5 mb-0">Các buổi học</h2></div></div>
+        @if (Model.Sessions == null || !Model.Sessions.Any()) { <div class="alert alert-light border mb-0">Chưa có buổi học cụ thể. Xem lịch học hàng tuần bên dưới hoặc liên hệ nhân viên để tạo buổi học.</div> }
+        else { <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Ngày / giờ</th><th>Lớp / khóa học</th><th>Phòng</th><th>Chủ đề</th><th>Điểm danh</th><th></th></tr></thead><tbody>@foreach (var session in Model.Sessions) { <tr><td><strong>@session.SessionDate.ToString("dd/MM/yyyy")</strong><div class="text-muted small">@session.StartTime.ToString(@"hh\:mm") – @session.EndTime.ToString(@"hh\:mm") · @session.TimeSlotName</div></td><td><strong>@session.ClassCode</strong><div class="text-muted small">@session.CourseName · @session.StudentCount học viên</div></td><td>@session.RoomName</td><td>@(string.IsNullOrWhiteSpace(session.Topic) ? "Chưa cập nhật" : session.Topic)</td><td><span class="badge @(session.AttendanceCount >= session.StudentCount ? "text-bg-success" : "text-bg-warning")">@session.AttendanceCount / @session.StudentCount</span></td><td><a class="btn btn-outline-primary btn-sm" href="@Url.Action("TakeAttendance", "Dashboard", new { sessionId = session.SessionId })">Điểm danh</a></td></tr> }</tbody></table></div> }
+    </section>
+    <section class="panel mt-4"><div class="panel-header"><div><p class="eyebrow mb-1">Lịch tuần</p><h2 class="h5 mb-0">Lịch lặp theo thứ</h2></div></div>
+        @if (Model.WeeklySchedules == null || !Model.WeeklySchedules.Any()) { <div class="alert alert-light border mb-0">Chưa có lịch lặp hàng tuần được khai báo.</div> }
+        else { <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Thứ</th><th>Khung giờ</th><th>Lớp / khóa học</th><th>Phòng</th></tr></thead><tbody>@foreach (var item in Model.WeeklySchedules) { <tr><td><strong>@item.WeekDay</strong></td><td>@item.StartTime.ToString(@"hh\:mm") – @item.EndTime.ToString(@"hh\:mm") <span class="text-muted">(@item.TimeSlotName)</span></td><td><strong>@item.ClassCode</strong><div class="text-muted small">@item.CourseName</div></td><td>@item.RoomName</td></tr> }</tbody></table></div> }
+    </section>
+</div></main>
