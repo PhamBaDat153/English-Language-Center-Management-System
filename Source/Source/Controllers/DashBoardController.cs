@@ -32,9 +32,169 @@ namespace Source.Controllers
         };
 
         // GET: Dashboard
+        [HttpGet]
+        [Authorize(Roles = "Administrator")]
         public ActionResult Index()
         {
-            return View();
+            try
+            {
+                var activeStatuses = ActiveEnrollmentStatuses;
+                var today = DateTime.Today;
+                var monthStart = new DateTime(today.Year, today.Month, 1);
+                var nextMonth = monthStart.AddMonths(1);
+                var chartStart = monthStart.AddMonths(-5);
+
+                var model = new AdminDashboardViewModel
+                {
+                    TotalUsers = db.Users.Count(),
+                    ActiveUsers = db.Users.Count(u => u.active_status == "Active"),
+                    ActiveStudents = db.Student_Profile.Count(s => s.student_status == "Active"),
+                    AvailableTeachers = db.Teacher_profile.Count(t => t.available_status == "Available"),
+                    AvailableCourses = db.Courses.Count(c => c.available_status == "Available"),
+                    OpenClasses = db.Classes.Count(c => c.class_status == "Open"),
+                    InProgressClasses = db.Classes.Count(c => c.class_status == "InProgress"),
+                    ActiveEnrollments = db.Enrollments.Count(e => activeStatuses.Contains(e.enrollment_status)),
+                    PendingPayments = db.Payments.Count(p => p.payment_status == "Pending"),
+                    MonthlyRevenue = db.Payments
+                        .Where(p => p.payment_status == "Completed" &&
+                                    p.payment_date >= monthStart && p.payment_date < nextMonth)
+                        .Select(p => (decimal?)p.amount)
+                        .Sum() ?? 0m
+                };
+
+                model.RevenueByMonth = Enumerable.Range(0, 6)
+                    .Select(i => chartStart.AddMonths(i))
+                    .Select(month =>
+                    {
+                        var monthEnd = month.AddMonths(1);
+                        return new DashboardChartPointViewModel
+                        {
+                            Label = month.ToString("MM/yyyy"),
+                            Value = db.Payments
+                                .Where(p => p.payment_status == "Completed" &&
+                                            p.payment_date >= month &&
+                                            p.payment_date < monthEnd)
+                                .Select(p => (decimal?)p.amount)
+                                .Sum() ?? 0m
+                        };
+                    })
+                    .ToList();
+
+                model.EnrollmentByMonth = Enumerable.Range(0, 6)
+                    .Select(i => chartStart.AddMonths(i))
+                    .Select(month =>
+                    {
+                        var monthEnd = month.AddMonths(1);
+                        return new DashboardChartPointViewModel
+                        {
+                            Label = month.ToString("MM/yyyy"),
+                            Value = db.Enrollments.Count(e =>
+                                e.enrollment_date >= month &&
+                                e.enrollment_date < monthEnd)
+                        };
+                    })
+                    .ToList();
+
+                model.ClassStatusSummary = new[] { "Planned", "Open", "InProgress", "Completed", "Cancelled" }
+                    .Select(status => new DashboardChartPointViewModel
+                    {
+                        Label = status,
+                        Value = db.Classes.Count(c => c.class_status == status)
+                    })
+                    .ToList();
+
+                model.StudentLevelSummary = new[] { "Beginner", "Elementary", "Intermediate", "UpperIntermediate", "Advanced", "IELTS", "TOEIC" }
+                    .Select(level => new DashboardChartPointViewModel
+                    {
+                        Label = level,
+                        Value = db.Student_Profile.Count(s => s.current_level == level && s.student_status == "Active")
+                    })
+                    .ToList();
+
+                model.PendingPaymentList = db.Payments
+                    .AsNoTracking()
+                    .Include(p => p.Enrollment.Student_Profile.User)
+                    .Include(p => p.Enrollment.Class.Course)
+                    .Where(p => p.payment_status == "Pending")
+                    .OrderByDescending(p => p.created_at)
+                    .Take(8)
+                    .ToList()
+                    .Select(p => new PendingPaymentViewModel
+                    {
+                        PaymentId = p.payment_id,
+                        StudentName = p.Enrollment?.Student_Profile?.User?.full_name ?? "-",
+                        CourseName = p.Enrollment?.Class?.Course?.course_name ?? "-",
+                        Amount = p.amount,
+                        PaymentDate = p.payment_date
+                    })
+                    .ToList();
+
+                var classRows = db.Classes
+                    .AsNoTracking()
+                    .Include(c => c.Course)
+                    .Include(c => c.Room)
+                    .Include(c => c.Teacher_profile.Staff_Profile.User)
+                    .Where(c => c.class_status == "Open" && c.start_date >= today)
+                    .OrderBy(c => c.start_date)
+                    .Take(12)
+                    .ToList();
+
+                var classIds = classRows.Select(c => c.class_id).ToList();
+                var enrollmentCounts = db.Enrollments
+                    .Where(e => classIds.Contains(e.class_id) && activeStatuses.Contains(e.enrollment_status))
+                    .GroupBy(e => e.class_id)
+                    .Select(g => new { ClassId = g.Key, Count = g.Count() })
+                    .ToDictionary(x => x.ClassId, x => x.Count);
+
+                model.UpcomingClasses = classRows
+                    .Take(8)
+                    .Select(c =>
+                    {
+                        var enrolled = enrollmentCounts.ContainsKey(c.class_id) ? enrollmentCounts[c.class_id] : 0;
+                        var capacity = c.Room == null ? c.class_capacity : Math.Min(c.class_capacity, c.Room.max_capacity);
+                        return new UpcomingClassViewModel
+                        {
+                            ClassId = c.class_id,
+                            ClassCode = c.class_code,
+                            CourseName = c.Course?.course_name ?? "-",
+                            TeacherName = c.Teacher_profile?.Staff_Profile?.User?.full_name ?? "Chưa phân công",
+                            RoomName = c.Room?.room_name ?? "Chưa xếp phòng",
+                            StartDate = c.start_date,
+                            EnrolledCount = enrolled,
+                            Capacity = capacity,
+                            RemainingSlots = Math.Max(0, capacity - enrolled)
+                        };
+                    })
+                    .ToList();
+
+                model.NearlyFullClasses = classRows
+                    .Select(c =>
+                    {
+                        var enrolled = enrollmentCounts.ContainsKey(c.class_id) ? enrollmentCounts[c.class_id] : 0;
+                        var capacity = c.Room == null ? c.class_capacity : Math.Min(c.class_capacity, c.Room.max_capacity);
+                        var occupancy = capacity <= 0 ? 0m : enrolled * 100m / capacity;
+                        return new NearlyFullClassViewModel
+                        {
+                            ClassId = c.class_id,
+                            ClassCode = c.class_code,
+                            CourseName = c.Course?.course_name ?? "-",
+                            EnrolledCount = enrolled,
+                            Capacity = capacity,
+                            OccupancyRate = occupancy
+                        };
+                    })
+                    .Where(c => c.OccupancyRate >= 80m)
+                    .OrderByDescending(c => c.OccupancyRate)
+                    .Take(8)
+                    .ToList();
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("DashboardController.Index failed: {0}", ex);
+                return View("~/Views/Shared/Error_500.cshtml");
+            }
         }
 
         /// <summary>

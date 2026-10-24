@@ -233,6 +233,7 @@
     <Compile Include="ViewModels\ClassScheduleViewModel.cs" />
     <Compile Include="ViewModels\CourseDetailViewModel.cs" />
     <Compile Include="ViewModels\HomePageViewModel.cs" />
+    <Compile Include="ViewModels\AdminDashboardViewModel.cs" />
     <Compile Include="ViewModels\ProfileViewModel.cs" />
     <Compile Include="ViewModels\AuthenticateViewModel\LoginViewModel.cs" />
     <Compile Include="ViewModels\AuthenticateViewModel\RegisterViewModel.cs" />

@@ -1,8 +1,90 @@
-﻿
+﻿@model Source.ViewModels.AdminDashboardViewModel
+@using Newtonsoft.Json
+@using System.Globalization
+
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Admin Dashboard";
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    var money = CultureInfo.GetCultureInfo("vi-VN");
 }
 
-<h2>Index</h2>
+<main class="dashboard-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+        <div class="page-heading">
+            <div class="page-heading-copy">
+                <span class="page-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
+                <div>
+                    <p class="eyebrow mb-1">Trang quản trị</p>
+                    <h1 class="h3 mb-1">Tổng quan trung tâm</h1>
+                    <p class="text-muted mb-0">Theo dõi người dùng, lớp học, tuyển sinh và thanh toán.</p>
+                </div>
+            </div>
+            <div class="heading-actions">
+                <a class="btn btn-outline-primary btn-sm" href="@Url.Action("Index", "Dashboard")">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Làm mới
+                </a>
+            </div>
+        </div>
 
+        <section class="row g-3" aria-label="Chỉ số tổng quan">
+            <div class="col-12 col-sm-6 col-xl-3"><article class="metric-card metric-primary"><div class="metric-top"><span class="metric-label">Tổng người dùng</span><span class="metric-icon"><i class="bi bi-people"></i></span></div><div class="metric-value">@Model.TotalUsers</div><div class="metric-meta">@Model.ActiveUsers đang hoạt động</div></article></div>
+            <div class="col-12 col-sm-6 col-xl-3"><article class="metric-card metric-success"><div class="metric-top"><span class="metric-label">Học viên hoạt động</span><span class="metric-icon"><i class="bi bi-mortarboard"></i></span></div><div class="metric-value">@Model.ActiveStudents</div><div class="metric-meta">@Model.ActiveEnrollments enrollment đang hoạt động</div></article></div>
+            <div class="col-12 col-sm-6 col-xl-3"><article class="metric-card metric-warning"><div class="metric-top"><span class="metric-label">Giáo viên khả dụng</span><span class="metric-icon"><i class="bi bi-person-workspace"></i></span></div><div class="metric-value">@Model.AvailableTeachers</div><div class="metric-meta">Sẵn sàng được phân công</div></article></div>
+            <div class="col-12 col-sm-6 col-xl-3"><article class="metric-card metric-primary"><div class="metric-top"><span class="metric-label">Khóa học đang mở</span><span class="metric-icon"><i class="bi bi-book"></i></span></div><div class="metric-value">@Model.AvailableCourses</div><div class="metric-meta">Nội dung đang cung cấp</div></article></div>
+            <div class="col-12 col-sm-6 col-xl-3"><article class="metric-card metric-success"><div class="metric-top"><span class="metric-label">Lớp đang học</span><span class="metric-icon"><i class="bi bi-easel2"></i></span></div><div class="metric-value">@Model.InProgressClasses</div><div class="metric-meta">@Model.OpenClasses lớp đang mở đăng ký</div></article></div>
+            <div class="col-12 col-sm-6 col-xl-3"><article class="metric-card metric-danger"><div class="metric-top"><span class="metric-label">Chờ duyệt thanh toán</span><span class="metric-icon"><i class="bi bi-credit-card"></i></span></div><div class="metric-value">@Model.PendingPayments</div><div class="metric-meta">Cần xử lý</div></article></div>
+            <div class="col-12 col-sm-6 col-xl-3"><article class="metric-card metric-success"><div class="metric-top"><span class="metric-label">Doanh thu tháng này</span><span class="metric-icon"><i class="bi bi-cash-stack"></i></span></div><div class="metric-value fs-4">@Model.MonthlyRevenue.ToString("N0", money)</div><div class="metric-meta">VNĐ, giao dịch đã hoàn tất</div></article></div>
+            <div class="col-12 col-sm-6 col-xl-3"><article class="metric-card metric-warning"><div class="metric-top"><span class="metric-label">Lớp sắp khai giảng</span><span class="metric-icon"><i class="bi bi-calendar-event"></i></span></div><div class="metric-value">@Model.UpcomingClasses.Count</div><div class="metric-meta">Các lớp Open sắp bắt đầu</div></article></div>
+        </section>
+
+        <section class="row g-3 mt-1">
+            <div class="col-12 col-xl-8"><article class="panel h-100"><div class="panel-header"><div><p class="eyebrow mb-1">Tài chính</p><h2 class="h5 mb-0">Doanh thu 6 tháng gần nhất</h2></div></div><div style="height: 300px"><canvas id="revenueChart"></canvas></div></article></div>
+            <div class="col-12 col-xl-4"><article class="panel h-100"><div class="panel-header"><div><p class="eyebrow mb-1">Vận hành</p><h2 class="h5 mb-0">Trạng thái lớp học</h2></div></div><div style="height: 300px"><canvas id="classStatusChart"></canvas></div></article></div>
+        </section>
+
+        <section class="row g-3 mt-1">
+            <div class="col-12 col-xl-7"><article class="panel h-100"><div class="panel-header"><div><p class="eyebrow mb-1">Tuyển sinh</p><h2 class="h5 mb-0">Enrollment theo tháng</h2></div></div><div style="height: 280px"><canvas id="enrollmentChart"></canvas></div></article></div>
+            <div class="col-12 col-xl-5"><article class="panel h-100"><div class="panel-header"><div><p class="eyebrow mb-1">Học viên</p><h2 class="h5 mb-0">Phân bố theo trình độ</h2></div></div><div style="height: 280px"><canvas id="studentLevelChart"></canvas></div></article></div>
+        </section>
+
+        <section class="row g-3 mt-1">
+            <div class="col-12 col-xl-7"><article class="panel h-100"><div class="panel-header"><div><p class="eyebrow mb-1">Cần xử lý</p><h2 class="h5 mb-0">Thanh toán chờ duyệt</h2></div><a class="link-primary fw-semibold" href="@Url.Action("Index", "PaymentManage")">Xem tất cả <i class="bi bi-arrow-right"></i></a></div>
+                @if (!Model.PendingPaymentList.Any()) { <div class="alert alert-light border mb-0">Không có thanh toán chờ duyệt.</div> } else { <div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Học viên</th><th>Khóa học</th><th>Số tiền</th><th>Ngày</th><th></th></tr></thead><tbody>@foreach (var payment in Model.PendingPaymentList) { <tr><td><strong>@payment.StudentName</strong></td><td>@payment.CourseName</td><td class="text-danger fw-semibold">@payment.Amount.ToString("N0", money)</td><td>@payment.PaymentDate.ToString("dd/MM/yyyy")</td><td><a class="btn btn-outline-primary btn-sm" href="@Url.Action("Details", "PaymentManage", new { id = payment.PaymentId })">Xem</a></td></tr> }</tbody></table></div> }
+            </article></div>
+            <div class="col-12 col-xl-5"><article class="panel h-100"><div class="panel-header"><div><p class="eyebrow mb-1">Tuyển sinh</p><h2 class="h5 mb-0">Lớp sắp khai giảng</h2></div><a class="link-primary fw-semibold" href="@Url.Action("Index", "ClassManage")">Xem tất cả <i class="bi bi-arrow-right"></i></a></div>
+                @if (!Model.UpcomingClasses.Any()) { <div class="alert alert-light border mb-0">Chưa có lớp mở đăng ký sắp khai giảng.</div> } else { <div class="list-group list-group-flush">@foreach (var item in Model.UpcomingClasses) { <a class="list-group-item list-group-item-action px-0" href="@Url.Action("Details", "ClassManage", new { id = item.ClassId })"><div class="d-flex justify-content-between gap-2"><strong>@item.ClassCode</strong><span class="badge @(item.RemainingSlots <= 3 ? "text-bg-warning" : "text-bg-success")">Còn @item.RemainingSlots chỗ</span></div><div class="small text-muted">@item.CourseName · @item.StartDate.ToString("dd/MM/yyyy")</div></a> }</div> }
+            </article></div>
+        </section>
+
+        <section class="panel mt-4"><div class="panel-header"><div><p class="eyebrow mb-1">Cảnh báo sức chứa</p><h2 class="h5 mb-0">Lớp gần đầy</h2></div></div>
+            @if (!Model.NearlyFullClasses.Any()) { <div class="alert alert-light border mb-0">Chưa có lớp nào đạt từ 80% sức chứa.</div> } else { <div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Lớp</th><th>Khóa học</th><th>Sĩ số</th><th style="min-width: 180px">Tỷ lệ lấp đầy</th><th></th></tr></thead><tbody>@foreach (var item in Model.NearlyFullClasses) { <tr><td><strong>@item.ClassCode</strong></td><td>@item.CourseName</td><td>@item.EnrolledCount / @item.Capacity</td><td><div class="progress" role="progressbar" aria-valuenow="@item.OccupancyRate" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar @(item.OccupancyRate >= 100 ? "bg-danger" : "bg-warning")" style="width: @Math.Min(100m, item.OccupancyRate)%"></div></div><small class="text-muted">@item.OccupancyRate.ToString("0")%</small></td><td><a class="btn btn-outline-primary btn-sm" href="@Url.Action("Details", "ClassManage", new { id = item.ClassId })">Chi tiết</a></td></tr> }</tbody></table></div> }
+        </section>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    var revenue = @Html.Raw(JsonConvert.SerializeObject(Model.RevenueByMonth));
+    var enrollments = @Html.Raw(JsonConvert.SerializeObject(Model.EnrollmentByMonth));
+    var classStatuses = @Html.Raw(JsonConvert.SerializeObject(Model.ClassStatusSummary));
+    var levels = @Html.Raw(JsonConvert.SerializeObject(Model.StudentLevelSummary));
+    var colors = ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#6f42c1', '#20c997', '#fd7e14'];
+
+    function chartData(points) {
+        return { labels: points.map(function (p) { return p.Label; }), values: points.map(function (p) { return p.Value; }) };
+    }
+
+    var revenueData = chartData(revenue);
+    new Chart(document.getElementById('revenueChart'), { type: 'bar', data: { labels: revenueData.labels, datasets: [{ label: 'Doanh thu (VNĐ)', data: revenueData.values, backgroundColor: '#0d6efd', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { callback: function (value) { return Number(value).toLocaleString('vi-VN'); } } } }, plugins: { legend: { display: false } } } });
+
+    var statusData = chartData(classStatuses);
+    new Chart(document.getElementById('classStatusChart'), { type: 'doughnut', data: { labels: statusData.labels, datasets: [{ data: statusData.values, backgroundColor: colors }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } });
+
+    var enrollmentData = chartData(enrollments);
+    new Chart(document.getElementById('enrollmentChart'), { type: 'line', data: { labels: enrollmentData.labels, datasets: [{ label: 'Enrollment', data: enrollmentData.values, borderColor: '#198754', backgroundColor: 'rgba(25,135,84,.12)', fill: true, tension: .3 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }, plugins: { legend: { display: false } } } });
+
+    var levelData = chartData(levels);
+    new Chart(document.getElementById('studentLevelChart'), { type: 'bar', data: { labels: levelData.labels, datasets: [{ label: 'Học viên', data: levelData.values, backgroundColor: '#6f42c1', borderRadius: 5 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }, plugins: { legend: { display: false } } } });
+})();
+</script>
