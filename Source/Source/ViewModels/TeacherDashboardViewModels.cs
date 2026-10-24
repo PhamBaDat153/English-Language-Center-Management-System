@@ -23,6 +23,7 @@ namespace Source.ViewModels
     public class TeacherClassesViewModel
     {
         public IList<TeacherClassItemViewModel> Classes { get; set; }
+        public string Search { get; set; }
     }
 
     public class TeacherClassDetailsViewModel
@@ -59,6 +60,7 @@ namespace Source.ViewModels
     {
         public IList<TeacherSessionItemViewModel> Sessions { get; set; }
         public IList<TeacherRecurringScheduleItemViewModel> WeeklySchedules { get; set; }
+        public string Search { get; set; }
     }
 
     public class TeacherSessionItemViewModel
@@ -94,6 +96,7 @@ namespace Source.ViewModels
     {
         public IList<TeacherAssessmentItemViewModel> Assessments { get; set; }
         public AssessmentGradeViewModel SelectedAssessment { get; set; }
+        public string Search { get; set; }
     }
 
     public class TeacherAssessmentItemViewModel

@@ -248,16 +248,19 @@ namespace Source.Controllers
         /// <summary>Danh sách lớp đang được phân công cho giáo viên hiện tại.</summary>
         [HttpGet]
         [Authorize(Roles = "Teacher")]
-        public ActionResult Classes()
+        public ActionResult Classes(string search, int page = 1)
         {
             try
             {
                 var teacherId = GetCurrentTeacherId();
                 if (!teacherId.HasValue) return new HttpUnauthorizedResult();
 
+                var classes = GetTeacherClasses(teacherId.Value, true)
+                    .Where(c => Matches(search, c.ClassCode, c.CourseName, c.CourseCode, c.RoomName)).ToList();
+                SetPagination(classes.Count, page);
                 return View("~/Views/DashBoard/TeacherClasses.cshtml", new TeacherClassesViewModel
                 {
-                    Classes = GetTeacherClasses(teacherId.Value, true)
+                    Classes = PageItems(classes, page), Search = search
                 });
             }
             catch (Exception ex)
@@ -317,17 +320,22 @@ namespace Source.Controllers
         /// <summary>Lịch buổi học đã tạo và lịch lặp hàng tuần của các lớp được giao.</summary>
         [HttpGet]
         [Authorize(Roles = "Teacher")]
-        public ActionResult Schedule()
+        public ActionResult Schedule(string search, int page = 1)
         {
             try
             {
                 var teacherId = GetCurrentTeacherId();
                 if (!teacherId.HasValue) return new HttpUnauthorizedResult();
 
+                var sessions = GetTeacherSessions(teacherId.Value, null, null)
+                    .Where(s => Matches(search, s.ClassCode, s.CourseName, s.RoomName, s.Topic, s.TimeSlotName)).ToList();
+                var schedules = GetTeacherWeeklySchedules(teacherId.Value)
+                    .Where(s => Matches(search, s.ClassCode, s.CourseName, s.RoomName, s.WeekDay, s.TimeSlotName)).ToList();
+                SetPagination(sessions.Count, page);
                 return View("~/Views/DashBoard/TeacherSchedule.cshtml", new TeacherScheduleViewModel
                 {
-                    Sessions = GetTeacherSessions(teacherId.Value, null, null),
-                    WeeklySchedules = GetTeacherWeeklySchedules(teacherId.Value)
+                    Sessions = PageItems(sessions, page),
+                    WeeklySchedules = schedules, Search = search
                 });
             }
             catch (Exception ex)
@@ -340,16 +348,19 @@ namespace Source.Controllers
         /// <summary>Xem điểm đã nhập và mở bảng điểm để giáo viên chỉnh sửa.</summary>
         [HttpGet]
         [Authorize(Roles = "Teacher")]
-        public ActionResult Results(Guid? assessmentId)
+        public ActionResult Results(Guid? assessmentId, string search, int page = 1)
         {
             try
             {
                 var teacherId = GetCurrentTeacherId();
                 if (!teacherId.HasValue) return new HttpUnauthorizedResult();
 
+                var assessments = GetTeacherAssessments(teacherId.Value)
+                    .Where(a => Matches(search, a.ClassCode, a.CourseName, a.AssessmentName, a.AssessmentType)).ToList();
+                SetPagination(assessments.Count, page);
                 var model = new TeacherResultsViewModel
                 {
-                    Assessments = GetTeacherAssessments(teacherId.Value)
+                    Assessments = PageItems(assessments, page), Search = search
                 };
 
                 if (assessmentId.HasValue)
@@ -375,7 +386,7 @@ namespace Source.Controllers
         [HttpPost]
         [Authorize(Roles = "Teacher")]
         [ValidateAntiForgeryToken]
-        public ActionResult SaveResults(AssessmentGradeViewModel model)
+        public ActionResult SaveResults(AssessmentGradeViewModel model, string search, int page = 1)
         {
             try
             {
@@ -431,12 +442,15 @@ namespace Source.Controllers
                         student.feedback = submittedById[student.enrollment_id].feedback;
                     }
 
-                    var page = new TeacherResultsViewModel
+                    var filteredAssessments = GetTeacherAssessments(teacherId.Value)
+                        .Where(a => Matches(search, a.ClassCode, a.CourseName, a.AssessmentName, a.AssessmentType)).ToList();
+                    SetPagination(filteredAssessments.Count, page);
+                    var resultsPage = new TeacherResultsViewModel
                     {
-                        Assessments = GetTeacherAssessments(teacherId.Value),
-                        SelectedAssessment = selectedAssessment
+                        Assessments = PageItems(filteredAssessments, page),
+                        SelectedAssessment = selectedAssessment, Search = search
                     };
-                    return View("~/Views/DashBoard/TeacherResults.cshtml", page);
+                    return View("~/Views/DashBoard/TeacherResults.cshtml", resultsPage);
                 }
 
                 var scoreRecords = db.AssessmentScores
@@ -471,13 +485,13 @@ namespace Source.Controllers
 
                 db.SaveChanges();
                 TempData["SuccessMessage"] = "Đã lưu kết quả học tập.";
-                return RedirectToAction("Results", new { assessmentId = assessment.assessment_id });
+                return RedirectToAction("Results", new { assessmentId = assessment.assessment_id, search, page });
             }
             catch (Exception ex)
             {
                 Trace.TraceError("DashboardController.SaveResults failed: {0}", ex);
                 TempData["ErrorMessage"] = "Không thể lưu điểm lúc này. Vui lòng thử lại.";
-                return RedirectToAction("Results", new { assessmentId = model == null ? (Guid?)null : model.assessment_id });
+                return RedirectToAction("Results", new { assessmentId = model == null ? (Guid?)null : model.assessment_id, search, page });
             }
         }
 
@@ -679,6 +693,31 @@ namespace Source.Controllers
                 case "Cancelled": return "Đã hủy";
                 default: return status ?? "Chưa xác định";
             }
+        }
+
+        // Dùng chung cách lọc/phân trang để các trang giáo viên giữ cùng hành vi.
+        private static bool Matches(string search, params string[] values)
+        {
+            if (string.IsNullOrWhiteSpace(search)) return true;
+            return values.Any(value => !string.IsNullOrEmpty(value) &&
+                value.IndexOf(search.Trim(), StringComparison.CurrentCultureIgnoreCase) >= 0);
+        }
+
+        private IList<T> PageItems<T>(IList<T> items, int page)
+        {
+            const int pageSize = 10;
+            var safePage = Math.Max(1, Math.Min(page, Math.Max(1, (int)Math.Ceiling(items.Count / (double)pageSize))));
+            return items.Skip((safePage - 1) * pageSize).Take(pageSize).ToList();
+        }
+
+        private void SetPagination(int totalItems, int page)
+        {
+            const int pageSize = 10;
+            var totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)pageSize));
+            ViewBag.CurrentPage = Math.Max(1, Math.Min(page, totalPages));
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
+            ViewBag.PageSize = pageSize;
         }
 
         private List<TeacherRecurringScheduleItemViewModel> GetTeacherWeeklySchedules(Guid teacherId)
