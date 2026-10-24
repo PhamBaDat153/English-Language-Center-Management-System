@@ -25,17 +25,9 @@
             <span class="nav-icon"><i class="bi bi-calendar-week" aria-hidden="true"></i></span>
             <span class="nav-text">Lịch giảng dạy</span>
         </a>
-        <a class="@(currentTeacherAction == "Attendance" || currentTeacherAction == "TakeAttendance" ? "nav-link active" : "nav-link")" href="@Url.Action("Attendance", "Dashboard")">
-            <span class="nav-icon"><i class="bi bi-card-checklist" aria-hidden="true"></i></span>
-            <span class="nav-text">Điểm danh</span>
-        </a>
         <a class="@(currentTeacherAction == "Results" || currentTeacherAction == "SaveResults" ? "nav-link active" : "nav-link")" href="@Url.Action("Results", "Dashboard")">
             <span class="nav-icon"><i class="bi bi-journal-check" aria-hidden="true"></i></span>
             <span class="nav-text">Kết quả học tập</span>
-        </a>
-        <a class="nav-link" href="@Url.Action("TeacherHome", "Dashboard")#teacher-notices">
-            <span class="nav-icon"><i class="bi bi-megaphone" aria-hidden="true"></i></span>
-            <span class="nav-text">Thông báo</span>
         </a>
         <a class="nav-link" href="@Url.Action("Index", "Home")">
             <span class="nav-icon"><i class="bi bi-arrow-left-circle" aria-hidden="true"></i></span>
