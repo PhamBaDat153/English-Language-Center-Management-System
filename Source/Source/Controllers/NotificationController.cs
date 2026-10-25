@@ -1,10 +1,12 @@
 ﻿using Source.Models;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Web.Mvc;
 
 namespace Source.Controllers
 {
+    [Authorize]
     public class NotificationController : Controller
     {
         private readonly NewGen_english_center_dbEntities db = new NewGen_english_center_dbEntities();
@@ -12,26 +14,8 @@ namespace Source.Controllers
         // Hàm hỗ trợ lấy ID người dùng chuẩn xác
         private Guid? GetCurrentUserId()
         {
-            // 1. Lấy từ Session nếu có
-            if (Session["UserId"] != null && Guid.TryParse(Session["UserId"].ToString(), out Guid sessionUserId))
-            {
-                return sessionUserId;
-            }
-
-            // 2. Lấy theo tên tài khoản đăng nhập (Identity.Name)
-            if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(User.Identity.Name))
-            {
-                string identifier = User.Identity.Name;
-                var user = db.Users.FirstOrDefault(u => u.username == identifier || u.email == identifier);
-                if (user != null)
-                {
-                    Session["UserId"] = user.user_id;
-                    return user.user_id;
-                }
-            }
-
-            // 3. Dự phòng cho mục đích test: Lấy ID người dùng đầu tiên trong CSDL
-            return db.Users.FirstOrDefault()?.user_id;
+            var value = (User.Identity as ClaimsIdentity)?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return Guid.TryParse(value, out var userId) ? userId : (Guid?)null;
         }
 
         // 1. GET: /Notification

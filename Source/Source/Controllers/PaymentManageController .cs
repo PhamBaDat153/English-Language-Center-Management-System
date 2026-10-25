@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 namespace Source.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class PaymentManageController : Controller
     {
         private readonly NewGen_english_center_dbEntities db =

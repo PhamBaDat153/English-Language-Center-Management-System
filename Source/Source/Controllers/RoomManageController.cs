@@ -9,6 +9,7 @@ using System.Web.Mvc;
 namespace Source.Controllers
 {
 
+    [Authorize(Roles = "Administrator")]
     public class RoomManageController : Controller
     {
         // Khởi tạo DbContext theo cấu trúc UserManageController.

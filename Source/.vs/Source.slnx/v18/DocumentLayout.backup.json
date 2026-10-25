@@ -3,12 +3,20 @@
   "WorkspaceRootPath": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\views\\shared\\_dashboardnavigation.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\views\\shared\\_dashboardnavigation.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\views\\shared\\_header.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\views\\shared\\_header.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\views\\authentication\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\views\\authentication\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\views\\shared\\_teacherdashboardnavigation.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\views\\shared\\_teacherdashboardnavigation.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\views\\shared\\_dashboardnavigation.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|solutionrelative:source\\views\\shared\\_dashboardnavigation.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D4B588E1-8B9E-4FFA-B3D9-280A1D1AAD04}|Source\\Source.csproj|d:\\projects\\school\\github\\english-language-center-management-system\\source\\source\\views\\shared\\_teacherdashboardlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -71,32 +79,58 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "_Header.cshtml",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Shared\\_Header.cshtml",
+              "RelativeDocumentMoniker": "Source\\Views\\Shared\\_Header.cshtml",
+              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Shared\\_Header.cshtml*",
+              "RelativeToolTip": "Source\\Views\\Shared\\_Header.cshtml*",
+              "ViewState": "AgIAABUAAAAAAAAAAAAAADQAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-10-25T04:09:17.19Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Login.cshtml",
+              "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Authentication\\Login.cshtml",
+              "RelativeDocumentMoniker": "Source\\Views\\Authentication\\Login.cshtml",
+              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Authentication\\Login.cshtml",
+              "RelativeToolTip": "Source\\Views\\Authentication\\Login.cshtml",
+              "ViewState": "AgIAADYAAAAAAAAAAAAAAEkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-10-25T03:55:07.722Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "_DashboardNavigation.cshtml",
               "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Shared\\_DashboardNavigation.cshtml",
               "RelativeDocumentMoniker": "Source\\Views\\Shared\\_DashboardNavigation.cshtml",
-              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Shared\\_DashboardNavigation.cshtml*",
-              "RelativeToolTip": "Source\\Views\\Shared\\_DashboardNavigation.cshtml*",
-              "ViewState": "AgIAACQAAAAAAAAAAAAAAD4AAAAZAAAAAAAAAA==",
+              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Shared\\_DashboardNavigation.cshtml",
+              "RelativeToolTip": "Source\\Views\\Shared\\_DashboardNavigation.cshtml",
+              "ViewState": "AgIAACEAAAAAAAAAAAAAAD4AAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-10-25T03:46:17.559Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "_TeacherDashboardNavigation.cshtml",
               "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Shared\\_TeacherDashboardNavigation.cshtml",
               "RelativeDocumentMoniker": "Source\\Views\\Shared\\_TeacherDashboardNavigation.cshtml",
-              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Shared\\_TeacherDashboardNavigation.cshtml*",
-              "RelativeToolTip": "Source\\Views\\Shared\\_TeacherDashboardNavigation.cshtml*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADEAAAAIAAAAAAAAAA==",
+              "ToolTip": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Shared\\_TeacherDashboardNavigation.cshtml",
+              "RelativeToolTip": "Source\\Views\\Shared\\_TeacherDashboardNavigation.cshtml",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAADMAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-10-25T03:42:39.91Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "_TeacherDashboardLayout.cshtml",
               "DocumentMoniker": "D:\\Projects\\School\\Github\\English-Language-Center-Management-System\\Source\\Source\\Views\\Shared\\_TeacherDashboardLayout.cshtml",
               "RelativeDocumentMoniker": "Source\\Views\\Shared\\_TeacherDashboardLayout.cshtml",

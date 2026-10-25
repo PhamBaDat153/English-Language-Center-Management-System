@@ -51,17 +51,6 @@
                                 </a>
                             </li>
                         }
-
-                        <li class="menu-item-has-children">
-                            <a href="blog.html">Blog</a>
-                            <ul>
-                                <li><a href="blog.html">Blog</a></li>
-                                <li><a href="blog_single.html">Blog Details</a></li>
-                            </ul>
-                        </li>
-
-                    </ul>
-                </nav>
             </div><!--- END Col -->
 
             <div class="col-20 d-none d-xl-block text-end align-self-center">
@@ -99,13 +88,7 @@
                     </a>
                 }
             </div>
-
-
-
-                @if (Request.IsAuthenticated)
-                {
-                    <li><a href="@Url.Action("Index", "Notification")">Thông báo</a></li>
-                }
+              
             </ul>
         </div><!--- END ROW -->
     </div><!--- END CONTAINER -->

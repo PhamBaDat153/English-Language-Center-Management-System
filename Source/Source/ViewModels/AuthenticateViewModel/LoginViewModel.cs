@@ -4,16 +4,16 @@ namespace Source.ViewModels
 {
     public class LoginViewModel
     {
-        [Required(ErrorMessage = "Please enter your username or email.")]
-        [Display(Name = "Username or email")]
+        [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập hoặc email.")]
+        [Display(Name = "Tên đăng nhập hoặc email")]
         public string Identifier { get; set; }
 
-        [Required(ErrorMessage = "Please enter your password.")]
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu.")]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Mật khẩu")]
         public string Password { get; set; }
 
-        [Display(Name = "Remember me")]
+        [Display(Name = "Ghi nhớ đăng nhập")]
         public bool RememberMe { get; set; }
     }
 }

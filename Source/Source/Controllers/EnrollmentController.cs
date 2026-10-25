@@ -9,6 +9,7 @@ using System.Web.Security;
 
 namespace Source.Controllers
 {
+    [Authorize]
     public class EnrollmentController : Controller
     {
         private NewGen_english_center_dbEntities db = new NewGen_english_center_dbEntities();

@@ -2,10 +2,12 @@
 using System;
 using System.Data.Entity;
 using System.Linq;
+using System.Security.Claims;
 using System.Web.Mvc;
 
 namespace Source.Controllers
 {
+    [Authorize]
     public class PaymentController : Controller
     {
         private readonly NewGen_english_center_dbEntities db =
@@ -29,6 +31,13 @@ namespace Source.Controllers
             if (payment == null)
             {
                 return HttpNotFound("Không tìm thấy thông tin hóa đơn thanh toán!");
+            }
+
+            Guid userId;
+            var claim = (User.Identity as ClaimsIdentity)?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!Guid.TryParse(claim, out userId) || payment.Enrollment?.Student_Profile?.user_id != userId)
+            {
+                return new HttpUnauthorizedResult();
             }
 
             return View(payment);

@@ -11,6 +11,7 @@ using System.Security.Claims;
 
 namespace Source.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class ClassManageController : Controller
     {
         // Khởi tạo DbContext theo cấu trúc UserManageController.

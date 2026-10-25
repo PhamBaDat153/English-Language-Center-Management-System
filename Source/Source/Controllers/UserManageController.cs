@@ -19,6 +19,7 @@ using System.Web.Security;
 
 namespace Source.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class UserManageController : Controller
     {
         // Khai báo DBContext
