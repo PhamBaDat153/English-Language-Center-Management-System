@@ -11,7 +11,7 @@
 <section class="section-top">
     <div class="container">
         <div class="col-lg-10 offset-lg-1 text-center">
-            <div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+            <div class="section-top-title">
                 <h1>Thông tin khóa học</h1>
                 <ul>
                     <li><a href="@Url.Action("Index","Home")">Trang chủ</a></li>
@@ -42,8 +42,7 @@
                     <h3>Thông tin nổi bật</h3>
                     <ul>
                         <li><i class="fa fa-calendar"></i> Độ dài khóa học <b>@Model.duration_weeks tuần</b></li>
-                        <li><i class="fa fa-user"></i> Total Lectures <b>30</b></li>
-                        <li><i class="fa fa-user"></i> Total Students <b>1000</b></li>
+                        <li><i class="fa fa-user"></i> Tổng học viên đã học <b>@Model.TotalStudents</b></li>
                     </ul>
                 </div>
                 <div class="event_info_price">

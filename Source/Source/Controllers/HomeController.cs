@@ -134,6 +134,15 @@ namespace Source.Controllers
                     return HttpNotFound();
                 }
 
+                int totalStudents = await db.Enrollments
+                    .Where(e => e.Class.course_id == id &&
+                                (e.enrollment_status == "Confirmed" ||
+                                 e.enrollment_status == "Studying" ||
+                                 e.enrollment_status == "Completed"))
+                    .Select(e => e.student_id)
+                    .Distinct()
+                    .CountAsync();
+
                 // Chỉ đưa ra lớp đang mở, sắp khai giảng, có lịch cụ thể và phòng còn sử dụng được.
                 var classes = await db.Classes
                     .Include(c => c.Room)
@@ -201,6 +210,7 @@ namespace Source.Controllers
                     duration_weeks = course.duration_weeks,
                     level = course.level,
                     tuition_fee = course.tuition_fee,
+                    TotalStudents = totalStudents,
                     AvailableClasses = classOptions,
                     RelatedCourses = await db.Courses
                                     .Where(c => c.level == course.level

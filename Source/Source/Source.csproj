@@ -682,6 +682,10 @@
     <Content Include="Views\NotificationManage\Details.cshtml" />
     <Content Include="Views\NotificationManage\Create.cshtml" />
     <Content Include="Views\Notification\Index.cshtml" />
+    <Content Include="Views\Profile\ClassDetails.cshtml" />
+    <Content Include="Views\Profile\MyClasses.cshtml" />
+    <Content Include="Views\Profile\Timetable.cshtml" />
+    <Content Include="Views\Profile\_ProfileNavigation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

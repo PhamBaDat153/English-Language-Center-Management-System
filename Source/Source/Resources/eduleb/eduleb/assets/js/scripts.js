@@ -8,13 +8,6 @@ Version      : 1.0
 	
 	jQuery(document).on('ready', function(){
 	
-		/*PRELOADER JS*/
-		$(window).on('load', function() { 
-			setTimeout(function(){
-				$('.preloaders').fadeToggle();
-			}, 1500);
-		}); 
-		/*END PRELOADER JS*/		
 		
 		/*START MENU JS*/		
 			$(".mobile_menu").simpleMobileMenu({			
@@ -94,10 +87,6 @@ Version      : 1.0
 
 	}); 	
 	
-	/*START WOW ANIMATION JS*/
-	  new WOW().init();	
-	/*END WOW ANIMATION JS*/	
-				
 })(jQuery);
 
 

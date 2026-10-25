@@ -14,15 +14,15 @@
 
     <nav class="sidebar-nav">
         <a class="@(currentTeacherAction == "TeacherHome" ? "nav-link active" : "nav-link")" href="@Url.Action("TeacherHome", "Dashboard")">
-            <span class="nav-icon"><i class="bi bi-house-door" aria-hidden="true"></i></span>
+            <span class="nav-icon"><i class="bi bi-house-door-fill" aria-hidden="true"></i></span>
             <span class="nav-text">Trang chủ</span>
         </a>
         <a class="@(currentTeacherAction == "Classes" || currentTeacherAction == "ClassDetails" ? "nav-link active" : "nav-link")" href="@Url.Action("Classes", "Dashboard")">
-            <span class="nav-icon"><i class="bi bi-easel2" aria-hidden="true"></i></span>
+            <span class="nav-icon"><i class="bi bi-easel2-fill" aria-hidden="true"></i></span>
             <span class="nav-text">Lớp giảng dạy</span>
         </a>
         <a class="@(currentTeacherAction == "Schedule" ? "nav-link active" : "nav-link")" href="@Url.Action("Schedule", "Dashboard")">
-            <span class="nav-icon"><i class="bi bi-calendar-week" aria-hidden="true"></i></span>
+            <span class="nav-icon"><i class="bi bi-calendar2-week-fill" aria-hidden="true"></i></span>
             <span class="nav-text">Lịch giảng dạy</span>
         </a>
         <a class="@(currentTeacherAction == "Results" || currentTeacherAction == "SaveResults" ? "nav-link active" : "nav-link")" href="@Url.Action("Results", "Dashboard")">
@@ -30,23 +30,10 @@
             <span class="nav-text">Kết quả học tập</span>
         </a>
         <a class="nav-link" href="@Url.Action("Index", "Home")">
-            <span class="nav-icon"><i class="bi bi-arrow-left-circle" aria-hidden="true"></i></span>
+            <span class="nav-icon"><i class="bi bi-house-door-fill" aria-hidden="true"></i></span>
             <span class="nav-text">Về trang chính</span>
         </a>
     </nav>
-
-    <div class="sidebar-user">
-        <img class="avatar-img avatar-md sidebar-user-avatar"
-             src="/Resources/adminhmd-1.0.0/assets/images/avatar/avatar-fallback.jpg"
-             alt="Ảnh đại diện giáo viên">
-        <strong>@(ViewBag.TeacherName ?? "Giáo viên")</strong>
-        <small>NewGen English Center</small>
-    </div>
-
-    <div class="sidebar-footer">
-        <span class="status-dot"></span>
-        <span class="sidebar-footer-text">Không gian giảng dạy</span>
-    </div>
 </aside>
 
 <div class="admin-main">
@@ -57,31 +44,12 @@
                 <span></span><span></span><span></span>
             </button>
 
-            <div class="d-none d-md-flex align-items-center ms-3 fw-bold text-secondary">
-                <i class="bi bi-mortarboard me-2 text-primary" aria-hidden="true"></i>
-                <span>Teacher workspace</span>
-            </div>
-
+    
             <div class="navbar-actions ms-auto">
                 <button class="icon-button theme-toggle" type="button" data-theme-toggle
                         aria-label="Đổi giao diện sáng tối" title="Đổi giao diện sáng tối">
                     <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
                 </button>
-
-                <div class="dropdown">
-                    <button class="profile-button dropdown-toggle" type="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                        <img class="avatar-img avatar-sm"
-                             src="/Resources/adminhmd-1.0.0/assets/images/avatar/avatar-fallback.jpg"
-                             alt="Ảnh đại diện giáo viên">
-                        <span class="profile-name d-none d-sm-inline">@(ViewBag.TeacherName ?? "Giáo viên")</span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="@Url.Action("Index", "Profile")">Hồ sơ cá nhân</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Đăng xuất</a></li>
-                    </ul>
-                </div>
             </div>
         </div>
     </nav>

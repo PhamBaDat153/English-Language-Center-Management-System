@@ -3,7 +3,7 @@
 <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
     <div class="sidebar-header">
         <a class="brand-mark" href="index.html" aria-label="adminHMD dashboard">
-            <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
+            <span class="brand-icon"><i class="bi bi-mortarboard-fill" aria-hidden="true"></i></span>
             <span class="brand-copy">
                 <span class="brand-title">NewGen</span>
                 <span class="brand-subtitle">Trang quản lý</span>
@@ -17,58 +17,35 @@
             <span class="nav-text">Trang chủ</span>
         </a>
         <a class="nav-link" href="@Url.Action("Index", "UserManage")">
-            <span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+            <span class="nav-icon"><i class="bi bi-people-fill" aria-hidden="true"></i></span>
             <span class="nav-text">Người dùng</span>
         </a>
         <a class="nav-link" href="@Url.Action("Index","CourseManage")">
-            <span class="nav-icon"><i class="bi bi-person-badge" aria-hidden="true"></i></span>
+            <span class="nav-icon"><i class="bi bi-book-half" aria-hidden="true"></i></span>
             <span class="nav-text">Khóa học</span>
         </a>
         <a class="nav-link" href="@Url.Action("Index","ClassManage")">
-            <span class="nav-icon"><i class="bi bi-bar-chart-line" aria-hidden="true"></i></span>
+            <span class="nav-icon"><i class="bi bi-easel2-fill" aria-hidden="true"></i></span>
             <span class="nav-text">Lớp học</span>
         </a>
         <a class="nav-link" href="@Url.Action("Index","RoomManage")">
-            <span class="nav-icon"><i class="bi bi-table" aria-hidden="true"></i></span>
+            <span class="nav-icon"><i class="bi bi-door-open-fill" aria-hidden="true"></i></span>
             <span class="nav-text">Phòng học</span>
         </a>
         <a class="nav-link" href="@Url.Action("Index","PaymentManage")">
 
-            <span class="nav-icon"><i class="bi bi-ui-checks-grid" aria-hidden="true"></i></span>
+            <span class="nav-icon"><i class="bi bi-wallet2" aria-hidden="true"></i></span>
             <span class="nav-text">Thanh toán</span>
         </a>
         <a class="nav-link" href="@Url.Action("Index", "NotificationManage")">
-            <span class="nav-icon"><i class="bi bi-bell" aria-hidden="true"></i></span>
+            <span class="nav-icon"><i class="bi bi-bell-fill" aria-hidden="true"></i></span>
             <span class="nav-text">Thông báo</span>
         </a>
-        <a class="nav-link" href="alerts.html">
-            <span class="nav-icon"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span>
-            <span class="nav-text">Alerts</span>
-        </a>
-        <a class="nav-link" href="modals.html">
-            <span class="nav-icon"><i class="bi bi-window-stack" aria-hidden="true"></i></span>
-            <span class="nav-text">Modals</span>
-        </a>
-        <a class="nav-link" href="settings.html">
-            <span class="nav-icon"><i class="bi bi-gear" aria-hidden="true"></i></span>
-            <span class="nav-text">Settings</span>
-        </a>
         <a class="nav-link" href="@Url.Action("Index","Home")">
-            <span class="nav-icon"><i class="bi bi-back" aria-hidden="true"></i></span>
+            <span class="nav-icon"><i class="bi bi-house-door-fill" aria-hidden="true"></i></span>
             <span class="nav-text">Quay về</span>
         </a>
     </nav>
-
-    <div class="sidebar-user">
-        <img class="avatar-img avatar-md sidebar-user-avatar" src="/Resources/adminhmd-1.0.0/assets/images/avatar/avatar.jpg" alt="Admin Hasan">
-        <strong>Admin Hasan</strong>
-        <small>Active Workspace</small>
-    </div>
-
-    <div class="sidebar-footer">
-        <span class="status-dot"></span>
-        <span class="sidebar-footer-text">System running smoothly</span>
-    </div>
 </aside>
 
 <div class="admin-main">
@@ -84,19 +61,6 @@
                 <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
                     <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
                 </button>
-
-                <div class="dropdown">
-                    <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img class="avatar-img avatar-sm" src="/Resources/adminhmd-1.0.0/assets/images/avatar/avatar.jpg" alt="Admin Hasan">
-                        <span class="profile-name d-none d-sm-inline">Admin Hasan</span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="@Url.Action("Index", "Profile")">Hồ sơ cá nhân</a></li>
-                        <li><a class="dropdown-item" href="@Url.Action("Index", "Profile")">Cài đặt tài khoản</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="login.html">Sign out</a></li>
-                    </ul>
-                </div>
             </div>
         </div>
     </nav>

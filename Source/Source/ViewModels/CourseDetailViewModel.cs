@@ -15,6 +15,7 @@ namespace Source.ViewModels
         public string description { get; set; }
         public int duration_weeks { get; set; }
         public decimal tuition_fee { get; set; }
+        public int TotalStudents { get; set; }
         public List<Course> RelatedCourses { get; set; } = new List<Course>();
         public List<ClassOptionViewModel> AvailableClasses { get; set; } = new List<ClassOptionViewModel>();
     }
