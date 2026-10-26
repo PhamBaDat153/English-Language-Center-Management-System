@@ -160,41 +160,90 @@
 </section>
 <!-- END ABOUT US -->
 <!-- START COURSE -->
-<section class="home_course section-padding">
+<section class="home-course-modern">
     <div class="container">
-        <div class="row">
-            <div class="col-lg-8 col-sm-6 col-xs-12">
-                <div class="section-title">
-                    <h2>Đồng hành cùng hơn <b>@Model.activeStudentCount</b> <br />Học viên bứt phá tiếng Anh tại NewGen.</h2>
-                </div>
-            </div><!--- END COL -->
-            <div class="col-lg-4 col-sm-6 col-xs-12">
-                <div class="cour_btn">
-                    <a href="@Url.Action("Courses", "Home")" class="btn_one">Tất cả khóa học <i class="ti-arrow-top-right"></i></a>
-                </div>
-            </div><!--- END COL -->
-        </div><!--- END ROW -->
-        <div class="row">
-            @foreach (var item in Model.Courses)
-            {
-                <div class="col-lg-4 col-sm-6 col-xs-12">
-                    <div class="single_course">
-                        <div class="single_c_img">
-                            <img src="/Resources/eduleb/eduleb/assets/img/course/1.png" class="img-fluid" alt="course-image" />
-                        </div>
-                        <h4><a href="@Url.Action("Details", "Home", new { id = item.course_id })">@item.course_name</a></h4>
-                        <p><span class="ti-star"> </span>@item.level</p>
-                        <br />
-                        <p><span class="ti-book"> </span>@item.description</p>
-                        <br />
-                        <p><span class="ti-alarm-clock"> </span>@item.duration_weeks Tuần</p>
-                        <br />
-                        <div class="price">@item.tuition_fee.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) ₫</div>
+        <div class="course-section-heading">
+            <div>
+                <span class="course-eyebrow">
+                    <i class="bi bi-book-half"></i>
+                    Khóa học nổi bật
+                </span>
+                <h2>
+                    Đồng hành cùng hơn
+                    <strong>@Model.activeStudentCount</strong>
+                    học viên tại NewGen
+                </h2>
+                <p>
+                    Chọn lộ trình phù hợp để cải thiện tiếng Anh
+                    và tiến gần hơn đến mục tiêu của bạn.
+                </p>
+            </div>
+
+            <a href="@Url.Action("Courses", "Home")" class="course-view-all">
+                Xem tất cả khóa học
+                <i class="bi bi-arrow-up-right"></i>
+            </a>
+        </div>
+
+        @if (Model.Courses == null || !Model.Courses.Any())
+        {
+            <div class="course-empty-state">
+                <i class="bi bi-book"></i>
+                <h3>Chưa có khóa học</h3>
+                <p>Hiện chưa có khóa học nào đang được mở.</p>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var item in Model.Courses)
+                {
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <article class="course-card-modern">
+                            <div class="course-card-image">
+                                <img src="/Resources/eduleb/eduleb/assets/img/course/1.png"
+                                     class="img-fluid"
+                                     alt="@item.course_name" />
+                                <span class="course-level-badge">@item.level</span>
+                            </div>
+
+                            <div class="course-card-body">
+                                <div class="course-card-meta">
+                                    <span><i class="bi bi-clock"></i>@item.duration_weeks tuần</span>
+                                    <span><i class="bi bi-book"></i>NewGen</span>
+                                </div>
+
+                                <h3 class="course-card-title">
+                                    <a href="@Url.Action("Details", "Home", new { id = item.course_id })">
+                                        @item.course_name
+                                    </a>
+                                </h3>
+
+                                <p class="course-card-description">
+                                    @(string.IsNullOrWhiteSpace(item.description)
+                                        ? "Lộ trình học tiếng Anh phù hợp với mục tiêu của bạn."
+                                        : item.description)
+                                </p>
+
+                                <div class="course-card-footer">
+                                    <div>
+                                        <small>Học phí từ</small>
+                                        <strong>@item.tuition_fee.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) ₫</strong>
+                                    </div>
+                                    <a class="course-detail-button"
+                                       href="@Url.Action("Details", "Home", new { id = item.course_id })"
+                                       aria-label="Xem chi tiết @item.course_name">
+                                        Xem chi tiết
+                                        <i class="ti-arrow-top-right" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
                     </div>
-                </div><!-- END COL -->
-            }
-        </div><!--- END ROW -->
-    </div><!--- END CONTAINER -->
+                }
+            </div>
+        }
+    </div>
 </section>
 <!-- END COURSE -->
 <!-- START PROMO -->
