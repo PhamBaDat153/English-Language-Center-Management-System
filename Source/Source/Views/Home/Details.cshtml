@@ -6,7 +6,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
 <!-- START SECTION TOP -->
 <section class="section-top">
     <div class="container">
@@ -14,49 +13,63 @@
             <div class="section-top-title">
                 <h1>Thông tin khóa học</h1>
                 <ul>
-                    <li><a href="@Url.Action("Index","Home")">Trang chủ</a></li>
-                    <li> / Thông tin khóa học</li>
+                    <li><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+                    <li><a href="@Url.Action("Courses", "Home")">Khóa học</a></li>
+                    <li> / @Model.course_name</li>
                 </ul>
-            </div><!-- //.HERO-TEXT -->
-        </div><!--- END COL -->
-    </div><!--- END CONTAINER -->
+            </div>
+        </div>
+    </div>
 </section>
 <!-- END SECTION TOP -->
-<!-- START COURSE -->
-<section class="our_event section-padding">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 col-sm-8 col-xs-12">
-                <div class="single_event_single">
-                    <img alt="" class="img-fluid" src="/Resources/eduleb/eduleb/assets/img/sc.png" />
-                    <div class="single_event_text_single">
-                        <h4>@Model.course_name</h4>
-                        <span><i class="fa fa-clock-o"></i>@Model.duration_weeks tuần</span>
-                        <p>@Model.description</p>
 
+<!-- START COURSE -->
+<section class="our_event section-padding course-detail-page">
+    <div class="container">
+        <div class="row g-4">
+            <main class="col-12 col-lg-8">
+                <article class="single_event_single course-detail-main">
+                    <img class="img-fluid course-detail-cover"
+                         src="/Resources/eduleb/eduleb/assets/img/sc.png"
+                         alt="@Model.course_name" />
+
+                    <div class="single_event_text_single course-detail-content">
+                        <div class="course-detail-heading">
+                            <span class="course-detail-code">@Model.course_code</span>
+                            <h2>@Model.course_name</h2>
+                        </div>
+
+                        <div class="course-detail-meta">
+                            <span><i class="fa fa-star" aria-hidden="true"></i>@Model.level</span>
+                            <span><i class="fa fa-clock-o" aria-hidden="true"></i>@Model.duration_weeks tuần</span>
+                            <span><i class="fa fa-user" aria-hidden="true"></i>@Model.TotalStudents học viên</span>
+                        </div>
+
+                        <div class="course-detail-description">
+                            <h3>Giới thiệu khóa học</h3>
+                            <p>
+                                @(string.IsNullOrWhiteSpace(Model.description)
+                                    ? "Lộ trình học tiếng Anh phù hợp với mục tiêu của bạn."
+                                    : Model.description)
+                            </p>
+                        </div>
                     </div>
-                </div><!--- END SINGLE EVENT -->
-            </div><!--- END COL -->
-            <div class="col-lg-4 col-sm-4 col-xs-12">
-                <div class="course_features">
-                    <h3>Thông tin nổi bật</h3>
-                    <ul>
-                        <li><i class="fa fa-calendar"></i> Độ dài khóa học <b>@Model.duration_weeks tuần</b></li>
-                        <li><i class="fa fa-user"></i> Tổng học viên đã học <b>@Model.TotalStudents</b></li>
-                    </ul>
-                </div>
-                <div class="event_info_price">
-                    <h4>Học phí - @Model.tuition_fee.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) ₫</h4>
-                </div>
-                <div class="event_info_register">
-                    <h3>Chọn lớp học</h3>
+                </article>
+
+                <section class="course-class-selection">
+                    <div class="course-detail-section-heading">
+                        <h3>Chọn lớp học</h3>
+                        <p>Chọn một lớp phù hợp với lịch học của bạn.</p>
+                    </div>
+
                     @if (TempData["ErrorMessage"] != null)
                     {
                         <div class="alert alert-danger" role="alert">@TempData["ErrorMessage"]</div>
                     }
+
                     @if (Model.AvailableClasses == null || !Model.AvailableClasses.Any())
                     {
-                        <div class="alert alert-info">
+                        <div class="alert alert-info" role="status">
                             Hiện chưa có lớp nào mở đăng ký cho khóa học này.
                         </div>
                     }
@@ -67,69 +80,100 @@
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="courseId" value="@Model.course_id" />
 
-                            foreach (var classOption in Model.AvailableClasses)
-                            {
-                                <label class="d-block border rounded p-3 mb-2 @(classOption.IsFull ? "text-muted bg-light" : "")"
-                                       style="cursor: @(classOption.IsFull ? "not-allowed" : "pointer")">
-                                    <span class="d-flex align-items-start gap-2">
-                                        <input type="radio" name="classId" value="@classOption.ClassId"
-                                               required @(classOption.IsFull ? "disabled" : "") />
-                                        <span>
-                                            <strong>@classOption.ClassCode</strong>
-                                            <br />
-                                            <small>@classOption.ScheduleText</small>
-                                            <br />
-                                            <small>@classOption.StartDate.ToString("dd/MM/yyyy") – @classOption.EndDate.ToString("dd/MM/yyyy")</small>
-                                            <br />
-                                            <small>@classOption.RoomName</small>
-                                            <br />
-                                            @if (classOption.IsFull)
-                                            {
-                                                <span class="badge bg-secondary">Đã đủ sĩ số</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-success">
-                                                    Còn @(classOption.Capacity - classOption.EnrolledCount) / @classOption.Capacity chỗ
-                                                </span>
-                                            }
+                            <fieldset class="course-class-list">
+                                <legend class="sr-only">Danh sách lớp học</legend>
+
+                                @foreach (var classOption in Model.AvailableClasses)
+                                {
+                                    <label class="course-class-card @(classOption.IsFull ? "is-full text-muted bg-light" : "")">
+                                        <span class="course-class-select">
+                                            <input type="radio" name="classId" value="@classOption.ClassId"
+                                                   required @(classOption.IsFull ? "disabled" : "") />
                                         </span>
-                                    </span>
-                                </label>
-                            }
+                                        <span class="course-class-details">
+                                            <span class="course-class-header">
+                                                <strong>@classOption.ClassCode</strong>
+                                                @if (classOption.IsFull)
+                                                {
+                                                    <span class="badge bg-secondary">Đã đủ sĩ số</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">
+                                                        Còn @(classOption.Capacity - classOption.EnrolledCount) / @classOption.Capacity chỗ
+                                                    </span>
+                                                }
+                                            </span>
+                                            <span class="course-class-info">
+                                                <span><i class="fa fa-calendar-o" aria-hidden="true"></i>@classOption.ScheduleText</span>
+                                                <span><i class="fa fa-clock-o" aria-hidden="true"></i>@classOption.StartDate.ToString("dd/MM/yyyy") – @classOption.EndDate.ToString("dd/MM/yyyy")</span>
+                                                <span><i class="fa fa-map-marker" aria-hidden="true"></i>@classOption.RoomName</span>
+                                                <span><i class="fa fa-users" aria-hidden="true"></i>@classOption.EnrolledCount / @classOption.Capacity học viên</span>
+                                            </span>
+                                        </span>
+                                    </label>
+                                }
+                            </fieldset>
 
                             if (Model.AvailableClasses.Any(c => !c.IsFull))
                             {
-                                <button type="submit" class="btn_one" style="border: none; cursor: pointer;">
+                                <button type="submit" class="btn_one course-register-button">
                                     Đăng ký lớp đã chọn
                                 </button>
                             }
                             else
                             {
-                                <div class="alert alert-warning mb-0">
+                                <div class="alert alert-warning mb-0" role="status">
                                     Tất cả lớp hiện đã đủ sĩ số.
                                 </div>
                             }
                         }
                     }
+                </section>
+            </main>
+
+            <aside class="col-12 col-lg-4">
+                <div class="course-detail-sidebar">
+                    <div class="course_features">
+                        <h3>Thông tin nổi bật</h3>
+                        <ul>
+                            <li><i class="fa fa-book" aria-hidden="true"></i> Mã khóa học <b>@Model.course_code</b></li>
+                            <li><i class="fa fa-star" aria-hidden="true"></i> Trình độ <b>@Model.level</b></li>
+                            <li><i class="fa fa-calendar" aria-hidden="true"></i> Độ dài khóa học <b>@Model.duration_weeks tuần</b></li>
+                            <li><i class="fa fa-user" aria-hidden="true"></i> Tổng học viên đã học <b>@Model.TotalStudents</b></li>
+                        </ul>
+                    </div>
+
+                    <div class="event_info_price">
+                        <small>Học phí khóa học</small>
+                        <h4>@Model.tuition_fee.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) ₫</h4>
+                    </div>
+
+                    <div class="event_info_register">
+                        <h3>Đăng ký khóa học</h3>
+                        <p>Chọn lớp học phù hợp ở bên trái để bắt đầu đăng ký.</p>
+                    </div>
                 </div>
 
-                <div class="related_course">
-                    <h3>Khóa học liên quan</h3>
-                    @foreach (var item in Model.RelatedCourses)
-                    {
-                        <div class="single_rc">
-                            <div class="rc_img">
-                                <img src="/Resources/eduleb/eduleb/assets/img/rc-1.png" alt="" />
+                @if (Model.RelatedCourses != null && Model.RelatedCourses.Any())
+                {
+                    <div class="related_course">
+                        <h3>Khóa học liên quan</h3>
+                        @foreach (var item in Model.RelatedCourses)
+                        {
+                            <div class="single_rc">
+                                <div class="rc_img">
+                                    <img src="/Resources/eduleb/eduleb/assets/img/rc-1.png"
+                                         alt="@item.course_name" />
+                                </div>
+                                <h4><a href="@Url.Action("Details", "Home", new { id = item.course_id })">@item.course_name</a></h4>
+                                <span>@item.tuition_fee.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) ₫</span>
                             </div>
-                            <h4><a href="@Url.Action("Details", "Home", new { id = item.course_id })">@item.course_name</a></h4>
-                            <span>@item.tuition_fee.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) </span>
-                        </div><!--- END SINGLE RELATED COURSE -->
-                    }
-                </div><!--- END RELATED COURSE -->
-                </div><!-- END SIDEBAR POST -->
-            </div><!--- END COL -->
-        </div><!-- END ROW -->
-    </div><!-- END CONTAINER -->
+                        }
+                    </div>
+                }
+            </aside>
+        </div>
+    </div>
 </section>
 <!-- END COURSE -->
