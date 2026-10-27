@@ -404,3 +404,11 @@ C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Syste
 C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\EPPlus.xml
 C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.IO.RecyclableMemoryStream.xml
 C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\System.Security.Cryptography.Xml.xml
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\EPPlus.dll
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\EPPlus.Interfaces.dll
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\Microsoft.IO.RecyclableMemoryStream.dll
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\System.ComponentModel.Annotations.dll
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\System.Security.Cryptography.Xml.dll
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\EPPlus.xml
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\Microsoft.IO.RecyclableMemoryStream.xml
+D:\Projects\School\Github\ENGLISH-LANGUAGE-CENTER-MANAGEMENT-SYSTEM\Source\Source\bin\System.Security.Cryptography.Xml.xml
