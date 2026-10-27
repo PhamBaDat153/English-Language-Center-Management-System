@@ -19,11 +19,19 @@
                     <p class="text-muted mb-0">Theo dõi người dùng, lớp học, tuyển sinh và thanh toán.</p>
                 </div>
             </div>
+
+
             <div class="heading-actions">
                 <a class="btn btn-outline-primary btn-sm" href="@Url.Action("Index", "Dashboard")">
                     <i class="bi bi-arrow-clockwise me-1"></i>Làm mới
                 </a>
+
+                <a class="btn btn-success btn-sm" href="@Url.Action("ExportExcel", "Dashboard")">
+                    <i class="bi bi-file-earmark-excel me-1"></i>Xuất Excel
+                </a>
             </div>
+
+
         </div>
 
         <section class="row g-3" aria-label="Chỉ số tổng quan">

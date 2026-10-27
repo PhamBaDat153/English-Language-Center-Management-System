@@ -396,3 +396,11 @@ C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Micro
 C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.Security.xml
 C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.Security.Cookies.xml
 C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.Owin.Security.Google.xml
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\EPPlus.dll
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\EPPlus.Interfaces.dll
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.IO.RecyclableMemoryStream.dll
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\System.ComponentModel.Annotations.dll
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\System.Security.Cryptography.Xml.dll
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\EPPlus.xml
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\Microsoft.IO.RecyclableMemoryStream.xml
+C:\WEB PROJECT\English-Language-Center-Management-System\Source\Source\bin\System.Security.Cryptography.Xml.xml

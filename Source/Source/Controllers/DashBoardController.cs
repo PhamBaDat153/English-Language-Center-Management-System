@@ -7,6 +7,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Web.Mvc;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Drawing;
+using System.IO;
 
 namespace Source.Controllers
 {
@@ -196,6 +200,318 @@ namespace Source.Controllers
                 return View("~/Views/Shared/Error_500.cshtml");
             }
         }
+        //----------------------------------------------------------// EXCEL
+
+
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator")]
+        public ActionResult ExportExcel()
+        {
+            var today = DateTime.Today;
+            var monthStart = new DateTime(today.Year, today.Month, 1);
+            var chartStart = monthStart.AddMonths(-5);
+
+            try
+            {
+                using (var package = new ExcelPackage())
+                {
+                    // 1. Tổng quan Dashboard
+                    var summaryRows = new List<object[]>
+            {
+                new object[] { "Tổng số người dùng", db.Users.Count() },
+                new object[] { "Người dùng đang hoạt động",
+                    db.Users.Count(u => u.active_status == "Active") },
+                new object[] { "Học viên đang hoạt động",
+                    db.Student_Profile.Count(s => s.student_status == "Active") },
+                new object[] { "Giáo viên sẵn sàng",
+                    db.Teacher_profile.Count(t => t.available_status == "Available") },
+                new object[] { "Khóa học khả dụng",
+                    db.Courses.Count(c => c.available_status == "Available") },
+                new object[] { "Lớp đang mở",
+                    db.Classes.Count(c => c.class_status == "Open") },
+                new object[] { "Lớp đang học",
+                    db.Classes.Count(c => c.class_status == "InProgress") },
+                new object[] { "Đăng ký đang hoạt động",
+                    db.Enrollments.Count(e =>
+                        ActiveEnrollmentStatuses.Contains(e.enrollment_status)) },
+                new object[] { "Thanh toán đang chờ",
+                    db.Payments.Count(p => p.payment_status == "Pending") }
+            };
+
+                    var nextMonth = monthStart.AddMonths(1);
+                    var monthlyRevenue = db.Payments
+                        .Where(p => p.payment_status == "Completed"
+                            && p.payment_date >= monthStart
+                            && p.payment_date < nextMonth)
+                        .Select(p => (decimal?)p.amount)
+                        .Sum() ?? 0m;
+
+                    summaryRows.Add(new object[]
+                        { "Doanh thu tháng hiện tại", monthlyRevenue });
+
+                    AddExcelSheet(package, "TongQuan",
+                        new[] { "Chỉ số", "Giá trị" }, summaryRows);
+
+                    // 2. Doanh thu theo tháng
+                    var revenueRows = new List<object[]>();
+
+                    for (int i = 0; i < 6; i++)
+                    {
+                        var month = chartStart.AddMonths(i);
+                        var monthEnd = month.AddMonths(1);
+
+                        var revenue = db.Payments
+                            .Where(p => p.payment_status == "Completed"
+                                && p.payment_date >= month
+                                && p.payment_date < monthEnd)
+                            .Select(p => (decimal?)p.amount)
+                            .Sum() ?? 0m;
+
+                        revenueRows.Add(new object[]
+                            { month.ToString("MM/yyyy"), revenue });
+                    }
+
+                    AddExcelSheet(package, "DoanhThuTheoThang",
+                        new[] { "Tháng", "Doanh thu" }, revenueRows);
+
+                    // 3. Đăng ký theo tháng
+                    var enrollmentRows = new List<object[]>();
+
+                    for (int i = 0; i < 6; i++)
+                    {
+                        var month = chartStart.AddMonths(i);
+                        var monthEnd = month.AddMonths(1);
+
+                        var count = db.Enrollments.Count(e =>
+                            e.enrollment_date >= month
+                            && e.enrollment_date < monthEnd);
+
+                        enrollmentRows.Add(new object[]
+                            { month.ToString("MM/yyyy"), count });
+                    }
+
+                    AddExcelSheet(package, "DangKyTheoThang",
+                        new[] { "Tháng", "Số lượt đăng ký" }, enrollmentRows);
+
+                    // 4. Trạng thái lớp
+                    var statuses = new[]
+                        { "Planned", "Open", "InProgress", "Completed", "Cancelled" };
+
+                    var statusRows = statuses.Select(status => new object[]
+                    {
+                status,
+                db.Classes.Count(c => c.class_status == status)
+                    }).ToList();
+
+                    AddExcelSheet(package, "TrangThaiLop",
+                        new[] { "Trạng thái", "Số lớp" }, statusRows);
+
+                    // 5. Trình độ học viên đang hoạt động
+                    var levels = new[]
+                    {
+                "Beginner", "Elementary", "Intermediate",
+                "UpperIntermediate", "Advanced", "IELTS", "TOEIC"
+            };
+
+                    var levelRows = levels.Select(level => new object[]
+                    {
+                level,
+                db.Student_Profile.Count(s =>
+                    s.current_level == level
+                    && s.student_status == "Active")
+                    }).ToList();
+
+                    AddExcelSheet(package, "TrinhDoHocVien",
+                        new[] { "Trình độ", "Số học viên" }, levelRows);
+
+                    // 6. Danh sách thanh toán đang chờ
+                    var pendingPayments = db.Payments
+                        .AsNoTracking()
+                        .Include(p => p.Enrollment.Student_Profile.User)
+                        .Include(p => p.Enrollment.Class.Course)
+                        .Where(p => p.payment_status == "Pending")
+                        .OrderByDescending(p => p.created_at)
+                        .Take(8)
+                        .ToList();
+
+                    var paymentRows = pendingPayments.Select(p => new object[]
+                    {
+                p.payment_id,
+                p.Enrollment?.Student_Profile?.User?.full_name ?? "-",
+                p.Enrollment?.Class?.Course?.course_name ?? "-",
+                p.amount,
+                p.payment_date
+                    }).ToList();
+
+                    AddExcelSheet(package, "ThanhToanCho",
+                        new[] { "Mã thanh toán", "Học viên", "Khóa học",
+                    "Số tiền", "Ngày thanh toán" }, paymentRows);
+
+                    // Dữ liệu lớp dùng cho 2 sheet tiếp theo
+                    var classRows = db.Classes
+                        .AsNoTracking()
+                        .Include(c => c.Course)
+                        .Include(c => c.Room)
+                        .Include(c => c.Teacher_profile.Staff_Profile.User)
+                        .Where(c => c.class_status == "Open" && c.start_date >= today)
+                        .OrderBy(c => c.start_date)
+                        .Take(12)
+                        .ToList();
+
+                    var classIds = classRows.Select(c => c.class_id).ToList();
+
+                    var enrollmentCounts = db.Enrollments
+                        .Where(e => classIds.Contains(e.class_id)
+                            && ActiveEnrollmentStatuses.Contains(e.enrollment_status))
+                        .GroupBy(e => e.class_id)
+                        .Select(g => new { ClassId = g.Key, Count = g.Count() })
+                        .ToDictionary(x => x.ClassId, x => x.Count);
+
+                    // 7. Lớp sắp diễn ra
+                    var upcomingRows = classRows
+                        .Take(8)
+                        .Select(c =>
+                        {
+                            var enrolled = enrollmentCounts.ContainsKey(c.class_id)
+                                ? enrollmentCounts[c.class_id] : 0;
+
+                            var capacity = c.Room == null
+                                ? c.class_capacity
+                                : Math.Min(c.class_capacity, c.Room.max_capacity);
+
+                            return new object[]
+                            {
+                        c.class_id,
+                        c.class_code,
+                        c.Course?.course_name ?? "-",
+                        c.Teacher_profile?.Staff_Profile?.User?.full_name
+                            ?? "Chưa phân công",
+                        c.Room?.room_name ?? "Chưa xếp phòng",
+                        c.start_date,
+                        enrolled,
+                        capacity,
+                        Math.Max(0, capacity - enrolled)
+                            };
+                        }).ToList();
+
+                    AddExcelSheet(package, "LopSapDienRa",
+                        new[] { "Mã lớp", "Tên/mã lớp", "Khóa học", "Giáo viên",
+                    "Phòng", "Ngày bắt đầu", "Số học viên", "Sức chứa",
+                    "Chỗ còn lại" }, upcomingRows);
+
+                    // 8. Lớp gần đầy (tỷ lệ từ 80%)
+                    var nearlyFullRows = classRows
+                        .Select(c =>
+                        {
+                            var enrolled = enrollmentCounts.ContainsKey(c.class_id)
+                                ? enrollmentCounts[c.class_id] : 0;
+
+                            var capacity = c.Room == null
+                                ? c.class_capacity
+                                : Math.Min(c.class_capacity, c.Room.max_capacity);
+
+                            var occupancy = capacity <= 0
+                                ? 0m : enrolled * 100m / capacity;
+
+                            return new
+                            {
+                                c.class_id,
+                                c.class_code,
+                                CourseName = c.Course?.course_name ?? "-",
+                                Enrolled = enrolled,
+                                Capacity = capacity,
+                                Occupancy = occupancy
+                            };
+                        })
+                        .Where(c => c.Occupancy >= 80m)
+                        .OrderByDescending(c => c.Occupancy)
+                        .Take(8)
+                        .Select(c => new object[]
+                        {
+                    c.class_id,
+                    c.class_code,
+                    c.CourseName,
+                    c.Enrolled,
+                    c.Capacity,
+                    Math.Round(c.Occupancy, 2)
+                        }).ToList();
+
+                    AddExcelSheet(package, "LopGanDay",
+                        new[] { "Mã lớp", "Tên/mã lớp", "Khóa học",
+                    "Số học viên", "Sức chứa", "Tỷ lệ lấp đầy (%)" },
+                        nearlyFullRows);
+
+                    var fileBytes = package.GetAsByteArray();
+
+                    return File(
+                        fileBytes,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "Dashboard_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xlsx"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("DashboardController.ExportExcel failed: {0}", ex);
+                return Content("Xuất Excel thất bại: " + ex.Message);
+            }
+        }
+
+        private static void AddExcelSheet(
+            ExcelPackage package,
+            string sheetName,
+            string[] headers,
+            IEnumerable<object[]> rows)
+        {
+            var worksheet = package.Workbook.Worksheets.Add(sheetName);
+
+            worksheet.Cells[1, 1].LoadFromArrays(
+                new[] { headers.Cast<object>().ToArray() }.Concat(rows)
+            );
+
+            using (var header = worksheet.Cells[1, 1, 1, headers.Length])
+            {
+                header.Style.Font.Bold = true;
+                header.Style.Font.Color.SetColor(Color.White);
+                header.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                header.Style.Fill.BackgroundColor.SetColor(Color.DarkGreen);
+            }
+
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            worksheet.View.FreezePanes(2, 1);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //-------------------------------------------------------------------//
 
         /// <summary>
         /// Hiển thị trang chủ với số liệu và lịch thật của giáo viên đang đăng nhập.

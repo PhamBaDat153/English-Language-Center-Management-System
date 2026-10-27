@@ -18,6 +18,9 @@ namespace Source
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            OfficeOpenXml.ExcelPackage.License.SetNonCommercialPersonal("Nguyen Huynh Gia Bao");
+
         }
     }
 }

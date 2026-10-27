@@ -15,85 +15,107 @@ namespace Source.Controllers
         // GET: PaymentManage
         public ActionResult Index(string search, string statusFilter, int page = 1)
         {
-            var query = db.Payments.AsQueryable();
-
-            // Lọc theo từ khóa (Tên học viên, Email, Mã hóa đơn, Tên khóa học)
-            if (!string.IsNullOrWhiteSpace(search))
+            try
             {
-                string searchLower = search.Trim().ToLower();
-                query = query.Where(p =>
-                    (p.Enrollment != null &&
-                     p.Enrollment.Student_Profile != null &&
-                     p.Enrollment.Student_Profile.User != null &&
-                     p.Enrollment.Student_Profile.User.full_name != null &&
-                     p.Enrollment.Student_Profile.User.full_name.ToLower().Contains(searchLower)) ||
-                    (p.Enrollment != null &&
-                     p.Enrollment.Student_Profile != null &&
-                     p.Enrollment.Student_Profile.User != null &&
-                     p.Enrollment.Student_Profile.User.email != null &&
-                     p.Enrollment.Student_Profile.User.email.ToLower().Contains(searchLower)) ||
-                    (p.Enrollment != null &&
-                     p.Enrollment.Class != null &&
-                     p.Enrollment.Class.Course != null &&
-                     p.Enrollment.Class.Course.course_name != null &&
-                     p.Enrollment.Class.Course.course_name.ToLower().Contains(searchLower)) ||
-                    p.payment_id.ToString().ToLower().Contains(searchLower));
-            }
+                var query = db.Payments.AsQueryable();
 
-            // Lọc theo trạng thái thanh toán
-            if (!string.IsNullOrWhiteSpace(statusFilter))
+                // Lọc theo từ khóa (Tên học viên, Email, Mã hóa đơn, Tên khóa học)
+                if (!string.IsNullOrWhiteSpace(search))
+                {
+                    string searchLower = search.Trim().ToLower();
+                    query = query.Where(p =>
+                        (p.Enrollment != null &&
+                         p.Enrollment.Student_Profile != null &&
+                         p.Enrollment.Student_Profile.User != null &&
+                         p.Enrollment.Student_Profile.User.full_name != null &&
+                         p.Enrollment.Student_Profile.User.full_name.ToLower().Contains(searchLower)) ||
+                        (p.Enrollment != null &&
+                         p.Enrollment.Student_Profile != null &&
+                         p.Enrollment.Student_Profile.User != null &&
+                         p.Enrollment.Student_Profile.User.email != null &&
+                         p.Enrollment.Student_Profile.User.email.ToLower().Contains(searchLower)) ||
+                        (p.Enrollment != null &&
+                         p.Enrollment.Class != null &&
+                         p.Enrollment.Class.Course != null &&
+                         p.Enrollment.Class.Course.course_name != null &&
+                         p.Enrollment.Class.Course.course_name.ToLower().Contains(searchLower)) ||
+                        p.payment_id.ToString().ToLower().Contains(searchLower));
+                }
+
+                // Lọc theo trạng thái thanh toán
+                if (!string.IsNullOrWhiteSpace(statusFilter))
+                {
+                    query = query.Where(p => p.payment_status == statusFilter);
+                }
+
+                // Thống kê toàn bộ hóa đơn
+                ViewBag.TotalPayments = db.Payments.Count();
+                ViewBag.PendingPayments = db.Payments.Count(
+                    p => p.payment_status == "Pending");
+                ViewBag.CompletedPayments = db.Payments.Count(
+                    p => p.payment_status == "Completed");
+                ViewBag.CancelledPayments = db.Payments.Count(
+                    p => p.payment_status == "Cancelled");
+
+                // Giữ lại điều kiện tìm kiếm trên giao diện
+                ViewBag.Search = search;
+                ViewBag.StatusFilter = statusFilter;
+
+                // Phân trang
+                int pageSize = 10;
+                int totalPayments = query.Count();
+                int totalPages = (int)Math.Ceiling(
+                    (double)totalPayments / pageSize);
+
+                if (page < 1) page = 1;
+                if (totalPages > 0 && page > totalPages)
+                    page = totalPages;
+
+                ViewBag.CurrentPage = page;
+                ViewBag.TotalPages = totalPages;
+                ViewBag.FilteredCount = totalPayments;
+                ViewBag.PageSize = pageSize;
+
+                var payments = query
+                    .OrderByDescending(p => p.created_at)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                return View(payments);
+            }
+            catch (Exception)
             {
-                query = query.Where(p => p.payment_status == statusFilter);
+                return RedirectToAction("ServerError", "Error");
             }
-
-            // Thống kê toàn bộ hóa đơn
-            ViewBag.TotalPayments = db.Payments.Count();
-            ViewBag.PendingPayments = db.Payments.Count(p => p.payment_status == "Pending");
-            ViewBag.CompletedPayments = db.Payments.Count(p => p.payment_status == "Completed");
-            ViewBag.CancelledPayments = db.Payments.Count(p => p.payment_status == "Cancelled");
-
-            // Giữ lại điều kiện tìm kiếm trên giao diện
-            ViewBag.Search = search;
-            ViewBag.StatusFilter = statusFilter;
-
-            // Phân trang
-            int pageSize = 10;
-            int totalPayments = query.Count();
-            int totalPages = (int)Math.Ceiling((double)totalPayments / pageSize);
-
-            if (page < 1) page = 1;
-            if (totalPages > 0 && page > totalPages) page = totalPages;
-
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = totalPages;
-            ViewBag.FilteredCount = totalPayments;
-            ViewBag.PageSize = pageSize;
-
-            var payments = query
-                .OrderByDescending(p => p.created_at)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            return View(payments);
         }
 
         // GET: PaymentManage/Details/5
         public ActionResult Details(Guid? id)
         {
-            if (id == null)
+            try
             {
-                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+                if (id == null)
+                {
+                    return new HttpStatusCodeResult(
+                        System.Net.HttpStatusCode.BadRequest);
+                }
+
+                var payment = db.Payments.FirstOrDefault(
+                    p => p.payment_id == id.Value);
+
+                if (payment == null)
+                {
+                    return HttpNotFound(
+                        "Không tìm thấy thông tin hóa đơn thanh toán.");
+                }
+
+                return View(payment);
             }
-
-            var payment = db.Payments.FirstOrDefault(p => p.payment_id == id.Value);
-
-            if (payment == null)
+            catch (Exception)
             {
-                return HttpNotFound("Không tìm thấy thông tin hóa đơn thanh toán.");
+                return RedirectToAction("ServerError", "Error");
             }
-
-            return View(payment);
         }
 
         // POST: PaymentManage/Approve
@@ -103,11 +125,14 @@ namespace Source.Controllers
         {
             try
             {
-                var payment = db.Payments.FirstOrDefault(p => p.payment_id == paymentId);
+                var payment = db.Payments.FirstOrDefault(
+                    p => p.payment_id == paymentId);
 
                 if (payment == null)
                 {
-                    TempData["ErrorMessage"] = "Không tìm thấy hóa đơn cần duyệt.";
+                    TempData["ErrorMessage"] =
+                        "Không tìm thấy hóa đơn cần duyệt.";
+
                     return RedirectToAction("Index");
                 }
 
@@ -123,11 +148,13 @@ namespace Source.Controllers
                 }
 
                 db.SaveChanges();
-                TempData["SuccessMessage"] = "Đã xác nhận thanh toán thành công.";
+
+                TempData["SuccessMessage"] =
+                    "Đã xác nhận thanh toán thành công.";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                TempData["ErrorMessage"] = "Lỗi khi duyệt thanh toán: " + ex.GetBaseException().Message;
+                return RedirectToAction("ServerError", "Error");
             }
 
             return RedirectToAction("Index");
@@ -138,16 +165,19 @@ namespace Source.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete(Guid paymentId)
         {
-            var payment = db.Payments.FirstOrDefault(p => p.payment_id == paymentId);
-
-            if (payment == null)
-            {
-                TempData["ErrorMessage"] = "Không tìm thấy hóa đơn cần xóa.";
-                return RedirectToAction("Index");
-            }
-
             try
             {
+                var payment = db.Payments.FirstOrDefault(
+                    p => p.payment_id == paymentId);
+
+                if (payment == null)
+                {
+                    TempData["ErrorMessage"] =
+                        "Không tìm thấy hóa đơn cần xóa.";
+
+                    return RedirectToAction("Index");
+                }
+
                 var enrollment = payment.Enrollment;
 
                 // Xóa bản ghi Payment
@@ -160,11 +190,13 @@ namespace Source.Controllers
                 }
 
                 db.SaveChanges();
-                TempData["SuccessMessage"] = "Đã xóa hoàn toàn hóa đơn khỏi hệ thống.";
+
+                TempData["SuccessMessage"] =
+                    "Đã xóa hoàn toàn hóa đơn khỏi hệ thống.";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                TempData["ErrorMessage"] = "Không thể xóa hóa đơn: " + ex.GetBaseException().Message;
+                return RedirectToAction("ServerError", "Error");
             }
 
             return RedirectToAction("Index");
@@ -176,6 +208,7 @@ namespace Source.Controllers
             {
                 db.Dispose();
             }
+
             base.Dispose(disposing);
         }
     }
