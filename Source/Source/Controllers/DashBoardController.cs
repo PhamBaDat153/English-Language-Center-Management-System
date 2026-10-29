@@ -20,16 +20,19 @@ namespace Source.Controllers
         private readonly NewGen_english_center_dbEntities db =
             new NewGen_english_center_dbEntities();
 
+        // Dùng chung để xác định học viên đang giữ chỗ/đang học trong sĩ số và điểm danh.
         private static readonly string[] ActiveEnrollmentStatuses =
         {
             "Pending", "Confirmed", "Studying"
         };
 
+        // Bao gồm học viên đã hoàn thành để vẫn tra cứu được bảng điểm sau khi lớp kết thúc.
         private static readonly string[] GradeEnrollmentStatuses =
         {
             "Pending", "Confirmed", "Studying", "Completed"
         };
 
+        // Các trạng thái lớp được xem là còn liên quan tới công việc giảng dạy.
         private static readonly string[] TeachingClassStatuses =
         {
             "Planned", "Open", "InProgress"
@@ -525,6 +528,7 @@ namespace Source.Controllers
                 var teacherId = GetCurrentTeacherId();
                 if (!teacherId.HasValue) return new HttpUnauthorizedResult();
 
+                // Tính phạm vi tuần từ thứ Hai tới trước thứ Hai tuần sau để tránh tính trùng ngày cuối.
                 var classItems = GetTeacherClasses(teacherId.Value, true);
                 var weekStart = DateTime.Today.AddDays(-(((int)DateTime.Today.DayOfWeek + 6) % 7));
                 var weekEnd = weekStart.AddDays(7);
@@ -533,6 +537,7 @@ namespace Source.Controllers
                 var weeklySchedules = GetTeacherWeeklySchedules(teacherId.Value);
                 var latestAssessments = GetTeacherAssessments(teacherId.Value);
                 var activeStudentCount = classItems.Sum(c => c.StudentCount);
+                // Buổi đã diễn ra nhưng số bản ghi điểm danh còn ít hơn sĩ số được tính là cần xử lý.
                 var pendingAttendance = thisWeekSessions.Count(s =>
                     s.SessionDate <= DateTime.Now && s.AttendanceCount < s.StudentCount);
 
@@ -573,6 +578,7 @@ namespace Source.Controllers
 
                 var classes = GetTeacherClasses(teacherId.Value, true)
                     .Where(c => Matches(search, c.ClassCode, c.CourseName, c.CourseCode, c.RoomName)).ToList();
+                // Lọc danh sách trước khi phân trang để tổng trang phản ánh đúng kết quả tìm kiếm.
                 SetPagination(classes.Count, page);
                 return View("~/Views/DashBoard/TeacherClasses.cshtml", new TeacherClassesViewModel
                 {
@@ -597,12 +603,14 @@ namespace Source.Controllers
                 if (!teacherId.HasValue) return new HttpUnauthorizedResult();
                 if (!id.HasValue) return new HttpStatusCodeResult(400);
 
+                // Ràng buộc teacher_id ngay trong truy vấn để giáo viên không mở roster lớp của người khác.
                 var classItem = db.Classes
                     .Include(c => c.Course)
                     .Include(c => c.Room)
                     .SingleOrDefault(c => c.class_id == id.Value && c.teacher_id == teacherId.Value);
                 if (classItem == null) return HttpNotFound();
 
+                // Chỉ lấy đăng ký còn hiệu lực theo quy ước ActiveEnrollmentStatuses phía trên.
                 var enrollments = db.Enrollments
                     .Include(e => e.Student_Profile.User)
                     .Where(e => e.class_id == classItem.class_id && ActiveEnrollmentStatuses.Contains(e.enrollment_status))
@@ -643,6 +651,7 @@ namespace Source.Controllers
                 var teacherId = GetCurrentTeacherId();
                 if (!teacherId.HasValue) return new HttpUnauthorizedResult();
 
+                // Lịch tuần là mẫu lặp; Sessions là từng buổi cụ thể và là danh sách được phân trang.
                 var sessions = GetTeacherSessions(teacherId.Value, null, null)
                     .Where(s => Matches(search, s.ClassCode, s.CourseName, s.RoomName, s.Topic, s.TimeSlotName)).ToList();
                 var schedules = GetTeacherWeeklySchedules(teacherId.Value)
@@ -681,6 +690,7 @@ namespace Source.Controllers
 
                 if (assessmentId.HasValue)
                 {
+                    // Không dựa vào assessmentId từ URL đơn thuần; xác minh bài thuộc lớp giáo viên phụ trách.
                     var assessment = db.Assessments
                         .Include(a => a.Class)
                         .SingleOrDefault(a => a.assessment_id == assessmentId.Value &&
@@ -710,6 +720,7 @@ namespace Source.Controllers
                 var teacherId = GetCurrentTeacherId();
                 if (!teacherId.HasValue) return new HttpUnauthorizedResult();
 
+                // Xác minh lại quyền sở hữu bài đánh giá ở POST vì request có thể bị sửa ngoài giao diện.
                 var assessment = db.Assessments
                     .Include(a => a.Class)
                     .SingleOrDefault(a => a.assessment_id == model.assessment_id &&
@@ -722,6 +733,7 @@ namespace Source.Controllers
 
                 var submittedStudents = model.Students ?? new List<AssessmentGradeStudentViewModel>();
                 var submittedIds = submittedStudents.Select(s => s.enrollment_id).ToList();
+                // Lấy roster hợp lệ từ database để đối chiếu toàn bộ ID gửi lên từ form.
                 var activeIds = db.Enrollments
                     .Where(e => e.class_id == assessment.class_id &&
                                 GradeEnrollmentStatuses.Contains(e.enrollment_status))
@@ -774,6 +786,7 @@ namespace Source.Controllers
                     .ToList();
                 foreach (var student in submittedStudents)
                 {
+                    // Có điểm thì thêm mới hoặc cập nhật; để trống thì không ghi đè điểm đã lưu.
                     // Empty score leaves the current record unchanged; a score can be edited repeatedly.
                     if (!student.score.HasValue) continue;
 
@@ -840,6 +853,7 @@ namespace Source.Controllers
                 if (!teacherId.HasValue) return new HttpUnauthorizedResult();
                 if (!sessionId.HasValue) return new HttpStatusCodeResult(400);
 
+                // Chỉ tạo bảng điểm danh sau khi xác nhận buổi học thuộc giáo viên đang đăng nhập.
                 var session = db.ClassSessions
                     .Include(s => s.Class)
                     .Include(s => s.TimeSlot)
@@ -875,6 +889,7 @@ namespace Source.Controllers
                 if (session == null) return HttpNotFound();
 
                 var students = model.Students ?? new List<ClassAttendanceStudentViewModel>();
+                // Server tự lấy danh sách học viên của lớp để phát hiện ID giả, thiếu hoặc bị lặp.
                 var activeEnrollments = db.Enrollments
                     .Where(e => e.class_id == session.class_id && ActiveEnrollmentStatuses.Contains(e.enrollment_status))
                     .Select(e => e.enrollment_id).ToList();
@@ -943,6 +958,7 @@ namespace Source.Controllers
 
         private Guid? GetCurrentUserId()
         {
+            // Claim NameIdentifier là ID người dùng đăng nhập; teacher_id không nhận từ trình duyệt.
             var identity = User.Identity as ClaimsIdentity;
             Guid userId;
             return identity != null && Guid.TryParse(
@@ -955,6 +971,7 @@ namespace Source.Controllers
             var userId = GetCurrentUserId();
             if (!userId.HasValue) return null;
 
+            // Ánh xạ tài khoản theo quan hệ User -> Staff_Profile -> Teacher_profile.
             var teacher = db.Teacher_profile
                 .Where(t => t.Staff_Profile.user_id == userId.Value)
                 .Select(t => new { Id = t.teacher_id, Name = t.Staff_Profile.User.full_name })
@@ -968,6 +985,7 @@ namespace Source.Controllers
 
         private List<TeacherClassItemViewModel> GetTeacherClasses(Guid teacherId, bool onlyTeachingStatuses)
         {
+            // Mọi danh sách lớp giáo viên đều bắt đầu từ teacher_id đã xác thực.
             var query = db.Classes
                 .Include(c => c.Course)
                 .Include(c => c.Room)
@@ -1038,6 +1056,7 @@ namespace Source.Controllers
 
         private List<TeacherRecurringScheduleItemViewModel> GetTeacherWeeklySchedules(Guid teacherId)
         {
+            // ClassSchedule lưu lịch lặp theo thứ; buổi học có ngày cụ thể nằm trong ClassSession.
             var classIds = db.Classes.Where(c => c.teacher_id == teacherId)
                 .Select(c => c.class_id).ToList();
             return db.ClassSchedules
@@ -1067,6 +1086,7 @@ namespace Source.Controllers
 
         private List<TeacherSessionItemViewModel> GetTeacherSessions(Guid teacherId, DateTime? from, DateTime? to)
         {
+            // Có thể giới hạn khoảng ngày cho dashboard; null/null trả về toàn bộ buổi của giáo viên.
             var query = db.ClassSessions
                 .Include(s => s.Class.Course)
                 .Include(s => s.Class.Room)
@@ -1084,6 +1104,7 @@ namespace Source.Controllers
                 .GroupBy(e => e.class_id)
                 .Select(g => new { ClassId = g.Key, Count = g.Count() })
                 .ToDictionary(g => g.ClassId, g => g.Count);
+            // Đếm bản ghi điểm danh gắn với các đăng ký còn hiệu lực để so với sĩ số lớp.
             var attendanceCounts = db.AttendanceRecords
                 .Where(a => sessionIds.Contains(a.session_id) &&
                             ActiveEnrollmentStatuses.Contains(a.Enrollment.enrollment_status))
@@ -1111,6 +1132,7 @@ namespace Source.Controllers
 
         private List<TeacherAssessmentItemViewModel> GetTeacherAssessments(Guid teacherId)
         {
+            // Chỉ lấy bài đánh giá từ các lớp của giáo viên; loại lớp đã hủy khỏi danh sách.
             return db.Assessments
                 .Include(a => a.Class.Course)
                 .Include(a => a.Class.Enrollments)
@@ -1142,6 +1164,7 @@ namespace Source.Controllers
 
         private AssessmentGradeViewModel BuildGradeViewModel(Assessment assessment)
         {
+            // Dựng bảng điểm từ roster đủ điều kiện và ghép điểm đã lưu theo enrollment_id.
             var enrollments = db.Enrollments
                 .Include(e => e.Student_Profile.User)
                 .Where(e => e.class_id == assessment.class_id && GradeEnrollmentStatuses.Contains(e.enrollment_status))
@@ -1179,6 +1202,7 @@ namespace Source.Controllers
             ClassSession session,
             IList<ClassAttendanceStudentViewModel> submitted = null)
         {
+            // Nạp trạng thái điểm danh cũ để giáo viên có thể xem và cập nhật lại.
             var enrollments = db.Enrollments
                 .Include(e => e.Student_Profile.User)
                 .Where(e => e.class_id == session.class_id && ActiveEnrollmentStatuses.Contains(e.enrollment_status))
